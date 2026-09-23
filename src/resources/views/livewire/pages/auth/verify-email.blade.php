@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Actions\Logout;
+use App\Modules\Auth\Actions\Logout;
 use App\Modules\Auth\Actions\SendVerificationEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;

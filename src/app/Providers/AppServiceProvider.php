@@ -21,9 +21,5 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(User::class, UserPolicy::class);
         Livewire::setUpdateRoute(fn ($handle) => Route::post('/livewire/update', $handle)
             ->middleware(['web', 'throttle:60,1']));
-
-        foreach (glob(app_path('Modules/*/migrations'), GLOB_ONLYDIR) ?: [] as $path) {
-            $this->loadMigrationsFrom($path);
-        }
     }
 }

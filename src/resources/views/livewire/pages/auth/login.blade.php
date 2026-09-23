@@ -1,6 +1,8 @@
 <?php
 
-use App\Livewire\Forms\LoginForm;
+declare(strict_types=1);
+
+use App\Modules\Auth\Http\Forms\LoginForm;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;

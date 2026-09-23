@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Livewire\Actions\Logout;
+use App\Modules\Auth\Actions\Logout;
+use App\Modules\Users\Actions\DeleteUser;
 use Illuminate\Support\Facades\Auth;
-use Livewire\Volt\Component;
 use Livewire\Attributes\Validate;
+use Livewire\Volt\Component;
 
 new class extends Component
 {
@@ -15,12 +16,13 @@ new class extends Component
     /**
      * Delete the currently authenticated user.
      */
-    public function deleteUser(Logout $logout): void
+    public function deleteUser(DeleteUser $delete, Logout $logout): void
     {
         $this->authorize('delete', Auth::user());
         $this->validate();
 
-        tap(Auth::user(), $logout(...))->delete();
+        $delete->handle(Auth::user());
+        $logout();
 
         $this->redirect('/', navigate: true);
     }

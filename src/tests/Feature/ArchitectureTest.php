@@ -2,22 +2,18 @@
 
 declare(strict_types=1);
 
-test('modules do not reference another modules eloquent models', function (): void {
-    $directories = glob(app_path('Modules/*'), GLOB_ONLYDIR) ?: [];
-    expect($directories)->not->toBeEmpty();
+$modules = array_map('basename', glob(dirname(__DIR__, 2).'/app/Modules/*', GLOB_ONLYDIR) ?: []);
 
-    foreach ($directories as $directory) {
-        $module = basename($directory);
-        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
-
-        foreach ($files as $file) {
-            if ($file->isFile() && $file->getExtension() === 'php') {
-                preg_match_all('/App\\\\Modules\\\\(\w+)\\\\Models\\\\/', file_get_contents($file->getPathname()), $matches);
-
-                foreach ($matches[1] as $referencedModule) {
-                    expect($referencedModule, $file->getPathname())->toBe($module);
-                }
-            }
-        }
+foreach ($modules as $module) {
+    foreach (array_diff($modules, [$module]) as $other) {
+        arch($module.' cannot import '.$other.' internals')
+            ->expect('App\\Modules\\'.$module)
+            ->not->toUse(array_map(
+                fn (string $layer): string => 'App\\Modules\\'.$other.'\\'.$layer,
+                ['Models', 'Actions', 'Http', 'Jobs', 'Listeners', 'Policies'],
+            ));
     }
-});
+}
+
+arch('module classes use strict types')
+    ->expect('App\\Modules')->toUseStrictTypes();

@@ -73,7 +73,7 @@ This implements the Phase 0 foundation. CoC linking, public player profiles, bas
 
 **Add later, only when you build that feature** (copy the block from `.env.docker.example` and fill real values):
 
-- **R2 object storage** — `FILESYSTEM_DISK=r2`, `AWS_*`, `AWS_ENDPOINT`. Needed at **Phase 3 (media uploads)**. Until then leave `FILESYSTEM_DISK=local`; switching to `r2` before the disk is configured in `config/filesystems.php` breaks uploads.
+- **R2 object storage** — the `r2` disk and S3 adapter are configured. Set `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`, `AWS_ENDPOINT` (your R2 S3 endpoint), `AWS_DEFAULT_REGION=auto`, and optionally `AWS_URL` (cookieless public CDN). Keep `FILESYSTEM_DISK=local` until credentials are available; choose `r2` for media. Pending/private objects use expiring signed URLs. Public CDN URLs are reserved for approved public media; uploads and processing arrive in Phase 3.
 - **Clash of Clans API** — `COC_API_TOKEN`, `COC_API_BASE_URL`. Needed at **Phase 1 (CoC integration)**; use your IP-bound key.
 
 **Recreating `src/.env` from scratch:**

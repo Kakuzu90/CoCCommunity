@@ -58,3 +58,11 @@ Each module:
 - **Boundaries:** a module owns its tables/migrations; others read via its Service/read-model.
 - **Events over calls:** `AccountVerified`, `BaseLiked`, `ReportFiled` decouple side effects.
 - **Enforcement:** an architecture test (deptrac/pest) fails the build on illegal cross-module references.
+
+### Implementation conventions
+
+- `ModuleServiceProvider` loads existing module migrations and `routes.php` files. Module routes receive the `web` middleware group and support Laravel's route cache. Laravel discovers typed event listeners in `app/Modules/*/Listeners`; event caching is supported.
+- Create module directories when they contain working code. The module list above defines ownership, not a requirement for empty scaffolding. Blade templates stay under `resources/views` so Breeze/Volt names remain stable; PHP controllers and form classes live in their owning module.
+- `App\Models\User` remains the shared Laravel authentication identity for Breeze, policies, and account settings. This is the sole shared Eloquent exception, preserving the existing auth provider and Spatie polymorphic role assignments. Auth owns the identity/session/reset-token migrations; Users owns profile data and account lifecycle actions. New domain models must stay inside their owning module and cannot be imported by other modules.
+- `UserDeleted` carries only the user ID and email. Auth handles it synchronously to revoke sessions and password-reset tokens in the deletion transaction. Future queued side effects run after commit (`queue.connections.database.after_commit=true`).
+- PostgreSQL is the application default; SQLite is retained for isolated tests. Cache, sessions, and queues use the database driver. R2 uses the S3 adapter with private visibility and throwing writes; public CDN URLs are only for content approved for public access.

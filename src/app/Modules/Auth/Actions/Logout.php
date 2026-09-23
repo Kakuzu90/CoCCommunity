@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Livewire\Actions;
+declare(strict_types=1);
+
+namespace App\Modules\Auth\Actions;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;

@@ -68,6 +68,21 @@ services:
     networks:
       - coc
 
+  # Web DB GUI (the Postgres equivalent of phpMyAdmin). Profile `tools`. UI at http://localhost:8081
+  adminer:
+    image: adminer:latest
+    ports:
+      - "${ADMINER_PORT:-8081}:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+      ADMINER_DESIGN: dracula
+    depends_on:
+      - db
+    networks:
+      - coc
+    profiles:
+      - tools
+
   # Local mail catcher for email verification / password resets. UI at http://localhost:8025
   mailpit:
     image: axllent/mailpit:latest

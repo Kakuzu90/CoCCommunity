@@ -12,6 +12,7 @@ The Laravel app lives in [`src/`](src/). Stack: PHP 8.3-FPM, Nginx, PostgreSQL 1
 | `scheduler` | `schedule:run` each minute | — |
 | `db` | PostgreSQL 16 | localhost:5432 |
 | `mailpit` | Catches outgoing mail | http://localhost:8025 |
+| `adminer` | DB GUI (Postgres, like phpMyAdmin), profile `tools` | http://localhost:8081 |
 | `node` | Vite dev server (profile `assets`) | localhost:5173 |
 
 ## First run
@@ -43,6 +44,7 @@ docker compose logs -f app                 # tail logs
 docker compose exec app php artisan test   # run Pest
 docker compose exec app php artisan tinker
 docker compose --profile assets up node    # Vite dev server for frontend work
+docker compose --profile tools up -d adminer  # DB GUI at http://localhost:8081 (server: db / coc / secret)
 docker compose down                        # stop (add -v to drop the DB volume)
 ```
 

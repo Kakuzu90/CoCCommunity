@@ -28,31 +28,21 @@ new class extends Component
     }
 }; ?>
 
-<section class="space-y-6">
-    <header>
-        <h2 class="text-lg font-display font-bold text-content">
-            {{ __('Delete Account') }}
-        </h2>
-
-        <p class="mt-1 text-sm text-content-muted">
-            {{ __('Deleting your account disables sign-in. Your account record is retained for safety and audit purposes.') }}
-        </p>
-    </header>
-
+<section>
     <x-danger-button
         x-data=""
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
-    >{{ __('Delete Account') }}</x-danger-button>
+    >{{ __('Abandon village') }}</x-danger-button>
 
     <x-modal name="confirm-user-deletion" :show="$errors->isNotEmpty()" focusable>
         <form wire:submit="deleteUser" class="p-6">
 
             <h2 class="text-lg font-display font-bold text-content">
-                {{ __('Are you sure you want to delete your account?') }}
+                {{ __('Abandon your village?') }}
             </h2>
 
             <p class="mt-1 text-sm text-content-muted">
-                {{ __('Please enter your password to confirm that you want to delete your account and disable sign-in.') }}
+                {{ __('This deletes your account and disables sign-in. Enter your password to confirm.') }}
             </p>
 
             <div class="mt-6">
@@ -76,7 +66,7 @@ new class extends Component
                 </x-secondary-button>
 
                 <x-danger-button class="ms-3">
-                    {{ __('Delete Account') }}
+                    {{ __('Abandon village') }}
                 </x-danger-button>
             </div>
         </form>

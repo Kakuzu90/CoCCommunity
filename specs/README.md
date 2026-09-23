@@ -22,6 +22,7 @@ Load in this order — each builds on the previous. For agentic coding, load `RE
 | 10 | [10-infrastructure.md](10-infrastructure.md) | Ongoing — jobs, caching, scaling | 02, 03 |
 | 11 | [11-phases-risks-edgecases.md](11-phases-risks-edgecases.md) | Planning each phase | all |
 | 12 | [12-design-system.md](12-design-system.md) | Any UI work (Phase 3+) — palette, fonts, tokens | 01 |
+| 13 | [13-social-sharing.md](13-social-sharing.md) | Public share pages (bases/profiles) — OG previews | 03, 05, 12 |
 
 ## MVP = Phases 0–4
 Verified accounts + public profiles + base sharing (images) + reports/moderation. Everything else is deferred — see [11-phases-risks-edgecases.md](11-phases-risks-edgecases.md).

@@ -40,6 +40,11 @@ Do not ship a view that only handles the happy path:
 - Debounce live inputs (`wire:model.live.debounce.300ms`) — don't fire a round-trip per keystroke.
 - Confirm destructive actions (delete base, unlink account, ban) before running them.
 
+## Sharing
+
+- Public bases, profiles, and recruitment posts get a **"Copy share link"** action (copies the canonical URL). Copy uses `navigator.clipboard.writeText` inside the click handler; on rejection, fall back to selecting the text. Track the copy for analytics.
+- Public share pages must output Open Graph meta so the link renders a card on Facebook/X/Discord — set them server-side per page; see [`specs/13-social-sharing.md`](../../../specs/13-social-sharing.md). Private/unlisted pages emit no OG data.
+
 ## Media in the UI
 
 - Render images from the CDN/signed URLs the `media` records provide (see [`specs/05-media-storage.md`](../../../specs/05-media-storage.md)). Never build storage paths by hand in Blade.

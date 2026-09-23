@@ -59,3 +59,15 @@ erDiagram
 ```
 
 `COC_ACCOUNT` is the hub — verification, snapshots, clan membership, and bases hang off it, which is why `tag` uniqueness is the platform's integrity anchor.
+
+## Implementation details
+
+- Laravel's existing `users.password` holds the password hash; it is not duplicated as `password_hash`. Spatie retains `guard_name`, `model_has_roles`, `model_has_permissions`, and `role_has_permissions`, with its native composite keys. Existing framework tables are exempt from the generic ID/timestamp convention above.
+- `users.status` starts as `active` and is cast to `UserStatus` (`active`, `suspended`, `banned`). Enforcement and transitions belong to moderation/auth workflows; adding the column does not expose a suspension endpoint.
+- User status, account state, and report status have database checks matching their backed enums. Account state includes `needs_reverify` for the invalid-tag failure mode in spec 04. Report status follows spec 07's `open`, `assigned`, `resolved`, and `dismissed` lifecycle.
+- Domain tables use module-owned migrations, JSONB for structured data, integer counters/amounts, explicit foreign keys, and timestamps. Account tags remain unique even after soft deletion. Profile privacy must be supplied explicitly rather than defaulting to public. Status columns without a lifecycle defined in the domain spec have no inferred default or database enum; the owning feature must define its backed enum before implementing transitions.
+- `coc_account_media` links accounts to media with unique `(coc_account_id, media_id)` and `(coc_account_id, position)`. `conversation_participants` links conversations to users with unique `(conversation_id, user_id)`. These complete relationships already described above but missing from the table list. Both include IDs and timestamps.
+- Base layouts also store `description` and integer `copy_click_count`, required by spec 01. `tags.name` is unique. Base media associations reserve unique positions and prohibit attaching the same media twice to one base.
+- Hard deletion is restricted for content owners, claims, orders, reviews, and audit/moderation actors so history is not silently lost. Soft deletion retains those references. Pure child/association rows cascade with their parent; optional featured-account and parent-comment references become null. Polymorphic targets have compound indexes but cannot have database foreign keys across several tables.
+- `notifications` follows this spec's `user_id`/JSONB schema, not Laravel's polymorphic database-notification schema. Its in-app delivery adapter belongs to the Notifications implementation; do not use Laravel's default database notification channel against this table.
+- Marketplace `price` and `amount` are integer metadata; `escrow_state` is nullable and has no payment/custody behavior. Marketplace, messaging, and recruitment tables do not enable their deferred features. Currency, rating limits, and unspecified status transitions remain decisions for their owning feature specs.

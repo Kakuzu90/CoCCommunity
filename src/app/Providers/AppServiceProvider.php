@@ -1,24 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
+use App\Models\User;
+use App\Modules\Users\Policies\UserPolicy;
+use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        //
-    }
-
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        //
+        Date::use(CarbonImmutable::class);
+        Gate::policy(User::class, UserPolicy::class);
+        Livewire::setUpdateRoute(fn ($handle) => Route::post('/livewire/update', $handle)
+            ->middleware(['web', 'throttle:60,1']));
     }
 }

@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use App\Modules\Auth\Actions\UpdatePassword;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Livewire\Volt\Component;
@@ -12,25 +14,26 @@ new class extends Component
     public string $password = '';
     public string $password_confirmation = '';
 
-    /**
-     * Update the password for the currently authenticated user.
-     */
-    public function updatePassword(): void
+    protected function rules(): array
     {
+        return [
+            'current_password' => ['required', 'string', 'current_password'],
+            'password' => ['required', 'string', Password::defaults(), 'confirmed'],
+        ];
+    }
+
+    public function updatePassword(UpdatePassword $update): void
+    {
+        $this->authorize('update', Auth::user());
         try {
-            $validated = $this->validate([
-                'current_password' => ['required', 'string', 'current_password'],
-                'password' => ['required', 'string', Password::defaults(), 'confirmed'],
-            ]);
+            $validated = $this->validate();
         } catch (ValidationException $e) {
             $this->reset('current_password', 'password', 'password_confirmation');
 
             throw $e;
         }
 
-        Auth::user()->update([
-            'password' => Hash::make($validated['password']),
-        ]);
+        $update->handle(Auth::user(), $validated['password']);
 
         $this->reset('current_password', 'password', 'password_confirmation');
 

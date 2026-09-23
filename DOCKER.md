@@ -12,6 +12,7 @@ The Laravel app lives in [`src/`](src/). Stack: PHP 8.3-FPM, Nginx, PostgreSQL 1
 | `scheduler` | `schedule:run` each minute | — |
 | `db` | PostgreSQL 16 | localhost:5432 |
 | `mailpit` | Catches outgoing mail | http://localhost:8025 |
+| `adminer` | DB GUI (Postgres, like phpMyAdmin), profile `tools` | http://localhost:8081 |
 | `node` | Vite dev server (profile `assets`) | localhost:5173 |
 
 ## First run
@@ -43,10 +44,19 @@ docker compose logs -f app                 # tail logs
 docker compose exec app php artisan test   # run Pest
 docker compose exec app php artisan tinker
 docker compose --profile assets up node    # Vite dev server for frontend work
+docker compose --profile tools up -d adminer  # DB GUI at http://localhost:8081 (server: db / coc / secret)
 docker compose down                        # stop (add -v to drop the DB volume)
 ```
 
 Ports are overridable via `APP_PORT`, `DB_PORT`, `MAILPIT_UI_PORT`, `VITE_PORT` in your shell or an `.env` beside `docker-compose.yml`.
+
+## Foundation migrations
+
+Run `docker compose exec app php artisan migrate` after updating this checkout. Module migrations are loaded from `src/app/Modules/*/migrations`. They install Spatie's permission tables, seed the four platform roles, enable user soft deletion, and create the media metadata table. Registration assigns the User role; migrations never grant staff access to an account.
+
+Email verification is enforced on the dashboard. Open verification messages in Mailpit at http://localhost:8025. Verification resends are limited to six per minute per account; registration attempts to five per minute per IP; Livewire updates to sixty per minute per user/IP.
+
+This implements the Phase 0 foundation. CoC linking, public player profiles, base sharing, media uploads/processing, moderation tools, and staff role-management endpoints are not implemented yet. The media table stores metadata only and defaults to `pending`; no upload endpoint exposes unprocessed files.
 
 ## Environment (`src/.env`)
 
@@ -63,7 +73,7 @@ Ports are overridable via `APP_PORT`, `DB_PORT`, `MAILPIT_UI_PORT`, `VITE_PORT` 
 
 **Add later, only when you build that feature** (copy the block from `.env.docker.example` and fill real values):
 
-- **R2 object storage** — `FILESYSTEM_DISK=r2`, `AWS_*`, `AWS_ENDPOINT`. Needed at **Phase 3 (media uploads)**. Until then leave `FILESYSTEM_DISK=local`; switching to `r2` before the disk is configured in `config/filesystems.php` breaks uploads.
+- **R2 object storage** — the `r2` disk and S3 adapter are configured. Set `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`, `AWS_ENDPOINT` (your R2 S3 endpoint), `AWS_DEFAULT_REGION=auto`, and optionally `AWS_URL` (cookieless public CDN). Keep `FILESYSTEM_DISK=local` until credentials are available; choose `r2` for media. Pending/private objects use expiring signed URLs. Public CDN URLs are reserved for approved public media; uploads and processing arrive in Phase 3.
 - **Clash of Clans API** — `COC_API_TOKEN`, `COC_API_BASE_URL`. Needed at **Phase 1 (CoC integration)**; use your IP-bound key.
 
 **Recreating `src/.env` from scratch:**

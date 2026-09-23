@@ -1,23 +1,28 @@
 <?php
 
-use App\Livewire\Actions\Logout;
+declare(strict_types=1);
+
+use App\Modules\Auth\Actions\Logout;
+use App\Modules\Users\Actions\DeleteUser;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 
 new class extends Component
 {
+    #[Validate('required|string|current_password')]
     public string $password = '';
 
     /**
      * Delete the currently authenticated user.
      */
-    public function deleteUser(Logout $logout): void
+    public function deleteUser(DeleteUser $delete, Logout $logout): void
     {
-        $this->validate([
-            'password' => ['required', 'string', 'current_password'],
-        ]);
+        $this->authorize('delete', Auth::user());
+        $this->validate();
 
-        tap(Auth::user(), $logout(...))->delete();
+        $delete->handle(Auth::user());
+        $logout();
 
         $this->redirect('/', navigate: true);
     }
@@ -30,7 +35,7 @@ new class extends Component
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
-            {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}
+            {{ __('Deleting your account disables sign-in. Your account record is retained for safety and audit purposes.') }}
         </p>
     </header>
 
@@ -47,7 +52,7 @@ new class extends Component
             </h2>
 
             <p class="mt-1 text-sm text-gray-600">
-                {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
+                {{ __('Please enter your password to confirm that you want to delete your account and disable sign-in.') }}
             </p>
 
             <div class="mt-6">

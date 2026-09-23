@@ -24,6 +24,22 @@ final class FakeClashClient implements ClashClient
 
     public bool $unavailable = false;
 
+    public function __construct()
+    {
+        // In local dev, hydrate from config so the web and queue-worker
+        // processes share the same known players. Tests seed via definePlayer().
+        if (! app()->environment('local')) {
+            return;
+        }
+
+        foreach ((array) config('coc.fake.players', []) as $tag => $payload) {
+            $token = $payload['token'] ?? null;
+            unset($payload['token']);
+            $payload['tag'] ??= $tag;
+            $this->definePlayer(PlayerData::fromApi($payload), $token);
+        }
+    }
+
     public function definePlayer(PlayerData $player, ?string $token = null): void
     {
         $this->players[$player->tag] = $player;

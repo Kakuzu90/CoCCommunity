@@ -34,8 +34,9 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
+    <div class="mb-6">
+        <h1 class="font-display font-extrabold text-2xl text-content tracking-tight">Confirm password</h1>
+        <p class="mt-1 text-sm text-content-muted">This is a secure area — please confirm your password to continue.</p>
     </div>
 
     <form wire:submit="confirmPassword">
@@ -53,10 +54,8 @@ new #[Layout('layouts.guest')] class extends Component
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <div class="flex justify-end mt-4">
-            <x-primary-button>
-                {{ __('Confirm') }}
-            </x-primary-button>
-        </div>
+        <x-primary-button class="w-full mt-6">
+            {{ __('Confirm') }}
+        </x-primary-button>
     </form>
 </div>

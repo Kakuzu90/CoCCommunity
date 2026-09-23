@@ -1,3 +1,107 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ | Design system — Dark Elixir Royal (see specs/12-design-system.md).
+ | Colours are CSS variables so components theme automatically: the light
+ | palette is the default, dark is applied by the OS preference unless the
+ | user forced light, and always by an explicit [data-theme="dark"] toggle.
+ */
+:root {
+    --primary: #6C3BF5;
+    --primary-hi: #8A5CFF;
+    --on-primary: #FFFFFF;
+    --accent: #F0A81F;
+    --verified: #1FA463;
+    --alert: #E0483D;
+    --warning: #C77A12;
+
+    --bg: #EEEFF8;
+    --surface: #FFFFFF;
+    --surface-2: #F5F5FC;
+    --surface-3: #EAEAF5;
+    --border: #DEDFEE;
+    --border-strong: #C9CAE2;
+
+    --text: #1A1830;
+    --muted: #5D5A78;
+    --faint: #918DAE;
+
+    --primary-soft: #E7DEFC;
+    --accent-soft: #FBEBCC;
+    --verified-soft: #D6F0E1;
+    --alert-soft: #FBE0DE;
+
+    color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --primary: #8A5CFF;
+        --primary-hi: #A480FF;
+        --on-primary: #FFFFFF;
+        --accent: #F2AE2A;
+        --verified: #35C67E;
+        --alert: #F26056;
+        --warning: #F2AE2A;
+
+        --bg: #0C0A1A;
+        --surface: #171333;
+        --surface-2: #201B44;
+        --surface-3: #28224F;
+        --border: #2C2656;
+        --border-strong: #3E3670;
+
+        --text: #ECEAF8;
+        --muted: #A29CC4;
+        --faint: #726C96;
+
+        --primary-soft: rgba(138, 92, 255, 0.18);
+        --accent-soft: rgba(242, 174, 42, 0.16);
+        --verified-soft: rgba(53, 198, 126, 0.16);
+        --alert-soft: rgba(226, 72, 61, 0.16);
+
+        color-scheme: dark;
+    }
+}
+
+:root[data-theme="dark"] {
+    --primary: #8A5CFF;
+    --primary-hi: #A480FF;
+    --on-primary: #FFFFFF;
+    --accent: #F2AE2A;
+    --verified: #35C67E;
+    --alert: #F26056;
+    --warning: #F2AE2A;
+
+    --bg: #0C0A1A;
+    --surface: #171333;
+    --surface-2: #201B44;
+    --surface-3: #28224F;
+    --border: #2C2656;
+    --border-strong: #3E3670;
+
+    --text: #ECEAF8;
+    --muted: #A29CC4;
+    --faint: #726C96;
+
+    --primary-soft: rgba(138, 92, 255, 0.18);
+    --accent-soft: rgba(242, 174, 42, 0.16);
+    --verified-soft: rgba(53, 198, 126, 0.16);
+    --alert-soft: rgba(226, 72, 61, 0.16);
+
+    color-scheme: dark;
+}
+
+@layer base {
+    body {
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: 'Rubik', ui-sans-serif, system-ui, sans-serif;
+    }
+}
+
+[x-cloak] {
+    display: none !important;
+}

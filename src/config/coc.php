@@ -31,4 +31,24 @@ return [
         // Max accounts enqueued per scheduled refresh pass.
         'batch' => (int) env('COC_SYNC_BATCH', 200),
     ],
+
+    // Seed data for the fake client in local dev, so the linked web and worker
+    // processes agree and the verify flow is demoable without live API access.
+    // Each entry is a normalised tag => API-shaped payload plus a 'token'.
+    'fake' => [
+        'players' => [
+            '#2P0YQRL8V' => [
+                'token' => 'TEST-TOKEN',
+                'name' => 'NightWitch',
+                'townHallLevel' => 17,
+                'expLevel' => 250,
+                'trophies' => 6000,
+                'bestTrophies' => 6200,
+                'warStars' => 1500,
+                'league' => ['name' => 'Legend League'],
+                'clan' => ['tag' => '#CLANTAG', 'name' => 'Bicol Warriors'],
+                'role' => 'coLeader',
+            ],
+        ],
+    ],
 ];

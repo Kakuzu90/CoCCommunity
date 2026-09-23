@@ -27,6 +27,11 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
+    <div class="mb-6">
+        <h1 class="font-display font-extrabold text-2xl text-content tracking-tight">Welcome back</h1>
+        <p class="mt-1 text-sm text-content-muted">Log in to your Clash Commons account.</p>
+    </div>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -53,21 +58,24 @@ new #[Layout('layouts.guest')] class extends Component
         <!-- Remember Me -->
         <div class="block mt-4">
             <label for="remember" class="inline-flex items-center">
-                <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-line-strong bg-surface-2 text-primary shadow-sm focus:ring-primary" name="remember">
+                <span class="ms-2 text-sm text-content-muted">{{ __('Remember me') }}</span>
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
+        <x-primary-button class="w-full mt-6">
+            {{ __('Log in') }}
+        </x-primary-button>
+
+        <div class="mt-5 flex items-center justify-between text-sm">
             @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}" wire:navigate>
-                    {{ __('Forgot your password?') }}
+                <a class="text-content-muted hover:text-content focus:outline-none" href="{{ route('password.request') }}" wire:navigate>
+                    {{ __('Forgot password?') }}
                 </a>
             @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
+            <a class="font-semibold text-primary hover:text-primary-hi focus:outline-none" href="{{ route('register') }}" wire:navigate>
+                {{ __('Create account') }}
+            </a>
         </div>
     </form>
 </div>

@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Livewire\Actions\Logout;
+use App\Modules\Auth\Actions\SendVerificationEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
@@ -11,7 +14,7 @@ new #[Layout('layouts.guest')] class extends Component
     /**
      * Send an email verification notification to the user.
      */
-    public function sendVerification(): void
+    public function sendVerification(SendVerificationEmail $send): void
     {
         if (Auth::user()->hasVerifiedEmail()) {
             $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
@@ -19,7 +22,8 @@ new #[Layout('layouts.guest')] class extends Component
             return;
         }
 
-        Auth::user()->sendEmailVerificationNotification();
+        $this->authorize('update', Auth::user());
+        $send->handle(Auth::user());
 
         Session::flash('status', 'verification-link-sent');
     }

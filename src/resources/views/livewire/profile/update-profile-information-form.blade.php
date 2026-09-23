@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
+use App\Modules\Users\Actions\UpdateProfile;
+use App\Modules\Auth\Actions\SendVerificationEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
@@ -20,25 +24,19 @@ new class extends Component
         $this->email = Auth::user()->email;
     }
 
-    /**
-     * Update the profile information for the currently authenticated user.
-     */
-    public function updateProfileInformation(): void
+    protected function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore(Auth::id())],
+        ];
+    }
+
+    public function updateProfileInformation(UpdateProfile $update): void
     {
         $user = Auth::user();
-
-        $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
-        ]);
-
-        $user->fill($validated);
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
-
-        $user->save();
+        $this->authorize('update', $user);
+        $update->handle($user, $this->validate());
 
         $this->dispatch('profile-updated', name: $user->name);
     }
@@ -46,7 +44,7 @@ new class extends Component
     /**
      * Send an email verification notification to the current user.
      */
-    public function sendVerification(): void
+    public function sendVerification(SendVerificationEmail $send): void
     {
         $user = Auth::user();
 
@@ -56,7 +54,8 @@ new class extends Component
             return;
         }
 
-        $user->sendEmailVerificationNotification();
+        $this->authorize('update', $user);
+        $send->handle($user);
 
         Session::flash('status', 'verification-link-sent');
     }

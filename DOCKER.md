@@ -48,6 +48,14 @@ docker compose down                        # stop (add -v to drop the DB volume)
 
 Ports are overridable via `APP_PORT`, `DB_PORT`, `MAILPIT_UI_PORT`, `VITE_PORT` in your shell or an `.env` beside `docker-compose.yml`.
 
+## Foundation migrations
+
+Run `docker compose exec app php artisan migrate` after updating this checkout. Module migrations are loaded from `src/app/Modules/*/migrations`. They install Spatie's permission tables, seed the four platform roles, enable user soft deletion, and create the media metadata table. Registration assigns the User role; migrations never grant staff access to an account.
+
+Email verification is enforced on the dashboard. Open verification messages in Mailpit at http://localhost:8025. Verification resends are limited to six per minute per account; registration attempts to five per minute per IP; Livewire updates to sixty per minute per user/IP.
+
+This implements the Phase 0 foundation. CoC linking, public player profiles, base sharing, media uploads/processing, moderation tools, and staff role-management endpoints are not implemented yet. The media table stores metadata only and defaults to `pending`; no upload endpoint exposes unprocessed files.
+
 ## Environment (`src/.env`)
 
 `src/.env` is git-ignored, so it does **not** travel with the repo. On a fresh checkout you recreate it; `.env.docker.example` is the reference for the Docker-specific keys.

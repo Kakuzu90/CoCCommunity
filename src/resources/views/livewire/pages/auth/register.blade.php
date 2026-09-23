@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
+use App\Modules\Auth\Actions\RegisterUser;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -11,26 +14,32 @@ use Livewire\Volt\Component;
 new #[Layout('layouts.guest')] class extends Component
 {
     public string $name = '';
+
     public string $email = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
 
-    /**
-     * Handle an incoming registration request.
-     */
-    public function register(): void
+    protected function rules(): array
     {
-        $validated = $this->validate([
+        return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
-        ]);
+        ];
+    }
 
-        $validated['password'] = Hash::make($validated['password']);
+    public function register(RegisterUser $register): void
+    {
+        $key = 'registration:'.request()->ip();
+        abort_if(RateLimiter::tooManyAttempts($key, 5), 429);
+        RateLimiter::hit($key, 60);
 
-        event(new Registered($user = User::create($validated)));
+        $user = $register->handle($this->validate());
 
         Auth::login($user);
+        Session::regenerate();
 
         $this->redirect(route('dashboard', absolute: false), navigate: true);
     }

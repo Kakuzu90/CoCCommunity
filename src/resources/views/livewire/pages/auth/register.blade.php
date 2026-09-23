@@ -46,6 +46,11 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
+    <div class="mb-6">
+        <h1 class="font-display font-extrabold text-2xl text-content tracking-tight">Create your account</h1>
+        <p class="mt-1 text-sm text-content-muted">Join the Clash Commons community.</p>
+    </div>
+
     <form wire:submit="register">
         <!-- Name -->
         <div>
@@ -84,14 +89,13 @@ new #[Layout('layouts.guest')] class extends Component
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}" wire:navigate>
-                {{ __('Already registered?') }}
-            </a>
+        <x-primary-button class="w-full mt-6">
+            {{ __('Create account') }}
+        </x-primary-button>
 
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
+        <p class="mt-5 text-center text-sm text-content-muted">
+            {{ __('Already have an account?') }}
+            <a class="font-semibold text-primary hover:text-primary-hi focus:outline-none" href="{{ route('login') }}" wire:navigate>{{ __('Log in') }}</a>
+        </p>
     </form>
 </div>

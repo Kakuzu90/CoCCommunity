@@ -22,7 +22,7 @@ Frontend is server-rendered Livewire + Blade, styled with Tailwind. Most CoC pla
 - **Mobile-first:** base styles target small screens; add `sm:`/`md:`/`lg:` upward. Never desktop-first with overrides down.
 - Use Tailwind utilities and existing shared Blade components. **Do not invent one-off CSS files or inline `<style>`** when a utility or shared component exists.
 - Extract a repeated markup block into a Blade component (`<x-base-card>`) once it appears a second time — don't copy-paste markup.
-- Use the design tokens from [`specs/12-design-system.md`](../../../specs/12-design-system.md), exposed via `tailwind.config.js`. Prefer semantic utilities (`bg-primary`, `text-muted`, `border-border`) over raw colours. Don't hardcode hex that duplicates a token.
+- Use the design tokens from [`specs/12-design-system.md`](../../../specs/12-design-system.md), exposed via `tailwind.config.js`. Prefer semantic utilities — `bg-ground`, `bg-surface`, `text-content`/`text-content-muted`, `border-line`, `bg-primary`/`text-on-primary`, `bg-accent`, `text-verified`, `font-display` — over raw colours. They theme via CSS variables, so no `dark:` variants are needed. Don't hardcode hex that duplicates a token.
 - **Primary CTA = Royal violet; Gold is a highlight, not a second CTA colour.** Semantic colours (`--verified`, `--alert`, `--warning`) are for state only, never as accents.
 - Keep tap targets ≥ 44px, readable contrast, and no horizontal scroll on a phone.
 

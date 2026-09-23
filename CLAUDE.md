@@ -26,6 +26,7 @@ Invoke these when the task matches; each encodes decisions from the specs so you
 - **`database-schema`** — migrations and schema changes.
 - **`secure-feature`** — the checklist for adding any user-facing action (policy, validation, rate limit, audit).
 - **`livewire-ui`** — building UI (Blade + Livewire + Tailwind): mobile-first, thin components, loading/empty/error states, accessibility.
+- **`ux`** — interaction quality for any user-facing flow: live async feedback (no "refresh to see"), the four states, forms, hierarchy, mobile ergonomics, review checklist.
 
 The built-in `security-review` skill is useful before finishing a PR that touches auth, uploads, or the marketplace.
 

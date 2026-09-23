@@ -71,24 +71,24 @@ Set `color-scheme: dark` wherever the dark palette applies so native controls an
 
 ## Tailwind mapping
 
-Expose the tokens in `tailwind.config.js` so utilities read them:
+The tokens are exposed in `tailwind.config.js` (implemented). Token color keys are named to avoid clobbering Tailwind's core `bg-*`/`text-*`/`border-*` scales, so Breeze defaults keep working during migration:
 
 ```js
 // theme.extend.colors
-primary:  'rgb(var(--primary) / <alpha-value>)',   // or hex via CSS vars
-accent:   'var(--accent)',
-verified: 'var(--verified)',
-alert:    'var(--alert)',
+primary:  { DEFAULT: 'var(--primary)', hi: 'var(--primary-hi)', soft: 'var(--primary-soft)' },
+accent:   { DEFAULT: 'var(--accent)', soft: 'var(--accent-soft)' },
+verified: { DEFAULT: 'var(--verified)', soft: 'var(--verified-soft)' },
+alert:    { DEFAULT: 'var(--alert)', soft: 'var(--alert-soft)' },
 warning:  'var(--warning)',
+'on-primary': 'var(--on-primary)',
+ground:   'var(--bg)',
 surface:  { DEFAULT: 'var(--surface)', 2: 'var(--surface-2)', 3: 'var(--surface-3)' },
-// bg / text / muted / border likewise
-fontFamily: {
-  display: ['"Baloo 2"', 'system-ui', 'sans-serif'],
-  sans:    ['Rubik', 'system-ui', '-apple-system', 'sans-serif'],
-},
+line:     { DEFAULT: 'var(--border)', strong: 'var(--border-strong)' },
+content:  { DEFAULT: 'var(--text)', muted: 'var(--muted)', faint: 'var(--faint)' },
+// fontFamily: sans = Rubik, display = "Baloo 2"
 ```
 
-Prefer semantic utility names (`bg-primary`, `text-muted`, `border-border`) over raw colours in markup.
+Utility names to use in markup: `bg-ground`, `bg-surface` / `bg-surface-2`, `text-content` / `text-content-muted` / `text-content-faint`, `border-line` / `border-line-strong`, `bg-primary` / `text-on-primary` / `bg-primary-soft`, `bg-accent`, `text-verified` / `bg-verified-soft`, `text-alert`, `font-display`. Theming happens via the CSS variables in `resources/css/app.css`, so these do not need `dark:` variants.
 
 ## Usage rules
 

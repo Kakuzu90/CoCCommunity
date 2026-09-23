@@ -56,7 +56,11 @@ Run `docker compose exec app php artisan migrate` after updating this checkout. 
 
 Email verification is enforced on the dashboard. Open verification messages in Mailpit at http://localhost:8025. Verification resends are limited to six per minute per account; registration attempts to five per minute per IP; Livewire updates to sixty per minute per user/IP.
 
-This implements the Phase 0 foundation. CoC linking, public player profiles, base sharing, media uploads/processing, moderation tools, and staff role-management endpoints are not implemented yet. The media table stores metadata only and defaults to `pending`; no upload endpoint exposes unprocessed files.
+This implements the Phase 0 foundation plus Phase 1 (CoC integration & account claiming). Public player profiles, base sharing, media uploads/processing, moderation tools, and staff role-management endpoints are not implemented yet. The media table stores metadata only and defaults to `pending`; no upload endpoint exposes unprocessed files.
+
+## CoC integration (Phase 1)
+
+Signed-in, verified users link Clash of Clans accounts at `/accounts` and prove ownership with the in-game API token (Settings → More Settings → API Token). The API is wrapped behind the `ClashClient` contract and is never called in a request path — verification and snapshot refresh run as queued jobs. With no `COC_API_TOKEN` set the app resolves an in-memory fake client, so local dev and tests never reach Supercell; set the token (and its IP allowlist) to use the live adapter. Verified snapshots refresh hourly for stale accounts via the scheduler; a tag that stops resolving flips to `needs_reverify` and keeps its data. Ownership transfers (current token control wins) are written to `audit_logs` and the previous owner is notified.
 
 ## Environment (`src/.env`)
 

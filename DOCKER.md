@@ -47,3 +47,30 @@ docker compose down                        # stop (add -v to drop the DB volume)
 ```
 
 Ports are overridable via `APP_PORT`, `DB_PORT`, `MAILPIT_UI_PORT`, `VITE_PORT` in your shell or an `.env` beside `docker-compose.yml`.
+
+## Environment (`src/.env`)
+
+`src/.env` is git-ignored, so it does **not** travel with the repo. On a fresh checkout you recreate it; `.env.docker.example` is the reference for the Docker-specific keys.
+
+**Already wired** (set during scaffolding — no action needed for local dev):
+
+| Key | Value | Why |
+| --- | --- | --- |
+| `APP_URL` | `http://localhost:8080` | matches the `web` service port |
+| `DB_*` | `pgsql` @ host `db`, database `coc` | the Postgres container |
+| `CACHE_STORE` / `QUEUE_CONNECTION` / `SESSION_DRIVER` | `database` | **no Redis** (see [`specs/10-infrastructure.md`](specs/10-infrastructure.md)) |
+| `MAIL_MAILER` / `MAIL_HOST` / `MAIL_PORT` | `smtp` / `mailpit` / `1025` | catches mail in Mailpit |
+
+**Add later, only when you build that feature** (copy the block from `.env.docker.example` and fill real values):
+
+- **R2 object storage** — `FILESYSTEM_DISK=r2`, `AWS_*`, `AWS_ENDPOINT`. Needed at **Phase 3 (media uploads)**. Until then leave `FILESYSTEM_DISK=local`; switching to `r2` before the disk is configured in `config/filesystems.php` breaks uploads.
+- **Clash of Clans API** — `COC_API_TOKEN`, `COC_API_BASE_URL`. Needed at **Phase 1 (CoC integration)**; use your IP-bound key.
+
+**Recreating `src/.env` from scratch:**
+
+```bash
+cp src/.env.example src/.env            # Laravel's own template
+docker compose run --rm app php artisan key:generate
+# then re-apply the Docker keys from the "Already wired" table above
+# (or copy the relevant lines out of .env.docker.example)
+```

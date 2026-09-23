@@ -1,5 +1,8 @@
 <?php
 
+use App\Modules\CocIntegration\Adapters\FakeClashClient;
+use App\Modules\CocIntegration\Contracts\ClashClient;
+use App\Modules\CocIntegration\DTOs\PlayerData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -47,4 +50,36 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+/**
+ * Bind an in-memory ClashClient and return it so a test can define players.
+ */
+function fakeClash(): FakeClashClient
+{
+    $fake = new FakeClashClient;
+    app()->instance(ClashClient::class, $fake);
+
+    return $fake;
+}
+
+/**
+ * @param  array<string, mixed>  $overrides
+ */
+function playerData(string $tag, array $overrides = []): PlayerData
+{
+    return new PlayerData(
+        tag: $tag,
+        name: $overrides['name'] ?? 'NightWitch',
+        townHall: $overrides['townHall'] ?? 17,
+        expLevel: $overrides['expLevel'] ?? 250,
+        trophies: $overrides['trophies'] ?? 6000,
+        bestTrophies: $overrides['bestTrophies'] ?? 6200,
+        warStars: $overrides['warStars'] ?? 1500,
+        league: $overrides['league'] ?? 'Legend League',
+        clanTag: $overrides['clanTag'] ?? '#CLANTAG',
+        clanName: $overrides['clanName'] ?? 'Bicol Warriors',
+        clanRole: $overrides['clanRole'] ?? 'coLeader',
+        raw: $overrides['raw'] ?? ['tag' => $tag, 'name' => $overrides['name'] ?? 'NightWitch'],
+    );
 }

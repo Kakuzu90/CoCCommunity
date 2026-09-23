@@ -21,6 +21,7 @@ Load in this order — each builds on the previous. For agentic coding, load `RE
 | 9 | [09-marketplace.md](09-marketplace.md) | Phase 7 (post-MVP) | 03, 06, 07 |
 | 10 | [10-infrastructure.md](10-infrastructure.md) | Ongoing — jobs, caching, scaling | 02, 03 |
 | 11 | [11-phases-risks-edgecases.md](11-phases-risks-edgecases.md) | Planning each phase | all |
+| 12 | [12-design-system.md](12-design-system.md) | Any UI work (Phase 3+) — palette, fonts, tokens | 01 |
 
 ## MVP = Phases 0–4
 Verified accounts + public profiles + base sharing (images) + reports/moderation. Everything else is deferred — see [11-phases-risks-edgecases.md](11-phases-risks-edgecases.md).

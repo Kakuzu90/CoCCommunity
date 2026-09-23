@@ -6,6 +6,8 @@ Canonical engineering rules for any AI agent (Codex, Claude, others) working in 
 
 A Clash of Clans community platform: a **Laravel modular monolith**. Players link CoC accounts (verified by in-game API token), share base layouts, recruit, and later trade permitted services. Full design is in [`specs/`](specs/) — start with [`specs/README.md`](specs/README.md).
 
+The Laravel app lives in [`src/`](src/); local dev runs on Docker — see [`DOCKER.md`](DOCKER.md). Design tokens (palette, fonts) are in [`specs/12-design-system.md`](specs/12-design-system.md).
+
 **The plan is authoritative.** If code and specs disagree, the specs win — or you change the spec in the same PR and say why. Do not silently diverge.
 
 ## Non-negotiables (from the specs)

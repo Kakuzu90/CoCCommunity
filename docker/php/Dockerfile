@@ -1,0 +1,24 @@
+# PHP 8.3 FPM image for the Clash Commons Laravel app (lives in ../../src).
+# No Redis: cache/queue use the database driver (see specs/10-infrastructure.md).
+FROM php:8.3-fpm-alpine
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# System deps + PHP extensions Laravel + Postgres + image work need.
+# pcntl is required for queue:work; gd/exif for Intervention Image; pdo_pgsql/pgsql for Postgres.
+RUN apk add --no-cache bash git curl postgresql-client \
+ && curl -sSLf https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions \
+      -o /usr/local/bin/install-php-extensions \
+ && chmod +x /usr/local/bin/install-php-extensions \
+ && install-php-extensions pdo_pgsql pgsql gd zip bcmath intl pcntl opcache exif \
+ && rm /usr/local/bin/install-php-extensions
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY docker/php/php.ini /usr/local/etc/php/conf.d/zzz-app.ini
+COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint
+RUN chmod +x /usr/local/bin/entrypoint
+
+WORKDIR /var/www/html
+
+ENTRYPOINT ["entrypoint"]
+CMD ["php-fpm"]

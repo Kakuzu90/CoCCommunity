@@ -1,0 +1,98 @@
+# Clash Commons local dev stack. Laravel app lives in ./src.
+# No Redis by design — cache, queue and sessions use the database driver.
+# Media is on Cloudflare R2 (external), so no storage container here.
+
+x-app: &app
+  build:
+    context: .
+    dockerfile: docker/php/Dockerfile
+  image: coccommunity-app:local
+  volumes:
+    - ./src:/var/www/html
+  networks:
+    - coc
+  depends_on:
+    db:
+      condition: service_healthy
+
+services:
+  app:
+    <<: *app
+    # php-fpm (default CMD). Serves the web tier via nginx.
+
+  web:
+    image: nginx:1.27-alpine
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    networks:
+      - coc
+
+  queue:
+    <<: *app
+    command: php artisan queue:work database --tries=3 --sleep=1 --max-time=3600
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+  scheduler:
+    <<: *app
+    command: sh -c "while :; do php artisan schedule:run --no-interaction; sleep 60; done"
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-coc}
+      POSTGRES_USER: ${DB_USERNAME:-coc}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-coc} -d ${DB_DATABASE:-coc}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - coc
+
+  # Local mail catcher for email verification / password resets. UI at http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "${MAILPIT_UI_PORT:-8025}:8025"
+    networks:
+      - coc
+
+  # Vite dev server for Livewire/Tailwind assets. Runs only when ./src has a package.json.
+  node:
+    image: node:20-alpine
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "${VITE_PORT:-5173}:5173"
+    networks:
+      - coc
+    profiles:
+      - assets
+
+networks:
+  coc:
+    driver: bridge
+
+volumes:
+  pgdata:

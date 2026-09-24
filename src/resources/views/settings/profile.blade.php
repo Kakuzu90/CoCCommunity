@@ -52,7 +52,7 @@
             {{-- Submitted by the uploader once the pipeline reports the media ready. --}}
             <form method="POST" action="{{ route('settings.profile.avatar.store') }}" x-ref="attachForm" hidden>
                 @csrf
-                <input type="hidden" name="media_ulid" x-bind:value="ulid">
+                <input type="hidden" name="media_ulid" x-ref="mediaInput">
             </form>
         </section>
 

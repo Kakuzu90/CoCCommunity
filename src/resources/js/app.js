@@ -163,6 +163,9 @@ Alpine.data('avatarUploader', () => ({
             this.ulid = ticket.media_ulid;
             this.preview = URL.createObjectURL(file);
             this.statusText = 'Saving…';
+            // Set the value imperatively: x-bind flushes on Alpine's next tick, which is after this
+            // synchronous submit(), so relying on it would post an empty media_ulid.
+            this.$refs.mediaInput.value = ticket.media_ulid;
             this.$refs.attachForm.submit();
         } catch (e) {
             this.fail('Upload failed. Please try again.');

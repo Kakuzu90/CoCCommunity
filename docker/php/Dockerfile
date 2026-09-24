@@ -16,7 +16,8 @@ RUN apk add --no-cache bash git curl postgresql-client \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/zzz-app.ini
 COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint
-RUN chmod +x /usr/local/bin/entrypoint
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint \
+ && chmod +x /usr/local/bin/entrypoint
 
 WORKDIR /var/www/html
 

@@ -69,11 +69,15 @@ provider.
 
 Two local-only wrinkles, both confined to configuration:
 
-- **Presign host.** The app signs URLs against `http://minio:9000`, which the browser on the host
-  cannot resolve. `MediaUrlResolver` rewrites the host of generated URLs to `MEDIA_PRESIGN_HOST`
-  when that variable is set, and leaves them untouched when it is not. It is empty in
-  staging/production. (The alternative — a `minio` entry in the host's `/etc/hosts` — works too and
-  needs no code, but requires a manual machine-level change.)
+- **Presign host.** The app reaches MinIO at `http://minio:9000`, which the browser on the host
+  cannot resolve. SigV4 signs the `host` header, so a presigned URL must be **signed against** the
+  host the browser will call — rewriting the host *after* signing produces `SignatureDoesNotMatch`.
+  `S3MediaStorage` therefore presigns against a client whose `endpoint` is `MEDIA_PRESIGN_HOST`
+  (e.g. `http://localhost:9000`) while all server-side object operations keep using the in-network
+  `AWS_ENDPOINT`. `MEDIA_PRESIGN_HOST` is empty in staging/production, where R2's endpoint is public
+  and identical for app and browser, so the presign client is just the media disk. (The alternative
+  — a `minio` entry in the host's `/etc/hosts` so both sides use one host — works too and needs no
+  code, but requires a manual machine-level change.)
 - **No CDN.** There is no Cloudflare in front locally, so cache headers, hotlink rules and the
   `game/`-prefix resizing opt-out (§7, §11.3) are configuration that only takes effect in
   staging/production. They must be verified there, not assumed from a green local run.

@@ -40,6 +40,12 @@ game/{pack_version}/leagues/{league_id}.png
 game/{pack_version}/manifest.json
 ```
 
+The `public/` paths above are illustrative of eventual entity nesting. In practice the worker writes
+derived objects under a **media-ULID-scoped** key — `public/{collection}/{media_ulid}/{variant}.webp`
+— because processing runs *before* attachment (§3), so the parent entity is not yet known when the
+files are written. The ULID keeps keys collision-free and stable; the `media` row's `path` points at
+the primary (largest) rendition, and `media_variants` hold the rest.
+
 Why `quarantine/` is a separate prefix: it makes "unvalidated bytes are not publicly reachable" a
 property of the bucket layout rather than of application logic. A bug in a URL resolver cannot
 expose an unscanned file, because the public CDN binding does not cover that prefix.
@@ -111,8 +117,9 @@ mirroring the CDN binding in §2.
 - Validates: collection is known, the user's quota for that collection has room, declared size is
   within the collection's limit, declared MIME is in the allowlist (a first-pass filter only).
 - Creates the `media` row in `pending` with `expires_at = now + 24h`.
-- Presigned PUT is valid for 5 minutes, constrained by `Content-Length` range and
-  `Content-Type`, and targets a key the client cannot choose.
+- Presigned PUT is valid for 5 minutes, signs the `Content-Type`, and targets a key the client
+  cannot choose. An S3 presigned PUT cannot bind a `Content-Length` range (that needs a POST
+  policy), so the declared size is enforced by the post-upload HEAD check in the worker instead.
 - Rate limited: 30 intents/hour/user.
 
 ### Complete endpoint rules
@@ -245,7 +252,7 @@ Four scheduled jobs. Every one of them is the reason the storage bill stays pred
 
 | Job | Schedule | Action |
 |---|---|---|
-| `media:sweep-orphans` | Hourly | Delete `media` rows in `pending`/`uploaded` past `expires_at` (24 h) with no `attachable_id`; delete their objects |
+| `media:sweep-orphans` | Hourly | Delete unattached `media` past `expires_at` (24 h) — `pending`/`uploaded` (abandoned intents) **and** `ready`/`failed` drafts that were never published — and delete their objects. `quarantined` is retained separately and never swept here. Attachment clears `expires_at`, making media permanent |
 | `media:purge-deleted` | Daily | Hard-delete storage objects + variants for media soft-deleted more than 7 days ago |
 | `media:reconcile-storage` | Weekly | List bucket keys **under `public/`, `quarantine/` and `private/` only**, diff against `media`+`media_variants`; delete bucket objects with no database row (log first, delete on the second consecutive detection); alert on database rows with no object. **The `game/` prefix is excluded by an explicit allowlist in code, not by convention** — every game asset has no `media` row by design, so an unguarded reconcile would delete the entire asset pack. A test asserts the exclusion |
 | `assets:verify-pack` | Weekly | Verifies every manifest entry resolves to an object whose SHA-256 matches the recorded checksum; alerts on missing, extra or modified objects |

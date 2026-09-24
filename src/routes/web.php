@@ -38,3 +38,5 @@ Route::get('/dev/components', function () {
 
     return view('dev.components');
 })->name('dev.components');
+
+require __DIR__.'/web/uploads.php';

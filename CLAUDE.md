@@ -54,7 +54,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] Domain skeleton + `Support` primitives
 - [x] Design tokens + `x-ui.*` primitives
 - [x] App shell, layouts, navigation
-- [ ] Media pipeline
+- [x] Media pipeline
 - [ ] GameAssets module + asset policy
 - [ ] Ops: health, logging, error tracking, workers
 

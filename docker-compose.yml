@@ -97,7 +97,7 @@ services:
   # Profile `storage` — start it for any media work:  docker compose --profile storage up -d
   # Console at http://localhost:9001 (minioadmin / minioadmin).
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
@@ -120,7 +120,7 @@ services:
   # One-shot: creates the bucket and makes the public/ and game/ prefixes readable,
   # mirroring the R2 + CDN binding described in specs/10-media-storage.md.
   minio-init:
-    image: minio/mc:latest
+    image: quay.io/minio/mc:latest
     depends_on:
       minio:
         condition: service_healthy

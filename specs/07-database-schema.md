@@ -506,7 +506,7 @@ one job.
 | expires_at | timestamptz null | set on `pending`; drives the orphan sweeper |
 | created_at / updated_at / deleted_at | timestamptz | |
 
-**Constraints:** `UNIQUE (disk, path)`; `CHECK (status <> 'ready' OR attachable_id IS NOT NULL OR collection = 'avatar')`.
+**Constraints:** `UNIQUE (disk, path)`; `CHECK (status <> 'ready' OR attachable_id IS NOT NULL OR expires_at IS NOT NULL)` — a ready file is either attached (expiry cleared) or a draft still in its expiry window. This reconciles the invariant with edge-case [23 §4](23-edge-cases.md), where an unpublished-but-processed screenshot is `ready` yet must expire and be swept. Enforced on Postgres; the pipeline upholds it on every driver.
 **Indexes:** `(attachable_type, attachable_id, collection, position)`;
 `(status, expires_at) WHERE status IN ('pending','uploaded')` — the sweeper's index;
 `(user_id, created_at DESC)`; `(checksum_sha256)`.

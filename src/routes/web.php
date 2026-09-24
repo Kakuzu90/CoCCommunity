@@ -32,3 +32,5 @@ Route::get('/dev/components', function () {
 require __DIR__.'/web/uploads.php';
 
 require __DIR__.'/auth.php';
+
+require __DIR__.'/web/settings.php';

@@ -3,7 +3,9 @@
 namespace App\Domain\Media;
 
 use App\Domain\Media\Contracts\ImageProcessor;
+use App\Domain\Media\Contracts\MediaLibrary;
 use App\Domain\Media\Contracts\MediaStorage;
+use App\Domain\Media\Services\MediaLibraryService;
 use App\Domain\Media\Storage\InterventionImageProcessor;
 use App\Domain\Media\Storage\S3MediaStorage;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -19,6 +21,9 @@ final class MediaServiceProvider extends ServiceProvider
         // The only bindings that know a storage provider or image library exists.
         $this->app->bind(MediaStorage::class, S3MediaStorage::class);
         $this->app->bind(ImageProcessor::class, InterventionImageProcessor::class);
+
+        // Public attachment/rendering seam for consuming modules (avatars, base images, …).
+        $this->app->bind(MediaLibrary::class, MediaLibraryService::class);
     }
 
     public function boot(): void

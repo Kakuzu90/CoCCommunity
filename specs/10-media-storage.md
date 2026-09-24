@@ -138,6 +138,20 @@ parent's transaction:
 A base whose media is still `processing` is created in `processing` status and published
 automatically by the `MediaReady` listener when the last item finishes.
 
+**Public seam (`MediaLibrary`).** Consuming modules attach and render media through the
+`App\Domain\Media\Contracts\MediaLibrary` service, never the Media model (specs/19 §2). It was added
+by the first consumer (avatars, Phase 1):
+- `attach($user, $ulid, MediaCollection, $parent): int` — asserts the media belongs to the user and
+  the collection, and is `ready`/`processing`; the ownership-scoped query 404s a foreign id before
+  any write; sets `attachable_type/id`, clears `expires_at`, returns the media id.
+- `resolve(?int $mediaId): ?MediaImage` — a render-ready DTO of variant name → public URL for a
+  `ready` image, else null.
+- `release(?int $mediaId): void` — detaches and re-arms `expires_at` so the orphan sweeper reclaims a
+  replaced/removed item (the object is deleted by the sweeper, not inline).
+
+Per-parent quota assertions (≤2 screenshots, 1 avatar, …) live in each consumer's attach path; the
+avatar consumer enforces its 1-per-profile rule by replacing and releasing the previous media.
+
 ## 4. Validation rules
 
 | Check | Images | Videos |

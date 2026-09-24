@@ -33,4 +33,19 @@ return [
 
     // Committed starter blocklist; ops refresh it monthly (specs/11). One domain per line, '#' comments.
     'disposable_domains_file' => resource_path('security/disposable-email-domains.txt'),
+
+    // Profile presentation limits and allowlists (specs/07 `profiles`). Editable fields only —
+    // display_name falls back to the username when blank.
+    'profile' => [
+        'display_name_max' => 50,
+        'bio_max' => 500,
+        'languages_max' => 3,
+        // ISO-639-1 two-letter code; the UI offers a curated list, the server enforces the shape.
+        'language_pattern' => '/^[a-z]{2}$/',
+        // ISO-3166-1 alpha-2; stored upper-cased. Shape-validated server-side; the UI select scopes it.
+        'country_pattern' => '/^[A-Za-z]{2}$/',
+        // The only social platforms a profile can link; each value is a handle/URL, length-capped.
+        'socials' => ['youtube', 'twitch', 'discord', 'x'],
+        'social_max' => 100,
+    ],
 ];

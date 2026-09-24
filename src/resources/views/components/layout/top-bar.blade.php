@@ -25,10 +25,14 @@
             <a href="{{ route('home') }}" class="app-iconbtn" aria-label="Notifications">
                 <x-ui.icon name="bell" size="24" />
             </a>
-            {{-- Phase 1: link to /u/{username}; role-gated staff links join this menu. --}}
+            {{-- Public profile (/u/{username}) arrives with the public-profile task; role-gated staff links join this menu. --}}
             <x-ui.dropdown label="Account">
-                <a href="{{ route('home') }}" class="ui-menu-item" role="menuitem" tabindex="-1">Profile</a>
-                <a href="{{ route('home') }}" class="ui-menu-item" role="menuitem" tabindex="-1">Settings</a>
+                <a href="{{ route('settings.profile.edit') }}" class="ui-menu-item" role="menuitem" tabindex="-1">Edit profile</a>
+                <a href="{{ route('settings.profile.edit') }}" class="ui-menu-item" role="menuitem" tabindex="-1">Settings</a>
+                <form method="POST" action="{{ route('logout') }}" role="none">
+                    @csrf
+                    <button type="submit" class="ui-menu-item" role="menuitem" tabindex="-1">Log out</button>
+                </form>
             </x-ui.dropdown>
         @else
             <a href="{{ route('login') }}" class="ui-button app-auth-login" data-variant="ghost" data-size="sm">Log in</a>

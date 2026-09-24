@@ -117,6 +117,22 @@ Denormalised counters so profile pages are a single row read.
 **Unique:** `(follower_id, followee_id)`. **Check:** `follower_id <> followee_id`.
 **Indexes:** `(followee_id, created_at)`, `(follower_id, created_at)`.
 
+### Implementation notes (Phase 1 — Profiles + avatar upload)
+
+- `profiles` and `user_stats` are created together and backfilled for existing users; the
+  `CreateUserProfile` listener (Users module) provisions both on the `Registered` event, and
+  `ProfileService::ensure()` is a defensive fallback. The 1:1 invariant holds from the first request.
+- **Portability divergence:** `languages` and `socials` are stored as **JSON**, not a Postgres
+  `varchar[]`/`jsonb` array, so the schema is identical on the SQLite CI leg. The `search_vector`
+  tsvector column and its GIN index are **deferred to the Search v1 task** (Phase 3), which owns
+  full-text search — `profiles` carries no search column yet.
+- `privacy_settings` is **not** created here; it is owned by the "Privacy settings + public profile"
+  task. This task ships only edit-own-profile and avatar upload; there is no public profile surface
+  yet, so no visibility gate is needed.
+- `avatar_media_id` is a nullable FK to `media` with `ON DELETE SET NULL`. Editable profile fields
+  are the only mass-assignable ones; `user_id`, `avatar_media_id` and all counters are set through
+  services (`specs/11` mass-assignment; enforced by the architecture convention test).
+
 ---
 
 ## Clash of Clans accounts

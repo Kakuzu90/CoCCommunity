@@ -182,6 +182,17 @@
 </div>
 <p class="gallery-caption mt-4">Six sizes, verified rings, and initials when an image is unavailable.</p>
 </x-ui.card>
+<x-ui.card>
+<p class="ui-help">Avatar editor (specs/07). The file input presigns an upload, sends the bytes straight to storage and attaches the processed image — the app never proxies the file.</p>
+<div class="avatar-editor">
+<x-ui.avatar name="Alex River" size="96" />
+<div class="avatar-editor-controls">
+<span class="ui-button" data-variant="secondary" data-size="sm">Upload new</span>
+<span class="ui-button" data-variant="ghost" data-size="sm">Remove</span>
+<p class="ui-help">JPG, PNG or WebP, up to 2&nbsp;MB. Square works best.</p>
+</div>
+</div>
+</x-ui.card>
 </div>
         </section>
         <section id="surfaces" class="gallery-section">

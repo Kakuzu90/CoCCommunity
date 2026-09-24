@@ -2,9 +2,16 @@
 
 namespace App\Domain\Users;
 
+use App\Domain\Users\Listeners\CreateUserProfile;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 final class UsersServiceProvider extends ServiceProvider
 {
-    // Register this module's bindings, policies and listeners as its features are added.
+    public function boot(): void
+    {
+        // Provision the 1:1 profile + stats rows when an account is registered (specs/07).
+        Event::listen(Registered::class, CreateUserProfile::class);
+    }
 }

@@ -141,6 +141,51 @@ Alpine.data('uiSentinel', () => ({
     },
     destroy() { this.observer?.disconnect(); },
 }));
+// Direct-to-storage avatar upload (specs/10 §3): the browser presigns an intent, PUTs the file
+// straight to storage, polls the idempotent complete endpoint until the pipeline reports the media
+// ready, then submits the attach form with its ULID. The app never proxies the bytes.
+Alpine.data('avatarUploader', () => ({
+    busy: false, statusText: '', error: '', ulid: '', preview: null,
+    async pick(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        this.error = '';
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { this.error = 'Choose a JPG, PNG or WebP image.'; this.reset(event); return; }
+        if (file.size > 2 * 1024 * 1024) { this.error = 'That image is larger than 2 MB.'; this.reset(event); return; }
+        this.busy = true; this.statusText = 'Uploading…';
+        try {
+            const ticket = await this.post('/uploads/intent', { collection: 'avatar', filename: file.name, size: file.size, mime: file.type });
+            const put = await fetch(ticket.upload_url, { method: 'PUT', headers: ticket.headers, body: file });
+            if (!put.ok) throw new Error('put');
+            this.statusText = 'Processing…';
+            const status = await this.awaitReady(ticket.media_ulid);
+            if (status !== 'ready') { this.fail('That image could not be processed.'); return; }
+            this.ulid = ticket.media_ulid;
+            this.preview = URL.createObjectURL(file);
+            this.statusText = 'Saving…';
+            this.$refs.attachForm.submit();
+        } catch (e) {
+            this.fail('Upload failed. Please try again.');
+        }
+    },
+    async awaitReady(ulid) {
+        for (let i = 0; i < 30; i++) {
+            const res = await fetch(`/uploads/${ulid}/complete`, { method: 'POST', headers: { Accept: 'application/json', 'X-CSRF-TOKEN': this.csrf() } });
+            if (res.ok) { const d = await res.json(); if (['ready', 'failed', 'quarantined'].includes(d.status)) return d.status; }
+            await new Promise(r => setTimeout(r, 1000));
+        }
+        return 'timeout';
+    },
+    async post(url, body) {
+        const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': this.csrf() }, body: JSON.stringify(body) });
+        if (!res.ok) throw new Error('post');
+        return res.json();
+    },
+    fail(message) { this.error = message; this.busy = false; this.statusText = ''; },
+    reset(event) { if (event?.target) event.target.value = ''; },
+    csrf() { return document.querySelector('meta[name=csrf-token]')?.content || ''; },
+}));
+
 // Vite includes this font in its manifest for the server-rendered preload.
 void displayFont;
 if (window.livewireScriptConfig) Livewire.start();

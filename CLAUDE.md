@@ -6,7 +6,8 @@ recruitment, and later a services marketplace. Laravel app lives in `src/`.
 **Current state:** Laravel 12 is scaffolded in `src/` with Livewire 3, Tailwind 4, Pest,
 Pint, PHPStan/Larastan and Deptrac. See `DOCKER.md` for setup and CI commands.
 Domain module providers and shared value objects, casts, validation rules, queue names and
-immutable dates are in place. The remaining Phase 0 tasks and application features are not implemented.
+immutable dates are in place. Design tokens and `x-ui.*` primitives are available in the
+non-production gallery at `/dev/components`. The app shell and remaining Phase 0 tasks are not implemented.
 
 ## Starting a session
 
@@ -51,7 +52,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 ### Phase 0 — Foundation
 - [x] Project setup, CI, static analysis
 - [x] Domain skeleton + `Support` primitives
-- [ ] Design tokens + `x-ui.*` primitives
+- [x] Design tokens + `x-ui.*` primitives
 - [ ] App shell, layouts, navigation
 - [ ] Media pipeline
 - [ ] GameAssets module + asset policy

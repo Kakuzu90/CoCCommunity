@@ -478,3 +478,34 @@ tint. This is implemented once in the base stylesheet, not per component.
   is a token-file addition, not a component rewrite.
 - The fan-content disclaimer (§2.1 condition 6) is part of the global footer component, present on
   every page including admin, and is not dismissible.
+
+### Phase 0 implementation
+
+Tokens live in `src/resources/css/tokens.css`, mapped through Tailwind 4 `@theme inline`.
+`ui.css` contains reusable component styles and the shared reduced-motion rule. The gallery has
+its own small presentation wrapper; the application shell is a separate task.
+
+The primitive API and integration examples are documented in
+[`components/ui/README.md`](../src/resources/views/components/ui/README.md). The gallery demonstrates
+buttons, fields, native and searchable selects, choice controls, cards, pills, badges, avatars,
+modal/sheet, toasts, alerts, skeletons, empty state, tooltips, menus, tabs, pagination, load-more /
+sentinel and progress. GameAsset and the signature/domain-specific components stay in their
+respective phase tasks. Category/TH pills are labelled generic primitives until those domain maps exist.
+
+Implementation choices:
+- Native `<dialog>` provides background inertness, with an explicit keyboard focus cycle, Escape,
+  focus restoration, scroll lock, and a mobile bottom-sheet treatment.
+- The searchable select keeps the native select and adds a labelled Alpine filter plus a no-match
+  message. This avoids a second custom combobox keyboard implementation.
+- Fonts are locked Fontsource dependencies (Lilita One, Inter, JetBrains Mono), served locally by
+  Vite with latin/latin-ext subsets and `font-display: swap`. Only the display WOFF2 is preloaded.
+- Livewire's ESM bundle supplies the single Alpine instance; local UI actions perform no server writes.
+- Small button sizes remain 32/40/48px on fine pointers, with at least 44px on coarse pointers.
+- The gallery is guarded at request time and returns 404 in production, including with cached routes.
+- Raw template colors are checked in `DesignTokensTest`. The stock Laravel welcome view remains
+  outside that lint scope until the next app-shell task replaces it.
+
+Verification: PHP tests cover gallery access, markup contracts and escaping; Playwright + axe cover
+WCAG 2.1 A/AA automated checks, dialog focus, menu/tab keyboards, field feedback, avatar fallback,
+360px layout, and reduced motion. Browser CI runs alongside the SQLite/Postgres test matrix.
+Automated checks supplement the manual assistive-technology review of product flows at phase exit.

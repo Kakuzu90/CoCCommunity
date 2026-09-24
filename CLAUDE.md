@@ -56,7 +56,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] App shell, layouts, navigation
 - [x] Media pipeline
 - [x] GameAssets module + asset policy
-- [ ] Ops: health, logging, error tracking, workers
+- [x] Ops: health, logging, error tracking, workers
 
 ### Phase 1 — Identity
 - [ ] Registration, login, verification, reset

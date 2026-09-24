@@ -46,6 +46,18 @@ return [
             'after_commit' => false,
         ],
 
+        // Same `jobs` table, longer lease. The media worker runs on this connection so a 900s
+        // re-encode is never re-reserved and run twice — retry_after MUST exceed the media job
+        // timeout (specs/20 §5, the most common database-queue bug).
+        'database-media' => [
+            'driver' => 'database',
+            'connection' => env('DB_QUEUE_CONNECTION'),
+            'table' => env('DB_QUEUE_TABLE', 'jobs'),
+            'queue' => QueueName::Media->value,
+            'retry_after' => (int) env('DB_QUEUE_MEDIA_RETRY_AFTER', 1200),
+            'after_commit' => false,
+        ],
+
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => env('BEANSTALKD_QUEUE_HOST', 'localhost'),

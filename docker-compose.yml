@@ -33,9 +33,38 @@ services:
     networks:
       - coc
 
-  queue:
+  # Queue topology from specs/20 §1: one worker per queue group. --rest keeps idle database-queue
+  # workers from hammering Postgres; --max-time recycles hourly to bound leaks and pick up deploys.
+  # restart + stop_grace_period give the worker-liveness and graceful-drain behaviour of §5.
+  queue-default:
     <<: *app
-    command: php artisan queue:work database --tries=3 --sleep=1 --max-time=3600
+    command: php artisan queue:work database --queue=high,default --tries=3 --sleep=1 --rest=0.2 --max-time=3600
+    restart: unless-stopped
+    stop_grace_period: 130s
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+  # Media runs on the database-media connection (retry_after 1200 > the 900s job timeout) so a long
+  # re-encode is never re-reserved mid-flight (specs/20 §5). CPU-heavy, so memory-capped and recycled.
+  queue-media:
+    <<: *app
+    command: php artisan queue:work database-media --queue=media --tries=2 --sleep=3 --max-time=3600 --memory=512
+    restart: unless-stopped
+    stop_grace_period: 950s
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+  queue-lowsync:
+    <<: *app
+    command: php artisan queue:work database --queue=sync,low --tries=3 --sleep=2 --max-time=3600
+    restart: unless-stopped
+    stop_grace_period: 310s
     depends_on:
       db:
         condition: service_healthy
@@ -45,6 +74,7 @@ services:
   scheduler:
     <<: *app
     command: sh -c "while :; do php artisan schedule:run --no-interaction; sleep 60; done"
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy

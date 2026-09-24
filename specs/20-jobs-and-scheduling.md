@@ -14,10 +14,16 @@ Five named queues on the `database` connection. Worker counts are the MVP baseli
 
 Worker command shape (already in `docker-compose.yml`, extended):
 ```
-php artisan queue:work database --queue=high,default --tries=3 --sleep=1 --rest=0.2 --max-time=3600
-php artisan queue:work database --queue=media       --tries=2 --sleep=3 --max-time=3600 --memory=512
-php artisan queue:work database --queue=sync,low    --tries=3 --sleep=2 --max-time=3600
+php artisan queue:work database       --queue=high,default --tries=3 --sleep=1 --rest=0.2 --max-time=3600
+php artisan queue:work database-media --queue=media        --tries=2 --sleep=3 --max-time=3600 --memory=512
+php artisan queue:work database       --queue=sync,low     --tries=3 --sleep=2 --max-time=3600
 ```
+
+The media worker runs on the **`database-media`** connection, not `database`: it is the same `jobs`
+table but with `retry_after = 1200` (> the 900 s media timeout), which is what stops a long
+re-encode being re-reserved and run twice (§5). The three workers are separate compose services
+(`queue-default`, `queue-media`, `queue-lowsync`), each with `restart: unless-stopped` and a
+`stop_grace_period` above its queue's timeout so a deploy drains in flight.
 
 `--max-time=3600` recycles workers hourly, which bounds memory leaks and picks up deploys.
 `--rest` matters on a database queue: it stops idle workers from hammering Postgres with polling.
@@ -85,11 +91,12 @@ php artisan queue:work database --queue=sync,low    --tries=3 --sleep=2 --max-ti
 | `GenerateSitemapJob` | Nightly | Public bases + profiles, chunked sitemap index |
 | `ExportUserDataJob` | On request | Builds a ZIP, uploads privately, emails a 7-day signed link |
 | `PruneOperationalTablesJob` | Nightly | `sessions`, `cache` expired rows, `coc_api_requests` >7d, `failed_jobs` >30d, `base_view_events` >30d |
-| `CheckExternalHealthJob` | Every 5 min | CoC API + R2 reachability → health endpoint state |
+| `CheckExternalHealthJob` | Every 5 min | CoC API + R2 reachability → health endpoint state. Implemented as the `platform:check-health` command (probes object storage now; the CoC API check slots in with Phase 2). Caches the result under `health:external` for `/health` to read |
 
 ## 3. Schedule
 
 ```
+every min    health:scheduler-heartbeat   (writes a heartbeat /health reads to detect a dead scheduler)
 * / 5 min    coc:sync-accounts            (withoutOverlapping, onOneServer)
 * / 5 min    platform:check-health
 * / 15 min   bases:recompute-trending
@@ -174,4 +181,19 @@ connection entry with its own `retry_after`.
 | Worker liveness | Any worker container restarting more than twice in 10 min |
 
 An admin "System Health" page shows all of the above plus the CoC key-pool status, so a moderator
-can tell the difference between "the user is lying" and "sync has been broken since Tuesday".
+can tell the difference between "the user is lying" and "sync has been broken since Tuesday". (The
+admin page lands with Admin v1 in Phase 1; Phase 0 ships the machine-readable surface it will read.)
+
+### Health endpoint and request logging (Phase 0)
+
+- **`GET /health`** (unauthenticated, no session/cookie) reports `database`, `queue` and `storage`
+  as JSON and returns **503 only when the database is down** — the one failure that means the app
+  cannot serve. Storage/queue degradation returns 200 with `status: degraded|down` in the body, so
+  uptime paging and finer alerting stay separable (NFR-OBS-4). `/up` remains the bare liveness probe.
+- **`storage`** is read from the cached `platform:check-health` result, never probed on the request
+  path; **`queue`** reads live backlog + failed-job counts and the scheduler heartbeat.
+- **Structured logs (NFR-OBS-1):** `AssignRequestId` sets/echoes `X-Request-Id` and shares it (plus
+  the user id and release) through `Context`, so every line — including one `request.handled` access
+  line per request on the `json` channel — is correlated JSON. Uptime probes are not access-logged.
+- **Error tagging (NFR-OBS-2):** unhandled exceptions are reported with the release and request id;
+  the `withExceptions` report hook is the single point a Sentry client slots into later.

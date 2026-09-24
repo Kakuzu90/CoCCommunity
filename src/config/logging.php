@@ -1,5 +1,6 @@
 <?php
 
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -19,6 +20,18 @@ return [
     */
 
     'default' => env('LOG_CHANNEL', 'stack'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Structured Access-Log Channel
+    |--------------------------------------------------------------------------
+    |
+    | The channel LogRequests writes one JSON line per request to (NFR-OBS-1).
+    | Defaults to the `json` channel below.
+    |
+    */
+
+    'request_channel' => env('LOG_REQUEST_CHANNEL', 'json'),
 
     /*
     |--------------------------------------------------------------------------
@@ -56,6 +69,19 @@ return [
             'driver' => 'stack',
             'channels' => explode(',', (string) env('LOG_STACK', 'single')),
             'ignore_exceptions' => false,
+        ],
+
+        // Structured JSON to stderr for containers/log shippers. Laravel merges Context
+        // (request_id, user_id, release) into every record, satisfying NFR-OBS-1.
+        'json' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => StreamHandler::class,
+            'handler_with' => [
+                'stream' => 'php://stderr',
+            ],
+            'formatter' => JsonFormatter::class,
+            'processors' => [PsrLogMessageProcessor::class],
         ],
 
         'single' => [

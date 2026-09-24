@@ -36,5 +36,20 @@
 <symbol id="ui-icon-heart" viewBox="0 0 24 24">
 <path d="M12 20S3 14 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6-9 12-9 12Z" />
 </symbol>
+<symbol id="ui-icon-home" viewBox="0 0 24 24">
+<path d="M4 11.5 12 4l8 7.5M6 10v10h12V10" />
+<path d="M10 20v-5h4v5" />
+</symbol>
+<symbol id="ui-icon-bell" viewBox="0 0 24 24">
+<path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6Z" />
+<path d="M10 20a2 2 0 0 0 4 0" />
+</symbol>
+<symbol id="ui-icon-user" viewBox="0 0 24 24">
+<path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+<path d="M4 20a8 8 0 0 1 16 0" />
+</symbol>
+<symbol id="ui-icon-menu" viewBox="0 0 24 24">
+<path d="M4 7h16M4 12h16M4 17h16" />
+</symbol>
 </defs>
 </svg>

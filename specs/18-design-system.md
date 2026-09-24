@@ -483,7 +483,9 @@ tint. This is implemented once in the base stylesheet, not per component.
 
 Tokens live in `src/resources/css/tokens.css`, mapped through Tailwind 4 `@theme inline`.
 `ui.css` contains reusable component styles and the shared reduced-motion rule. The gallery has
-its own small presentation wrapper; the application shell is a separate task.
+its own small presentation wrapper. The application shell (`<x-layouts.app>`, top bar, desktop
+sidebar, mobile bottom tabs, footer disclaimer) ships in the app-shell task and drives its
+primary nav from `config/navigation.php`.
 
 The primitive API and integration examples are documented in
 [`components/ui/README.md`](../src/resources/views/components/ui/README.md). The gallery demonstrates
@@ -503,8 +505,8 @@ Implementation choices:
 - Livewire's ESM bundle supplies the single Alpine instance; local UI actions perform no server writes.
 - Small button sizes remain 32/40/48px on fine pointers, with at least 44px on coarse pointers.
 - The gallery is guarded at request time and returns 404 in production, including with cached routes.
-- Raw template colors are checked in `DesignTokensTest`. The stock Laravel welcome view remains
-  outside that lint scope until the next app-shell task replaces it.
+- Raw template colors are checked in `DesignTokensTest` across `components/`, `dev/` and `pages/`.
+  The stock Laravel welcome view was removed when the app shell replaced the home route.
 
 Verification: PHP tests cover gallery access, markup contracts and escaping; Playwright + axe cover
 WCAG 2.1 A/AA automated checks, dialog focus, menu/tab keyboards, field feedback, avatar fallback,

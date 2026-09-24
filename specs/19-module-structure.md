@@ -189,6 +189,7 @@ config/
 ├── bases.php      # categories, TH range, trending weights, publish quotas
 ├── recruitment.php# activity levels, war preferences, expiry and bump windows
 ├── platform.php   # feature flags defaults, trust-ramp thresholds, reserved usernames
+├── navigation.php # primary nav items (label, route, icon) rendered as top bar, sidebar and bottom tabs
 ├── assets.php     # pack_version, manifest path, CDN base, enabled flag, placeholder + fallback rules
 ```
 

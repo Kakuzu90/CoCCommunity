@@ -55,6 +55,14 @@
 <code class="text-secondary mt-3 block">#P0Y8Q2 · 24,680</code>
 </x-ui.card>
 </div>
+            <x-ui.card class="mt-6">
+<p class="gallery-eyebrow mb-3">Iconography · original 24px outline set, no game marks</p>
+<div class="grid grid-cols-4 sm:grid-cols-8 gap-4">@foreach(['home', 'search', 'layers', 'shield', 'user', 'bell', 'menu', 'heart', 'star', 'plus', 'check', 'close', 'chevron', 'arrow', 'info', 'spinner'] as $name)<div class="gallery-swatch" style="display:grid;place-items:center">
+<x-ui.icon :name="$name" size="24" />
+</div>
+@endforeach
+</div>
+</x-ui.card>
         </section>
         <section id="actions" class="gallery-section">
             <div class="gallery-section-head">

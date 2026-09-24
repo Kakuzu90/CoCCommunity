@@ -153,3 +153,80 @@
 .ui-select-option { display: flex; justify-content: space-between; gap: var(--space-2); padding: var(--space-3); min-height: 44px; border-radius: var(--radius-sm); cursor: pointer; overflow-wrap: anywhere; }
 .ui-select-option.is-active { background: var(--brand-primary); color: var(--text-inverse); }
 .ui-select-empty { padding: var(--space-3); }
+
+/* ── Application shell (specs/18-design-system.md §5) ───────────────────────── */
+@layer components {
+    .app-shell { min-height: 100dvh; display: flex; flex-direction: column; }
+
+    .app-topbar { position: sticky; top: 0; z-index: var(--z-sticky); display: flex; align-items: center; gap: var(--space-3); height: 56px; padding: 0 var(--space-4); background: color-mix(in srgb, var(--bg-page) 90%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-subtle); }
+    .app-brand { display: inline-flex; align-items: center; gap: var(--space-2); text-decoration: none; color: var(--text-primary); white-space: nowrap; }
+    .app-brand-mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: var(--radius-md); background: var(--brand-primary); color: var(--text-inverse); font-family: var(--font-display); font-size: var(--text-sm); border-bottom: 3px solid var(--brand-primary-shadow); }
+    .app-brand-word { font-family: var(--font-display); font-size: var(--text-h3); }
+    .app-brand-accent { color: var(--brand-primary); }
+    .app-topbar-spacer { flex: 1; }
+    .app-topbar-nav { display: none; }
+    .app-topbar-actions { display: flex; align-items: center; gap: var(--space-2); }
+
+    .app-iconbtn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: var(--radius-md); color: var(--text-secondary); text-decoration: none; }
+    .app-iconbtn:hover { background: var(--bg-surface-hover); color: var(--text-primary); }
+
+    .app-search { display: none; align-items: center; gap: var(--space-2); flex: 0 1 420px; padding: 0 var(--space-3); height: 40px; background: var(--bg-page); border: 1px solid var(--border-strong); border-radius: var(--radius-full); }
+    .app-search:focus-within { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+    .app-search-icon { color: var(--text-muted); flex: none; }
+    .app-search-input { flex: 1; min-width: 0; height: 100%; background: transparent; border: 0; color: var(--text-primary); }
+    .app-search-input:focus { outline: none; }
+    .app-search-input::placeholder { color: var(--text-muted); }
+
+    .app-body { flex: 1; width: 100%; max-width: 1440px; margin-inline: auto; display: flex; align-items: flex-start; }
+    .app-sidebar { display: none; }
+    .app-main { flex: 1; min-width: 0; }
+    .app-container { max-width: 1200px; margin-inline: auto; padding: var(--space-6) var(--space-4) var(--space-9); }
+
+    .app-nav { list-style: none; margin: 0; padding: 0; }
+    .app-nav-link { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3); border-radius: var(--radius-md); color: var(--text-secondary); text-decoration: none; font-weight: 600; }
+    .app-nav-link:hover { background: var(--bg-surface-hover); color: var(--text-primary); }
+    .app-nav-link[aria-current="page"] { color: var(--brand-primary); background: color-mix(in srgb, var(--brand-primary) 12%, transparent); }
+
+    .app-bottomnav { position: fixed; inset-inline: 0; bottom: 0; z-index: var(--z-sticky); display: flex; background: var(--bg-surface); border-top: 1px solid var(--border-subtle); padding-bottom: env(safe-area-inset-bottom); }
+    .app-bottomnav-link { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 56px; padding: var(--space-1); color: var(--text-muted); text-decoration: none; }
+    .app-bottomnav-link[aria-current="page"] { color: var(--brand-primary); }
+    .app-bottomnav-label { font-size: var(--text-xs); line-height: var(--leading-xs); }
+
+    .app-footer { border-top: 1px solid var(--border-subtle); background: var(--bg-page); }
+    .app-footer-inner { max-width: 1200px; margin-inline: auto; padding: var(--space-6) var(--space-4); display: grid; gap: var(--space-2); }
+    .app-disclaimer { color: var(--text-muted); font-size: var(--text-sm); line-height: var(--leading-sm); margin: 0; }
+    .app-footer-meta { color: var(--text-muted); font-size: var(--text-xs); margin: 0; }
+
+    /* Home landing */
+    .home-hero { padding: var(--space-8) 0 var(--space-9); max-width: 42rem; }
+    .home-eyebrow { color: var(--brand-primary); font-weight: 700; font-size: var(--text-sm); letter-spacing: .02em; text-transform: uppercase; margin: 0 0 var(--space-3); }
+    .home-title { margin: 0 0 var(--space-4); }
+    .home-lead { color: var(--text-secondary); font-size: var(--text-h3); line-height: var(--leading-h3); margin: 0 0 var(--space-6); }
+    .home-cta { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+    .home-values { display: grid; gap: var(--space-4); grid-template-columns: 1fr; }
+    .home-value-title { font-size: var(--text-h3); line-height: var(--leading-h3); margin: 0 0 var(--space-2); }
+
+    /* Mobile keeps the fixed bottom bar clear of the footer. */
+    @media (max-width: 767px) {
+        .app-footer { margin-bottom: calc(56px + env(safe-area-inset-bottom)); }
+        .app-auth-login { display: none; }
+    }
+
+    /* Tablet: bottom bar becomes an inline top nav. */
+    @media (min-width: 768px) {
+        .app-bottomnav { display: none; }
+        .app-topbar-nav { display: flex; gap: var(--space-1); }
+        .app-topbar-nav .app-nav-link { padding: var(--space-2) var(--space-3); }
+        .home-values { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* Desktop: left sidebar + prominent search; drop the inline top nav. */
+    @media (min-width: 1024px) {
+        .app-topbar-nav { display: none; }
+        .app-search { display: flex; }
+        .app-search-trigger { display: none; }
+        .app-sidebar { display: block; position: sticky; top: 56px; align-self: flex-start; flex: 0 0 240px; padding: var(--space-6) var(--space-4); }
+        .app-sidebar .app-nav { display: grid; gap: var(--space-1); }
+        .app-container { padding-inline: var(--space-6); }
+    }
+}

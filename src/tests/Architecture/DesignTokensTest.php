@@ -3,10 +3,10 @@
 use Symfony\Component\Finder\Finder;
 
 it('uses semantic color tokens in design system templates', function () {
-    // The stock Laravel welcome page is replaced by the next app-shell task.
     $files = Finder::create()->files()->name('*.blade.php')->in([
         dirname(__DIR__, 2).'/resources/views/components',
         dirname(__DIR__, 2).'/resources/views/dev',
+        dirname(__DIR__, 2).'/resources/views/pages',
     ]);
     foreach ($files as $file) {
         expect($file->getContents())

@@ -1,5 +1,5 @@
 # PHP 8.3 FPM image for the Clash Commons Laravel app (lives in ../../src).
-# No Redis: cache/queue use the database driver (see specs/10-infrastructure.md).
+# No Redis: cache/queue use the database driver (see specs/21-caching-strategy.md).
 FROM php:8.3-fpm-alpine
 
 ENV COMPOSER_ALLOW_SUPERUSER=1

@@ -1,6 +1,7 @@
 # Clash Commons local dev stack. Laravel app lives in ./src.
 # No Redis by design — cache, queue and sessions use the database driver.
-# Media is on Cloudflare R2 (external), so no storage container here.
+# Media: MinIO locally (S3-compatible, presigned URLs work the same),
+# Cloudflare R2 in staging/production. Swapping is an .env change only.
 
 x-app: &app
   build:
@@ -91,6 +92,55 @@ services:
     networks:
       - coc
 
+  # S3-compatible object storage for local dev, standing in for Cloudflare R2.
+  # Same API and presigned-URL flow, so the media pipeline is exercised for real.
+  # Profile `storage` — start it for any media work:  docker compose --profile storage up -d
+  # Console at http://localhost:9001 (minioadmin / minioadmin).
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - coc
+    profiles:
+      - storage
+
+  # One-shot: creates the bucket and makes the public/ and game/ prefixes readable,
+  # mirroring the R2 + CDN binding described in specs/10-media-storage.md.
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      AWS_BUCKET: ${AWS_BUCKET:-clashcommons-media}
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD &&
+      mc mb --ignore-existing local/$$AWS_BUCKET &&
+      mc anonymous set download local/$$AWS_BUCKET/public &&
+      mc anonymous set download local/$$AWS_BUCKET/game &&
+      echo 'minio ready: bucket '$$AWS_BUCKET' with public/ and game/ readable'
+      "
+    networks:
+      - coc
+    profiles:
+      - storage
+
   # Vite dev server for Livewire/Tailwind assets. Runs only when ./src has a package.json.
   node:
     image: node:20-alpine
@@ -111,3 +161,4 @@ networks:
 
 volumes:
   pgdata:
+  miniodata:

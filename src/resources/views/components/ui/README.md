@@ -28,8 +28,7 @@ Tailwind's raw color palettes are checked in the architecture suite.
   Errors and hints merge with a caller's `aria-describedby`. Callers focus the first invalid
   field after their server-side validation fails.
 - `input` has `prefix`/`suffix`; `textarea` has `counter`/`maxlength` and `value`.
-- `select` takes associative `options` and a selected `value`. `searchable` adds an Alpine-powered,
-  labelled option filter while keeping native select keyboard behavior. Readonly is not a native
+- `select` takes associative `options` and a selected `value`. Select2-style dropdowns include search by default, arrow/Home/End navigation, Enter to select, Escape to close, and clearing optional values. Set `:searchable="false"` to disable filtering. A native select preserves form submission and Livewire input/change events, and is the no-JavaScript fallback. Readonly is not a native
   select state: render a read-only value when editing is disallowed.
 - `checkbox`, `radio`, `toggle`: `id`, `label`, native input attributes. Checkbox also accepts
   `indeterminate`. Group related options with a fieldset and legend. Toggle is a native checkbox

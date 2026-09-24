@@ -142,3 +142,14 @@
     .ui-button:active:not(:disabled), .ui-card[data-variant=interactive]:hover { transform: none; }
     .ui-skeleton::after { display: none; }
 }
+
+.ui-select { position: relative; }
+.ui-select-trigger { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); text-align: left; cursor: pointer; }
+.ui-select-clear { flex-shrink: 0; min-width: 44px; min-height: 44px; color: var(--text-secondary); cursor: pointer; }
+.ui-select-popup { position: absolute; top: 100%; left: 0; right: 0; z-index: var(--z-dropdown); padding: var(--space-2); margin-top: var(--space-1); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--bg-surface-raised); box-shadow: var(--shadow-modal); }
+.ui-select-search { border: 1px solid var(--border-strong); background: var(--bg-page); margin-bottom: var(--space-2); }
+.ui-select-search:focus { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+.ui-select-options { max-height: 15rem; overflow-y: auto; overscroll-behavior: contain; }
+.ui-select-option { display: flex; justify-content: space-between; gap: var(--space-2); padding: var(--space-3); min-height: 44px; border-radius: var(--radius-sm); cursor: pointer; overflow-wrap: anywhere; }
+.ui-select-option.is-active { background: var(--brand-primary); color: var(--text-inverse); }
+.ui-select-empty { padding: var(--space-3); }

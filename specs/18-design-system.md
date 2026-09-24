@@ -238,7 +238,7 @@ Implemented as one component reading a tier map, so a new TH level is a config l
 | **Button** | primary (gold), secondary (surface+border), ghost, danger, success | default, hover, active(compressed), focus-visible, disabled, loading(spinner, width-locked) |
 | | sizes: sm 32px, md 40px, lg 48px; `block`, `icon-only` (square, aria-label required) | |
 | **Input / Textarea** | default, with-prefix, with-suffix, with-counter | default, focus, error, disabled, readonly |
-| **Select** | native-styled, searchable (Alpine) | same |
+| **Select** | searchable dropdown (Alpine), native fallback | same |
 | **Checkbox / Radio / Toggle** | — | default, checked, indeterminate, focus, disabled |
 | **Pill / Tag** | neutral, category (per-category hue), th, status, removable | default, hover, selected |
 | **Badge** | verified (gold check), featured (purple star), role (mod/admin), rarity | — |
@@ -487,7 +487,7 @@ its own small presentation wrapper; the application shell is a separate task.
 
 The primitive API and integration examples are documented in
 [`components/ui/README.md`](../src/resources/views/components/ui/README.md). The gallery demonstrates
-buttons, fields, native and searchable selects, choice controls, cards, pills, badges, avatars,
+buttons, fields, searchable selects, choice controls, cards, pills, badges, avatars,
 modal/sheet, toasts, alerts, skeletons, empty state, tooltips, menus, tabs, pagination, load-more /
 sentinel and progress. GameAsset and the signature/domain-specific components stay in their
 respective phase tasks. Category/TH pills are labelled generic primitives until those domain maps exist.
@@ -495,8 +495,9 @@ respective phase tasks. Category/TH pills are labelled generic primitives until 
 Implementation choices:
 - Native `<dialog>` provides background inertness, with an explicit keyboard focus cycle, Escape,
   focus restoration, scroll lock, and a mobile bottom-sheet treatment.
-- The searchable select keeps the native select and adds a labelled Alpine filter plus a no-match
-  message. This avoids a second custom combobox keyboard implementation.
+- Selects use a Select2-style Alpine dropdown with inline search, selected-option indicators,
+  optional-value clearing, keyboard navigation, focus restoration, and no-match feedback.
+  The backing native select supports form submission, Livewire events, and a no-JavaScript fallback.
 - Fonts are locked Fontsource dependencies (Lilita One, Inter, JetBrains Mono), served locally by
   Vite with latin/latin-ext subsets and `font-display: swap`. Only the display WOFF2 is preloaded.
 - Livewire's ESM bundle supplies the single Alpine instance; local UI actions perform no server writes.

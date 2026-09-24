@@ -1,5 +1,8 @@
 name: Tests
 
+permissions:
+  contents: read
+
 on:
   push:
   pull_request:
@@ -7,7 +10,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
+      fail-fast: false
       matrix:
         database: [sqlite, pgsql]
     services:
@@ -34,16 +39,20 @@ jobs:
           php-version: '8.3'
           extensions: pdo_sqlite, pdo_pgsql
           coverage: none
+      - run: composer validate --strict
       - run: composer install --no-interaction --prefer-dist
       - run: cp .env.example .env
       - run: php artisan key:generate
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: npm
           cache-dependency-path: src/package-lock.json
       - run: npm ci
       - run: npm run build
+      - run: composer lint
+      - run: composer analyse
+      - run: composer architecture
       - run: php artisan test --compact
         env:
           DB_CONNECTION: ${{ matrix.database }}

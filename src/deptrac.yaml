@@ -1,0 +1,270 @@
+# Public interfaces, presentation-only actions/queries, and private module internals.
+# New modules must be classified here; uncovered dependencies fail CI.
+imports:
+  - resource: deptrac.allowlist
+    type: yaml
+deptrac:
+  paths:
+    - ./app
+  layers:
+    - name: AuthPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Auth\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: AuthApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Auth\\(Actions|Queries)\\.*$'
+    - name: AuthInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Auth\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: UsersPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Users\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: UsersApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Users\\(Actions|Queries)\\.*$'
+    - name: UsersInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Users\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: CocIntegrationPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\CocIntegration\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: CocIntegrationApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\CocIntegration\\(Actions|Queries)\\.*$'
+    - name: CocIntegrationInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\CocIntegration\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: PlayerAccountsPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\PlayerAccounts\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: PlayerAccountsApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\PlayerAccounts\\(Actions|Queries)\\.*$'
+    - name: PlayerAccountsInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\PlayerAccounts\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: ClansPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Clans\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: ClansApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Clans\\(Actions|Queries)\\.*$'
+    - name: ClansInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Clans\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: BasesPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Bases\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: BasesApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Bases\\(Actions|Queries)\\.*$'
+    - name: BasesInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Bases\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: RecruitmentPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Recruitment\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: RecruitmentApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Recruitment\\(Actions|Queries)\\.*$'
+    - name: RecruitmentInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Recruitment\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: MarketplacePublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Marketplace\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: MarketplaceApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Marketplace\\(Actions|Queries)\\.*$'
+    - name: MarketplaceInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Marketplace\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: MessagingPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Messaging\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: MessagingApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Messaging\\(Actions|Queries)\\.*$'
+    - name: MessagingInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Messaging\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: MediaPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Media\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: MediaApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Media\\(Actions|Queries)\\.*$'
+    - name: MediaInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Media\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: GameAssetsPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\GameAssets\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: GameAssetsApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\GameAssets\\(Actions|Queries)\\.*$'
+    - name: GameAssetsInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\GameAssets\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: NotificationsPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Notifications\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: NotificationsApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Notifications\\(Actions|Queries)\\.*$'
+    - name: NotificationsInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Notifications\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: ModerationPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Moderation\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: ModerationApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Moderation\\(Actions|Queries)\\.*$'
+    - name: ModerationInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Moderation\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: AuditPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Audit\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: AuditApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Audit\\(Actions|Queries)\\.*$'
+    - name: AuditInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Audit\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: SearchPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Search\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: SearchApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Search\\(Actions|Queries)\\.*$'
+    - name: SearchInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Search\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: AdminPublic
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Admin\\(Contracts|Services|Data|Events|Enums)\\.*$'
+    - name: AdminApplication
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Admin\\(Actions|Queries)\\.*$'
+    - name: AdminInternal
+      collectors:
+        - type: classLike
+          value: '^App\\Domain\\Admin\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+    - name: Presentation
+      collectors:
+        - type: classLike
+          value: '^App\\(?:Http|Livewire)\\.*$'
+    - name: Support
+      collectors:
+        - type: classLike
+          value: '^App\\Support\\.*$'
+    - name: Framework
+      collectors:
+        - type: classLike
+          value: '^(?:Illuminate|Livewire|Carbon|Database\\Factories)\\.*$'
+    - name: Bootstrap
+      collectors:
+        - type: classLike
+          value: '^App\\(?:Providers|View|Console|Models)\\.*$'
+  ruleset:
+    AuthPublic: [AuthApplication, Framework, Support, AuthInternal, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    AuthInternal: [AuthApplication, Framework, Support, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    AuthApplication: [AuthInternal, Framework, Support, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    UsersPublic: [UsersApplication, Framework, Support, UsersInternal, AuthPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    UsersInternal: [UsersApplication, Framework, Support, UsersPublic, AuthPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    UsersApplication: [UsersInternal, Framework, Support, UsersPublic, AuthPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    CocIntegrationPublic: [CocIntegrationApplication, Framework, Support, CocIntegrationInternal]
+    CocIntegrationInternal: [CocIntegrationApplication, Framework, Support, CocIntegrationPublic]
+    CocIntegrationApplication: [CocIntegrationInternal, Framework, Support, CocIntegrationPublic]
+    PlayerAccountsPublic: [PlayerAccountsApplication, Framework, Support, PlayerAccountsInternal, AuthPublic, UsersPublic, CocIntegrationPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    PlayerAccountsInternal: [PlayerAccountsApplication, Framework, Support, PlayerAccountsPublic, AuthPublic, UsersPublic, CocIntegrationPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    PlayerAccountsApplication: [PlayerAccountsInternal, Framework, Support, PlayerAccountsPublic, AuthPublic, UsersPublic, CocIntegrationPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    ClansPublic: [ClansApplication, Framework, Support, ClansInternal, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    ClansInternal: [ClansApplication, Framework, Support, ClansPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    ClansApplication: [ClansInternal, Framework, Support, ClansPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    BasesPublic: [BasesApplication, Framework, Support, BasesInternal, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    BasesInternal: [BasesApplication, Framework, Support, BasesPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    BasesApplication: [BasesInternal, Framework, Support, BasesPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    RecruitmentPublic: [RecruitmentApplication, Framework, Support, RecruitmentInternal, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    RecruitmentInternal: [RecruitmentApplication, Framework, Support, RecruitmentPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    RecruitmentApplication: [RecruitmentInternal, Framework, Support, RecruitmentPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    MarketplacePublic: [MarketplaceApplication, Framework, Support, MarketplaceInternal, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    MarketplaceInternal: [MarketplaceApplication, Framework, Support, MarketplacePublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    MarketplaceApplication: [MarketplaceInternal, Framework, Support, MarketplacePublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    MessagingPublic: [MessagingApplication, Framework, Support, MessagingInternal, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    MessagingInternal: [MessagingApplication, Framework, Support, MessagingPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    MessagingApplication: [MessagingInternal, Framework, Support, MessagingPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    MediaPublic: [MediaApplication, Framework, Support, MediaInternal]
+    MediaInternal: [MediaApplication, Framework, Support, MediaPublic]
+    MediaApplication: [MediaInternal, Framework, Support, MediaPublic]
+    GameAssetsPublic: [GameAssetsApplication, Framework, Support, GameAssetsInternal]
+    GameAssetsInternal: [GameAssetsApplication, Framework, Support, GameAssetsPublic]
+    GameAssetsApplication: [GameAssetsInternal, Framework, Support, GameAssetsPublic]
+    NotificationsPublic: [NotificationsApplication, Framework, Support, NotificationsInternal, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    NotificationsInternal: [NotificationsApplication, Framework, Support, NotificationsPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    NotificationsApplication: [NotificationsInternal, Framework, Support, NotificationsPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    ModerationPublic: [ModerationApplication, Framework, Support, ModerationInternal, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, AuditPublic, SearchPublic, AdminPublic]
+    ModerationInternal: [ModerationApplication, Framework, Support, ModerationPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, AuditPublic, SearchPublic, AdminPublic]
+    ModerationApplication: [ModerationInternal, Framework, Support, ModerationPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, AuditPublic, SearchPublic, AdminPublic]
+    AuditPublic: [AuditApplication, Framework, Support, AuditInternal]
+    AuditInternal: [AuditApplication, Framework, Support, AuditPublic]
+    AuditApplication: [AuditInternal, Framework, Support, AuditPublic]
+    SearchPublic: [SearchApplication, Framework, Support, SearchInternal, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, AdminPublic]
+    SearchInternal: [SearchApplication, Framework, Support, SearchPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, AdminPublic]
+    SearchApplication: [SearchInternal, Framework, Support, SearchPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, AdminPublic]
+    AdminPublic: [AdminApplication, Framework, Support, AdminInternal, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic]
+    AdminInternal: [AdminApplication, Framework, Support, AdminPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic]
+    AdminApplication: [AdminInternal, Framework, Support, AdminPublic, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic]
+    Presentation: [Framework, Support, AuthApplication, UsersApplication, CocIntegrationApplication, PlayerAccountsApplication, ClansApplication, BasesApplication, RecruitmentApplication, MarketplaceApplication, MessagingApplication, MediaApplication, GameAssetsApplication, NotificationsApplication, ModerationApplication, AuditApplication, SearchApplication, AdminApplication, AuthPublic, UsersPublic, CocIntegrationPublic, PlayerAccountsPublic, ClansPublic, BasesPublic, RecruitmentPublic, MarketplacePublic, MessagingPublic, MediaPublic, GameAssetsPublic, NotificationsPublic, ModerationPublic, AuditPublic, SearchPublic, AdminPublic]
+    Support: [Framework]
+    Bootstrap: [AuthApplication, UsersApplication, CocIntegrationApplication, PlayerAccountsApplication, ClansApplication, BasesApplication, RecruitmentApplication, MarketplaceApplication, MessagingApplication, MediaApplication, GameAssetsApplication, NotificationsApplication, ModerationApplication, AuditApplication, SearchApplication, AdminApplication, AuthPublic, AuthInternal, UsersPublic, UsersInternal, CocIntegrationPublic, CocIntegrationInternal, PlayerAccountsPublic, PlayerAccountsInternal, ClansPublic, ClansInternal, BasesPublic, BasesInternal, RecruitmentPublic, RecruitmentInternal, MarketplacePublic, MarketplaceInternal, MessagingPublic, MessagingInternal, MediaPublic, MediaInternal, GameAssetsPublic, GameAssetsInternal, NotificationsPublic, NotificationsInternal, ModerationPublic, ModerationInternal, AuditPublic, AuditInternal, SearchPublic, SearchInternal, AdminPublic, AdminInternal, Presentation, Support, Framework]
+    Framework: []

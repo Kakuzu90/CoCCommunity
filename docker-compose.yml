@@ -143,11 +143,11 @@ services:
 
   # Vite dev server for Livewire/Tailwind assets. Runs only when ./src has a package.json.
   node:
-    image: node:20-alpine
+    image: node:22-alpine
     working_dir: /var/www/html
     volumes:
       - ./src:/var/www/html
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
     ports:
       - "${VITE_PORT:-5173}:5173"
     networks:

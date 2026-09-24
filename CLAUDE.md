@@ -3,9 +3,9 @@
 A Clash of Clans community platform: verified in-game account ownership, base-layout sharing,
 recruitment, and later a services marketplace. Laravel app lives in `src/`.
 
-**Current state: greenfield.** `src/` is empty. Docker, CI and the full spec set exist; no
-application code has been written yet. Phase 0 task 1 is `composer create-project` into `src/`
-(see `DOCKER.md` → First run).
+**Current state:** Laravel 12 is scaffolded in `src/` with Livewire 3, Tailwind 4, Pest,
+Pint, PHPStan/Larastan and Deptrac. See `DOCKER.md` for setup and CI commands.
+The remaining Phase 0 tasks and application features are not implemented.
 
 ## Starting a session
 

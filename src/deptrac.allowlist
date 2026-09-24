@@ -1,0 +1,3 @@
+# Reviewed exceptions require a reason comment beside each entry.
+deptrac:
+  skip_violations: {}

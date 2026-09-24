@@ -22,28 +22,19 @@ Everything runs locally with no external accounts: MinIO stands in for Cloudflar
 ## First run
 
 ```bash
-# 1. Create the Laravel app into src/ (only if it doesn't exist yet)
-docker compose run --rm app composer create-project laravel/laravel .
+# 1. Install the committed dependencies
+docker compose run --rm app composer install --no-interaction --prefer-dist
 
-# 2. Configure env: start from Laravel's own template, then append the Docker keys
-#    (the Docker file is a partial — it does not contain APP_KEY, APP_ENV, etc.)
+# 2. Configure the app (only on a fresh checkout)
 cp src/.env.example src/.env
-cat .env.docker.example >> src/.env        # later keys win; review the result once
 docker compose run --rm app php artisan key:generate
 
-# 3. Start the stack. Add --profile storage whenever you are doing media work
-#    (minio-init then creates the bucket and exits).
-docker compose --profile storage up -d --build
+# 3. Build assets and start the stack
+docker compose --profile assets run --rm node sh -c 'npm ci && npm run build'
+docker compose up -d --build
 
-# 4. Migrate (and create the cache/queue/session tables)
+# 4. Migrate. The committed migrations already include cache, queue and sessions.
 docker compose exec app php artisan migrate
-docker compose exec app php artisan session:table
-docker compose exec app php artisan queue:table
-docker compose exec app php artisan cache:table
-docker compose exec app php artisan migrate
-
-# 5. Check storage is reachable (needs --profile storage running; empty list is fine)
-docker compose exec app php artisan tinker --execute="dump(Storage::disk('s3')->files());"
 ```
 
 ## Everyday commands
@@ -63,25 +54,32 @@ Ports are overridable via `APP_PORT`, `DB_PORT`, `MAILPIT_UI_PORT`, `VITE_PORT`,
 
 ## Project state
 
-`src/` is empty. No application code has been written yet — the previous implementation was removed
-in the spec refactor. Start from `CLAUDE.md` and `specs/25-development-phases.md`; the first task is
-Phase 0 "Project setup".
+Laravel 12 is installed with Livewire 3, Tailwind 4, Pest 3, Pint, Larastan and Deptrac.
+The stock User model lives in `app/Domain/Auth/Models`; its schema is still Laravel's
+bootstrap schema. Identity fields and behavior belong to Phase 1.
 
-Notes for whoever writes the first migrations: roles are a single `users.role` enum column, **not**
-Spatie's permission tables, and domain code lives in `app/Domain/*` (see
-[`specs/19-module-structure.md`](specs/19-module-structure.md)).
+Run the CI checks locally:
+
+```bash
+docker compose exec app composer ci
+# Use a separate test database, never the development database:
+docker compose exec db createdb -U coc coc_test
+docker compose exec -e DB_CONNECTION=pgsql -e DB_DATABASE=coc_test app php artisan test --compact
+```
+
+`composer ci` runs Pint, PHPStan L6, PHPStan L8 on Domain, Deptrac and Pest.
+GitHub Actions runs these checks plus the frontend build on SQLite and PostgreSQL 16.
+Tests default to in-memory SQLite, array cache/session and synchronous queues.
+Environment variables can select PostgreSQL without changing `phpunit.xml`.
+Node 22 is used for the Vite 7 build. Livewire supplies Alpine; do not load it twice.
+
+Deptrac uses the module boundaries in spec 19. Any reviewed exception belongs in
+`src/deptrac.allowlist` with a reason comment. Models are internal to their module.
 
 ## Environment (`src/.env`)
 
 `src/.env` is git-ignored, so it does **not** travel with the repo. On a fresh checkout you recreate it; `.env.docker.example` is the reference for the Docker-specific keys.
 
-**Already wired** (set during scaffolding — no action needed for local dev):
-
-**Recreating `src/.env` from scratch:**
-
-```bash
-cp src/.env.example src/.env            # Laravel's own template
-docker compose run --rm app php artisan key:generate
-# then re-apply the Docker keys from the "Already wired" table above
-# (or copy the relevant lines out of .env.docker.example)
-```
+The template configures PostgreSQL, database cache/queue/sessions and Mailpit.
+For media work, start `--profile storage` and apply the storage keys from
+`.env.docker.example`; the media pipeline is a separate Phase 0 task.

@@ -1,3 +1,8 @@
+@php
+    // Original placeholder art (ours) used only to demonstrate the resolver's clan-badge
+    // pass-through <img> branch in this gallery — not a Supercell asset.
+    $sampleBadge = 'data:image/svg+xml;utf8,'.rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72"><rect width="72" height="72" rx="14" fill="#2A3150"/><path d="M36 12l18 6v14c0 12-8 20-18 26-10-6-18-14-18-26V18z" fill="#F5B800"/></svg>');
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,7 +29,7 @@
 <h1>A common language.<br>Room to make it yours.</h1>
 <p class="gallery-description">Bold where we celebrate. Clear where we work. The building blocks of Clash Commons, from the first tap to the next milestone.</p>
 </div>
-        <nav class="gallery-nav" aria-label="Component sections">@foreach(['foundations' => 'Foundations', 'actions' => 'Actions', 'forms' => 'Forms', 'identity' => 'Identity', 'surfaces' => 'Surfaces', 'feedback' => 'Feedback', 'navigation' => 'Navigation'] as $id => $text)<a href="#{{ $id }}">{{ $text }}</a>
+        <nav class="gallery-nav" aria-label="Component sections">@foreach(['foundations' => 'Foundations', 'actions' => 'Actions', 'forms' => 'Forms', 'identity' => 'Identity', 'surfaces' => 'Surfaces', 'feedback' => 'Feedback', 'navigation' => 'Navigation', 'game-assets' => 'Game assets'] as $id => $text)<a href="#{{ $id }}">{{ $text }}</a>
 
 @endforeach
 </nav>
@@ -296,6 +301,24 @@
 </div>
 </x-ui.card>
 </div>
+        </section>
+        <section id="game-assets" class="gallery-section">
+            <div class="gallery-section-head">
+<span class="gallery-number">08</span>
+<h2>Game assets, unmodified and labelled</h2>
+</div>
+<x-ui.card>
+<p class="ui-help">Every Clash of Clans asset is referenced through <code>&lt;x-game.asset&gt;</code> / <code>GameAssetResolver</code> — never a hardcoded path (specs/18 §2.3). Each carries an accessible name and, when the asset is unknown or the category kill switch is off, falls back to our own original placeholder. The curated pack itself lands in Phase 2, so the catalogue examples below render as placeholders today.</p>
+<div class="gallery-row" style="align-items: flex-end; gap: var(--space-4)">
+<figure><x-game.asset type="townhall" :value="15" :size="72" /><figcaption class="ui-label">Town Hall 15</figcaption></figure>
+<figure><x-game.asset type="unit" value="barbarian-king" name="Barbarian King" :size="72" /><figcaption class="ui-label">Barbarian King</figcaption></figure>
+<figure><x-game.asset type="league" :value="29000022" name="Legend League" :size="72" /><figcaption class="ui-label">Legend League</figcaption></figure>
+<figure><x-game.asset type="clan" :value="$sampleBadge" name="Sample Clan" :size="72" /><figcaption class="ui-label">Clan badge (pass-through)</figcaption></figure>
+</div>
+<div class="gallery-row" style="align-items: flex-end; gap: var(--space-3); margin-top: var(--space-4)">@foreach([32, 48, 64, 96] as $s)<x-game.asset type="townhall" :value="14" :size="$s" />
+@endforeach
+</div>
+</x-ui.card>
         </section>
     </main>
     <footer class="gallery-footer">

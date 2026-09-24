@@ -229,4 +229,17 @@
         .app-sidebar .app-nav { display: grid; gap: var(--space-1); }
         .app-container { padding-inline: var(--space-6); }
     }
+
+    /* Game assets (specs/18 §2). Sized with CSS over a byte-exact source file, never by
+       transforming the file. The placeholder is our own original mark, shown when the asset is
+       unknown or the category is switched off — a game asset never carries meaning alone. */
+    .game-asset { display: inline-block; width: var(--game-asset-size, 64px); height: var(--game-asset-size, 64px); object-fit: contain; vertical-align: middle; }
+    .game-asset--placeholder {
+        width: var(--game-asset-size, 64px); height: var(--game-asset-size, 64px);
+        display: inline-flex; align-items: center; justify-content: center;
+        background: var(--bg-surface-raised); border: 1px solid var(--border-default);
+        border-radius: var(--radius-md); color: var(--text-muted);
+    }
+    .game-asset__mark { font-weight: 700; font-size: calc(var(--game-asset-size, 64px) * 0.42); line-height: 1; }
+
 }

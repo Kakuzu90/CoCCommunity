@@ -1,0 +1,5 @@
+{
+    "version": 1,
+    "note": "Phase 0 ships the pipeline, not the pack. The curated catalogue (troop/hero/spell/equipment icons, Town Hall imagery, league emblems) is assembled and published in Phase 2 'Asset pack v1' — a task blocked on a human (see CLAUDE.md). Until then this manifest is empty and GameAssetResolver returns our placeholder for every unit, Town Hall and league, which is the intended fallback-everywhere behaviour.",
+    "assets": []
+}

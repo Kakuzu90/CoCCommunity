@@ -8,7 +8,7 @@
 
     {{-- Desktop: prominent search with a "/" shortcut. --}}
     <form class="app-search" role="search" action="{{ route('search') }}" method="get"
-          x-data @keydown.window.slash.prevent="$refs.q.focus()">
+          x-data @keydown.window.slash="if (!/^(?:INPUT|TEXTAREA|SELECT)$/.test($event.target.tagName) && !$event.target.isContentEditable) { $event.preventDefault(); $refs.q.focus(); }">
         <x-ui.icon name="search" size="20" class="app-search-icon" />
         <label class="sr-only" for="topbar-search">Search bases, players and clans</label>
         <input id="topbar-search" name="q" type="search" x-ref="q" class="app-search-input"

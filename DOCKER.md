@@ -10,7 +10,9 @@ Everything runs locally with no external accounts: MinIO stands in for Cloudflar
 | --- | --- | --- |
 | `web` | Nginx → PHP-FPM | http://localhost:8080 |
 | `app` | PHP-FPM (Laravel) | — |
-| `queue` | `queue:work database` | — |
+| `queue-default` | `queue:work` — high/default queues | — |
+| `queue-media` | `queue:work database-media` — image/video processing (**required for avatar/media uploads**) | — |
+| `queue-lowsync` | `queue:work` — sync/low queues | — |
 | `scheduler` | `schedule:run` each minute | — |
 | `db` | PostgreSQL 16 | localhost:5432 |
 | `minio` | S3-compatible object storage (stands in for R2), profile `storage` | API localhost:9000 · console http://localhost:9001 |
@@ -82,4 +84,7 @@ Deptrac uses the module boundaries in spec 19. Any reviewed exception belongs in
 
 The template configures PostgreSQL, database cache/queue/sessions and Mailpit.
 For media work, start `--profile storage` and apply the storage keys from
-`.env.docker.example`; the media pipeline is a separate Phase 0 task.
+`.env.docker.example`. Uploads (avatars, base images) also need the `queue-media`
+worker running — it processes each upload into its variants; `docker compose up -d`
+starts it. If an upload stalls on "Processing…", check `docker compose ps` for
+`queue-media` and its logs (`docker compose logs queue-media`).

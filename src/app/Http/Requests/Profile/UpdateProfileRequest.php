@@ -19,8 +19,9 @@ class UpdateProfileRequest extends FormRequest
     }
 
     /**
-     * Normalise before validation: lower-case language codes (so 'EN' is accepted) and keep only
-     * known social platforms so unknown keys cannot slip through the array rule.
+     * Normalise before validation: trim and drop blank language tags (the tag input can submit an
+     * empty trailing field) and keep only known social platforms so unknown keys cannot slip
+     * through the array rule.
      */
     protected function prepareForValidation(): void
     {
@@ -28,9 +29,9 @@ class UpdateProfileRequest extends FormRequest
 
         $languages = $this->input('languages');
         if (is_array($languages)) {
-            $merge['languages'] = array_values(array_map(
-                fn ($l) => is_string($l) ? Str::lower(trim($l)) : $l,
-                $languages,
+            $merge['languages'] = array_values(array_filter(
+                array_map(fn ($l) => is_string($l) ? trim($l) : $l, $languages),
+                fn ($l) => is_string($l) && $l !== '',
             ));
         }
 
@@ -55,7 +56,7 @@ class UpdateProfileRequest extends FormRequest
             'bio' => ['nullable', 'string', 'max:'.$p['bio_max']],
             'country_code' => ['nullable', 'string', 'regex:'.$p['country_pattern']],
             'languages' => ['nullable', 'array', 'max:'.$p['languages_max']],
-            'languages.*' => ['string', 'regex:'.$p['language_pattern'], 'distinct'],
+            'languages.*' => ['string', 'max:'.$p['language_max'], 'distinct:ignore_case'],
             'timezone' => ['nullable', 'timezone'],
             'socials' => ['nullable', 'array'],
         ];
@@ -70,10 +71,7 @@ class UpdateProfileRequest extends FormRequest
 
     public function toInput(): ProfileInput
     {
-        $languages = array_values(array_map(
-            fn (string $l): string => Str::lower($l),
-            (array) $this->validated('languages', []),
-        ));
+        $languages = array_values((array) $this->validated('languages', []));
 
         $socials = array_filter(
             (array) $this->validated('socials', []),

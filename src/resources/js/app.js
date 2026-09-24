@@ -186,6 +186,25 @@ Alpine.data('avatarUploader', () => ({
     csrf() { return document.querySelector('meta[name=csrf-token]')?.content || ''; },
 }));
 
+// Free-text tag entry (profile languages): type a value and press Enter to add a removable chip.
+// Each chip is mirrored to a hidden input so the form posts a plain `name[]` array.
+Alpine.data('tagInput', ({ tags = [], max = 5, maxLength = 30 } = {}) => ({
+    tags: Array.isArray(tags) ? tags.filter(t => typeof t === 'string') : [],
+    draft: '', max, maxLength,
+    add() {
+        const value = this.draft.trim().slice(0, this.maxLength);
+        if (!value) return;
+        if (this.tags.length >= this.max) { this.draft = ''; return; }
+        if (!this.tags.some(t => t.toLowerCase() === value.toLowerCase())) this.tags.push(value);
+        this.draft = '';
+    },
+    remove(index) { this.tags.splice(index, 1); this.$nextTick(() => this.$refs.entry?.focus()); },
+    onKey(event) {
+        if (event.key === ',') { event.preventDefault(); this.add(); }
+        if (event.key === 'Backspace' && this.draft === '' && this.tags.length) { event.preventDefault(); this.tags.pop(); }
+    },
+}));
+
 // Vite includes this font in its manifest for the server-rendered preload.
 void displayFont;
 if (window.livewireScriptConfig) Livewire.start();

@@ -79,14 +79,24 @@
                     hint="e.g. Europe/London." :error="$errors->first('timezone')" />
             </div>
 
-            <fieldset class="settings-fieldset">
+            <fieldset class="settings-fieldset"
+                x-data="tagInput({ tags: {{ Js::from(old('languages', $profile->languages ?? [])) }}, max: {{ $p['languages_max'] }}, maxLength: {{ $p['language_max'] }} })">
                 <legend class="ui-label">Languages</legend>
-                <p class="ui-help">Up to {{ $p['languages_max'] }} two-letter codes, e.g. en.</p>
-                <div class="settings-grid settings-grid-3">
-                    @for($i = 0; $i < $p['languages_max']; $i++)
-                        <x-ui.input :id="'language_'.$i" name="languages[]" label="Language {{ $i + 1 }}"
-                            :value="old('languages.'.$i, $profile->languages[$i] ?? '')" maxlength="2" />
-                    @endfor
+                <p class="ui-help">Type a language and press Enter, e.g. English or Bisaya. Up to {{ $p['languages_max'] }}.</p>
+                <div class="tag-input" @click="$refs.entry.focus()">
+                    <template x-for="(tag, index) in tags" :key="index">
+                        <span class="ui-pill" data-tone="neutral">
+                            <span x-text="tag"></span>
+                            <input type="hidden" name="languages[]" :value="tag">
+                            <button type="button" class="tag-remove" x-on:click="remove(index)" x-bind:aria-label="`Remove ${tag}`">
+                                <x-ui.icon name="close" size="16" />
+                            </button>
+                        </span>
+                    </template>
+                    <input x-ref="entry" type="text" x-model="draft" class="tag-input-entry"
+                        x-bind:maxlength="maxLength" x-show="tags.length < max"
+                        x-on:keydown.enter.prevent="add()" x-on:keydown="onKey($event)" x-on:blur="add()"
+                        placeholder="Add a language" aria-label="Add a language">
                 </div>
                 @error('languages')<p class="ui-error">{{ $message }}</p>@enderror
                 @error('languages.*')<p class="ui-error">{{ $message }}</p>@enderror

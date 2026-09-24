@@ -43,7 +43,7 @@ it('saves valid profile fields and normalises them', function () {
         'display_name' => '  Chief Ruben  ',
         'bio' => 'TH15 rusher, war three-star enjoyer.',
         'country_code' => 'gb',
-        'languages' => ['EN', 'de'],
+        'languages' => ['English', 'Bisaya'],
         'timezone' => 'Europe/London',
         'socials' => ['youtube' => 'ChiefRuben', 'twitch' => 'chief_ruben'],
     ])->assertRedirect(route('settings.profile.edit'))->assertSessionHas('status', 'profile-updated');
@@ -51,7 +51,7 @@ it('saves valid profile fields and normalises them', function () {
     $profile = Profile::where('user_id', $user->id)->firstOrFail();
     expect($profile->display_name)->toBe('Chief Ruben')
         ->and($profile->country_code)->toBe('GB')
-        ->and($profile->languages)->toBe(['en', 'de'])
+        ->and($profile->languages)->toBe(['English', 'Bisaya'])
         ->and($profile->socials)->toBe(['youtube' => 'ChiefRuben', 'twitch' => 'chief_ruben']);
 });
 
@@ -77,9 +77,9 @@ it('rejects invalid profile input', function (array $payload, string $field) {
         ->assertSessionHasErrors($field);
 })->with([
     'bio too long' => [['bio' => str_repeat('a', 501)], 'bio'],
-    'too many languages' => [['languages' => ['en', 'de', 'fr', 'es']], 'languages'],
+    'too many languages' => [['languages' => ['English', 'German', 'French', 'Spanish']], 'languages'],
     'bad country' => [['country_code' => 'GBR'], 'country_code'],
-    'bad language code' => [['languages' => ['eng']], 'languages.0'],
+    'language too long' => [['languages' => [str_repeat('a', 31)]], 'languages.0'],
     'social with spaces' => [['socials' => ['youtube' => 'has spaces']], 'socials.youtube'],
     'bad timezone' => [['timezone' => 'Mars/Phobos'], 'timezone'],
 ]);

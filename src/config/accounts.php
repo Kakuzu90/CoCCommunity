@@ -40,8 +40,9 @@ return [
         'display_name_max' => 50,
         'bio_max' => 500,
         'languages_max' => 3,
-        // ISO-639-1 two-letter code; the UI offers a curated list, the server enforces the shape.
-        'language_pattern' => '/^[a-z]{2}$/',
+        // Free-text language names the user types (e.g. English, Bisaya). Length-capped, not an
+        // ISO code list — communities use local names the code lists do not carry.
+        'language_max' => 30,
         // ISO-3166-1 alpha-2; stored upper-cased. Shape-validated server-side; the UI select scopes it.
         'country_pattern' => '/^[A-Za-z]{2}$/',
         // The only social platforms a profile can link; each value is a handle/URL, length-capped.

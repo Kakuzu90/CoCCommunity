@@ -32,6 +32,6 @@
 
 <x-layout.bottom-nav />
 
-@livewireScripts
+@livewireScriptConfig
 </body>
 </html>

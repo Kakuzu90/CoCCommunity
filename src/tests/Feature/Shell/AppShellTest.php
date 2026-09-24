@@ -38,7 +38,7 @@ it('carries the required, linked Fan Content disclaimer on every page', function
 });
 
 it('resolves every section route through the shell', function () {
-    foreach (['bases.index', 'recruit.index', 'search', 'login', 'register'] as $name) {
+    foreach (['bases.index', 'recruit.index', 'search'] as $name) {
         $this->get(route($name))
             ->assertOk()
             ->assertSee('Back to home')

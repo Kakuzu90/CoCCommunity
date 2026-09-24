@@ -2,9 +2,43 @@
 
 namespace App\Domain\Auth;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 final class AuthServiceProvider extends ServiceProvider
 {
-    // Register this module's bindings, policies and listeners as its features are added.
+    public function boot(): void
+    {
+        $this->registerRateLimiters();
+    }
+
+    /**
+     * Named limiters for the auth surfaces (specs/04 §4). All go through the Cache facade, so they
+     * move to Redis unchanged. Keys combine ip + email (or the user) to blunt both spray and
+     * targeted attacks without locking a whole IP out on a shared network.
+     */
+    private function registerRateLimiters(): void
+    {
+        RateLimiter::for('login', fn (Request $request) => [
+            Limit::perMinute(5)->by($this->loginKey($request)),
+            Limit::perHour(20)->by($this->loginKey($request)),
+        ]);
+
+        RateLimiter::for('register', fn (Request $request) => Limit::perHour(3)->by($request->ip()));
+
+        RateLimiter::for('password-reset', fn (Request $request) => Limit::perHour(3)
+            ->by(($request->ip() ?? '').'|'.strtolower((string) $request->input('email'))));
+
+        RateLimiter::for('verify-email-resend', fn (Request $request) => Limit::perHour(3)
+            ->by((string) (optional($request->user())->getAuthIdentifier() ?? $request->ip())));
+
+        RateLimiter::for('username-check', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
+    }
+
+    private function loginKey(Request $request): string
+    {
+        return ($request->ip() ?? '').'|'.strtolower((string) $request->input('email'));
+    }
 }

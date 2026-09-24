@@ -59,7 +59,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] Ops: health, logging, error tracking, workers
 
 ### Phase 1 — Identity
-- [ ] Registration, login, verification, reset
+- [x] Registration, login, verification, reset
 - [ ] Roles, status, policy scaffold
 - [ ] Profiles + avatar upload
 - [ ] Privacy settings + public profile

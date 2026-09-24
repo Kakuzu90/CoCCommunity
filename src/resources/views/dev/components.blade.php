@@ -29,7 +29,7 @@
 <h1>A common language.<br>Room to make it yours.</h1>
 <p class="gallery-description">Bold where we celebrate. Clear where we work. The building blocks of Clash Commons, from the first tap to the next milestone.</p>
 </div>
-        <nav class="gallery-nav" aria-label="Component sections">@foreach(['foundations' => 'Foundations', 'actions' => 'Actions', 'forms' => 'Forms', 'identity' => 'Identity', 'surfaces' => 'Surfaces', 'feedback' => 'Feedback', 'navigation' => 'Navigation', 'game-assets' => 'Game assets'] as $id => $text)<a href="#{{ $id }}">{{ $text }}</a>
+        <nav class="gallery-nav" aria-label="Component sections">@foreach(['foundations' => 'Foundations', 'actions' => 'Actions', 'forms' => 'Forms', 'identity' => 'Identity', 'surfaces' => 'Surfaces', 'feedback' => 'Feedback', 'navigation' => 'Navigation', 'game-assets' => 'Game assets', 'auth' => 'Auth'] as $id => $text)<a href="#{{ $id }}">{{ $text }}</a>
 
 @endforeach
 </nav>
@@ -317,6 +317,29 @@
 </div>
 <div class="gallery-row" style="align-items: flex-end; gap: var(--space-3); margin-top: var(--space-4)">@foreach([32, 48, 64, 96] as $s)<x-game.asset type="townhall" :value="14" :size="$s" />
 @endforeach
+</div>
+</x-ui.card>
+        </section>
+        <section id="auth" class="gallery-section">
+            <div class="gallery-section-head">
+<span class="gallery-number">09</span>
+<h2>Sign-in, built from the kit</h2>
+</div>
+<x-ui.card>
+<p class="ui-help">The auth pages are compositions of the primitives above on a centred single-column layout (specs/04). Rate limiting, Turnstile, the honeypot and generic enumeration-safe messages live server-side.</p>
+<div class="auth-card-wrap" style="margin-inline:auto">
+<x-ui.card class="auth-card">
+<h3 class="auth-title">Welcome back</h3>
+<div class="auth-form">
+<x-ui.input id="demo-email" label="Email" type="email" autocomplete="email" />
+<x-ui.input id="demo-password" label="Password" type="password" autocomplete="current-password" />
+<div class="auth-row">
+<x-ui.checkbox id="demo-remember" label="Remember me" />
+<span class="auth-link">Forgot password?</span>
+</div>
+<x-ui.button :block="true">Sign in</x-ui.button>
+</div>
+</x-ui.card>
 </div>
 </x-ui.card>
         </section>

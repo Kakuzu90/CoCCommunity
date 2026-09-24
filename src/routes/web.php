@@ -23,16 +23,6 @@ Route::view('/search', 'pages.placeholder', [
     'body' => 'Full base, player and clan search arrives in Phase 3.',
 ])->name('search');
 
-Route::view('/login', 'pages.placeholder', [
-    'heading' => 'Accounts open in Phase 1',
-    'body' => 'Registration, login, email verification and password reset are being built.',
-])->name('login');
-
-Route::view('/register', 'pages.placeholder', [
-    'heading' => 'Accounts open in Phase 1',
-    'body' => 'Registration, login, email verification and password reset are being built.',
-])->name('register');
-
 Route::get('/dev/components', function () {
     abort_if(app()->isProduction(), 404);
 
@@ -40,3 +30,5 @@ Route::get('/dev/components', function () {
 })->name('dev.components');
 
 require __DIR__.'/web/uploads.php';
+
+require __DIR__.'/auth.php';

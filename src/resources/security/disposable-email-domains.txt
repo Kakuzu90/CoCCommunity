@@ -1,0 +1,17 @@
+# Disposable / throwaway email domains blocked at registration (specs/11).
+# Starter list — ops refreshes monthly from a maintained source. One domain per line.
+mailinator.com
+guerrillamail.com
+10minutemail.com
+tempmail.com
+temp-mail.org
+throwawaymail.com
+yopmail.com
+getnada.com
+trashmail.com
+sharklasers.com
+dispostable.com
+maildrop.cc
+fakeinbox.com
+mailnesia.com
+mohmal.com

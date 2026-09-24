@@ -157,3 +157,21 @@ Email-based reset only. **No security questions, no support-driven manual resets
 manual reset path is the single most-abused social-engineering vector on community platforms. If a
 user loses email access, their CoC accounts can be re-claimed on a new account via in-game token
 verification — which is stronger proof than anything support could verify.
+
+### Implementation notes (Phase 1 — register/login/verify/reset)
+
+- **Built on Laravel's native auth primitives** (session guard, `PasswordBroker`, `MustVerifyEmail`,
+  signed URLs), not Laravel Fortify. Native primitives gave cleaner per-route rate limiting and the
+  enumeration-safe registration below; Fortify can still be layered later without changing the model.
+- **Registration is enumeration-safe:** the form never reveals whether an email exists. A new email
+  creates an unverified account and sends the verification link; an existing email creates nothing
+  and emails the real owner instead. Both show the same "check your email" screen. Registration does
+  not auto-login — the emailed verification link is signed and works signed-out.
+- **HIBP** is checked synchronously with `Password::uncompromised()` (fail-open on an unreachable
+  service), not on a background job; the fail-open is the spec's async intent without the queue hop.
+- **Session-management columns** (`sessions.ip_hash`, `sessions.device_label`) and the handler
+  override that fills them are deferred to the "Settings incl. sessions" task; the table keeps
+  Laravel's default `ip_address`/`user_agent` for now so sessions work. 2FA is Phase 2.
+- **Rate limiters** `login`, `register`, `password-reset`, `verify-email-resend`, `username-check`
+  are defined centrally in `AuthServiceProvider` via the `Cache` facade (Redis-swappable). The
+  remaining limiters in the table below are added by the features that own them.

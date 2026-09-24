@@ -10,7 +10,6 @@
             <h1>Edit profile</h1>
             <p class="ui-help">This is what other players see. Your username stays <strong>{{ '@'.$username }}</strong>.</p>
             @include('settings.partials.nav')
-            <p><a href="{{ route('profile.show', $username) }}">View profile</a></p>
         </header>
 
         @if(session('status') && isset($messages[session('status')]))

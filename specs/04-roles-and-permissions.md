@@ -200,12 +200,13 @@ verification — which is stronger proof than anything support could verify.
   not auto-login — the emailed verification link is signed and works signed-out.
 - **HIBP** is checked synchronously with `Password::uncompromised()` (fail-open on an unreachable
   service), not on a background job; the fail-open is the spec's async intent without the queue hop.
-- **Session-management columns** (`sessions.ip_hash`, `sessions.device_label`) and the handler
-  override that fills them are deferred to the "Settings incl. sessions" task; the table keeps
-  Laravel's default `ip_address`/`user_agent` for now so sessions work. 2FA is Phase 2.
-- **Settings task:** the database session handler now writes device label, IP hash and creation
-  time alongside Laravel's live IP/user agent. Idle expiry is 14 days and absolute expiry is 30
-  days. Pending-deletion users may sign in to cancel, but all ordinary writes remain blocked.
+- **Session-management columns** (`sessions.device_label`) and the handler override that fills them
+  are deferred to the "Settings incl. sessions" task; the table keeps Laravel's default
+  `ip_address`/`user_agent` for now so sessions work. 2FA is Phase 2.
+- **Settings task:** the database session handler writes device label and creation time alongside
+  Laravel's live IP/user agent. The session row keeps the IP in the clear because the owner reads it
+  in the sessions UI; it is not hashed, since a hash next to its own plaintext protects nothing.
+  Idle expiry is 14 days and absolute expiry is 30 days. Pending-deletion users may sign in to cancel, but all ordinary writes remain blocked.
   Password and email changes require the current password, rotate the remember token, and revoke
   other sessions. Email changes send a notice to the old address and re-verify the new address.
 - **Rate limiters** `login`, `register`, `password-reset`, `verify-email-resend`, `username-check`

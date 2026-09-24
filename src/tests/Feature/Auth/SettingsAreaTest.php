@@ -66,7 +66,7 @@ it('writes device metadata and creation time to database sessions', function () 
 
     $row = DB::table('sessions')->where('id', 'tracked-session')->first();
     expect($row->device_label)->toBe('Firefox on Windows')
-        ->and($row->ip_hash)->toHaveLength(64)
+        ->and($row->ip_address)->toBe('192.0.2.10')
         ->and($row->created_at)->not->toBeNull();
 });
 
@@ -144,4 +144,45 @@ it('anonymizes due accounts once while leaving recent requests intact', function
         ->and(User::query()->find($due->id))->toBeNull()
         ->and(User::query()->find($recent->id))->not->toBeNull()
         ->and(Profile::where('user_id', $due->id)->firstOrFail()->bio)->toBeNull();
+});
+
+it('marks the current settings page and links every destination from the nav', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    $pages = ['settings.profile.edit', 'settings.privacy.edit', 'settings.security.edit',
+        'settings.sessions.index', 'settings.deletion.show'];
+
+    foreach ($pages as $page) {
+        $html = $this->get(route($page))->assertOk()->getContent();
+        expect(preg_match('~<nav class="settings-nav".*?</nav>~s', $html, $match))->toBe(1);
+        $nav = preg_replace('/\s+/', ' ', $match[0]);
+
+        expect(substr_count($nav, 'aria-current="page"'))->toBe(1)
+            ->and($nav)->toContain('href="'.route($page).'" aria-current="page"')
+            ->and($nav)->toContain('href="'.route('profile.show', $user->username).'"');
+        foreach ($pages as $destination) {
+            expect($nav)->toContain('href="'.route($destination).'"');
+        }
+    }
+});
+
+it('names which sessions were signed out', function () {
+    $user = User::factory()->create();
+    sessionRow($user, 'remote');
+
+    $this->actingAs($user)->delete(route('settings.sessions.destroy', 'remote'))
+        ->assertRedirect(route('settings.sessions.index'));
+    $this->get(route('settings.sessions.index'))->assertSee('That device was signed out.');
+
+    sessionRow($user, 'remote-2');
+    $this->delete(route('settings.sessions.destroy-others'))->assertRedirect(route('settings.sessions.index'));
+    $this->get(route('settings.sessions.index'))->assertSee('Every other device was signed out. This one is still active.');
+});
+
+it('states the password rules before the form is submitted', function () {
+    config(['accounts.password.check_compromised' => true]);
+
+    $this->actingAs(User::factory()->create())->get(route('settings.security.edit'))->assertOk()
+        ->assertSee('At least '.config('accounts.password.min').' characters.')
+        ->assertSee('appeared in a known data breach are rejected.');
 });

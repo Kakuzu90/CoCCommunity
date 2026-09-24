@@ -56,9 +56,9 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
         });
 
-        // Laravel's database session table. The session-management UI columns (ip_hash, device_label)
-        // and the handler override that fills them are owned by the Settings/sessions task; the
-        // default columns Laravel's DatabaseSessionHandler writes are kept here so sessions work now.
+        // Laravel's database session table. The session-management UI column (device_label) and the
+        // handler override that fills it are owned by the Settings/sessions task; the default columns
+        // Laravel's DatabaseSessionHandler writes are kept here so sessions work now.
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->foreignId('user_id')->nullable()->index();

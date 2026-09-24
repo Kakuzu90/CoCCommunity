@@ -66,8 +66,12 @@ Holds released usernames so old profile URLs redirect and handles cannot be snip
 Laravel's database session table, plus columns for the session-management UI.
 
 `id (varchar PK)`, `user_id (bigint null, index)`, `ip_address` (live session only),
-`ip_hash`, `user_agent`, `payload (text)`, `last_activity (int, index)`, `device_label`,
+`user_agent`, `payload (text)`, `last_activity (int, index)`, `device_label`,
 `created_at` (absolute-expiry start). Existing sessions are backfilled at migration time.
+
+No `ip_hash` here: the session row already carries the live `ip_address`, so a hash beside its own
+plaintext protects nothing. Hashed IPs stay on the tables that keep history (`users`,
+`coc_verification_attempts`, `audit_logs`, `security_events`), where the plaintext is not retained.
 
 ### `password_reset_tokens` [M]
 Laravel default: `email (PK)`, `token`, `created_at`.

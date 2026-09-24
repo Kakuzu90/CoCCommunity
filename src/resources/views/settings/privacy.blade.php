@@ -5,7 +5,6 @@
             <h1>Privacy</h1>
             <p class="ui-help">Control who sees your profile and what you share.</p>
             @include('settings.partials.nav')
-            <p><a href="{{ route('profile.show', auth()->user()->username) }}">View profile</a></p>
         </header>
 
         @if(session('status') === 'privacy-updated')

@@ -11,11 +11,7 @@ class TrackedDatabaseSessionHandler extends DatabaseSessionHandler
     protected function getDefaultPayload($data)
     {
         $payload = parent::getDefaultPayload($data);
-
-        $ip = $this->ipAddress();
-        $agent = $this->userAgent();
-        $payload['ip_hash'] = $ip === null ? null : hash_hmac('sha256', $ip, (string) config('app.key'));
-        $payload['device_label'] = $this->deviceLabel($agent);
+        $payload['device_label'] = $this->deviceLabel($this->userAgent());
 
         return $payload;
     }

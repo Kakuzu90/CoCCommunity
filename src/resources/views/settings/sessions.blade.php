@@ -1,4 +1,9 @@
 <x-layouts.app title="Active sessions">
+    @php($messages = [
+        'session-revoked' => 'That device was signed out.',
+        'sessions-revoked' => 'Every other device was signed out. This one is still active.',
+    ])
+
     <div class="settings-page">
         <header class="settings-head">
             <p class="ui-eyebrow">Settings</p>
@@ -7,7 +12,9 @@
             @include('settings.partials.nav')
         </header>
 
-        @if(session('status'))<x-ui.alert tone="success">Sessions updated.</x-ui.alert>@endif
+        @if($message = $messages[session('status')] ?? null)
+            <x-ui.alert tone="success">{{ $message }}</x-ui.alert>
+        @endif
 
         <section class="settings-card">
             <h2 class="settings-card-title">Devices</h2>
@@ -29,17 +36,19 @@
             @endforelse
         </section>
 
-        <form method="POST" action="{{ route('settings.sessions.destroy-others') }}" class="settings-card">
-            @csrf @method('DELETE')
-            <h2 class="settings-card-title">Other devices</h2>
-            <p class="ui-help">Keep this session and sign out everywhere else.</p>
-            <div class="settings-actions"><x-ui.button type="submit" variant="secondary">Sign out other devices</x-ui.button></div>
-        </form>
-        <form method="POST" action="{{ route('settings.sessions.destroy-all') }}" class="settings-card">
-            @csrf @method('DELETE')
-            <h2 class="settings-card-title">All devices</h2>
-            <p class="ui-help">Sign out this device and every other session.</p>
-            <div class="settings-actions"><x-ui.button type="submit" variant="secondary">Sign out everywhere</x-ui.button></div>
-        </form>
+        <section class="settings-card">
+            <h2 class="settings-card-title">Sign out in bulk</h2>
+            <p class="ui-help">Keeping this device signs out every other session and leaves you signed in here. Signing out everywhere includes this device, so you will need to sign in again.</p>
+            <div class="settings-bulk">
+                <form method="POST" action="{{ route('settings.sessions.destroy-others') }}">
+                    @csrf @method('DELETE')
+                    <x-ui.button type="submit" variant="secondary">Sign out other devices</x-ui.button>
+                </form>
+                <form method="POST" action="{{ route('settings.sessions.destroy-all') }}">
+                    @csrf @method('DELETE')
+                    <x-ui.button type="submit" variant="danger">Sign out everywhere</x-ui.button>
+                </form>
+            </div>
+        </section>
     </div>
 </x-layouts.app>

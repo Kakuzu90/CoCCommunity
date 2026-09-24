@@ -406,8 +406,14 @@ Grouped list, unread highlighted with a gold left border, filter tabs by categor
 *Empty:* "You're all caught up" with an illustration.
 
 ### Settings (`/settings/*`)
-Left sub-nav (Profile · Privacy · Accounts · Security · Notifications · Danger zone) with plain,
-dense forms. Danger zone is visually separated with a red border and requires password confirmation.
+Sub-nav (Profile · Privacy · Accounts · Security · Notifications · Danger zone) with plain, dense
+forms. Danger zone is visually separated with a red border and requires password confirmation.
+
+*Phase 1 implementation:* the sub-nav is a horizontal tab row under the page heading rather than a
+left rail, because the settings pages are a single narrow column and a rail would cost width the
+forms need. The active tab carries `aria-current="page"` and a brand underline. `View profile` and
+`Delete account` sit in a divided group at the end: one leaves settings, the other is the danger
+zone, and neither is a peer of the tabs. Accounts and Notifications arrive with their phase tasks.
 
 ### Admin (`/admin/*`)
 Left nav (Dashboard · Reports · Disputes · Users · Content · Media · Marketplace · Logs) →

@@ -10,7 +10,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sessions', function (Blueprint $table) {
-            $table->string('ip_hash', 64)->nullable();
             $table->string('device_label', 120)->nullable();
             $table->timestampTz('created_at')->nullable();
         });
@@ -22,7 +21,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('sessions', function (Blueprint $table) {
-            $table->dropColumn(['ip_hash', 'device_label', 'created_at']);
+            $table->dropColumn(['device_label', 'created_at']);
         });
     }
 };

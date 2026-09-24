@@ -348,13 +348,18 @@ Evaluate this stack:
 * Laravel
 * PHP
 * PostgreSQL or MySQL
-* Redis
 * Queue workers
 * Laravel Scheduler
 * Official Clash of Clans API
 * Cloudflare R2 or similar object storage
 * CDN
 * Blade, Livewire, or Inertia for frontend
+* Laravel Cache, Queue, and Session using the `database` driver for the MVP
+  (no Redis at launch, to keep infrastructure cost low)
+* All code must use Laravel's Cache/Queue facades only, never driver-specific calls,
+  so we can switch to Redis later by changing .env
+* Note where Redis will become necessary (e.g. rate limiting at scale,
+  heavy queues, real-time features) and what signals should trigger the switch
 
 Recommend whether I should use:
 
@@ -478,7 +483,73 @@ Define suggested modules/domains such as:
 
 Explain module boundaries and responsibilities.
 
-## 17. Development Phases
+
+## 17. UI/UX and Design System
+
+The platform must feel like a game companion app, not a generic dashboard or
+starter-kit template. Do NOT use Laravel Breeze/starter-kit default styling or
+default shadcn/ui theme values.
+
+### Visual direction
+* Game-inspired: bold, chunky, tactile, rewarding
+* Must be ORIGINAL. Do not use Supercell's fonts, logos, character art, icons,
+  or game UI assets. Create our own visual language inspired by the genre.
+* Usability first: game vibe on cards, profiles, badges, and highlights;
+  forms, tables, and admin screens stay clean and readable.
+
+### Design tokens
+* Heading font: Lilita One (fallback: system bold sans)
+* Body font: Inter
+* Colors:
+  - Background: #0E1220 (deep navy)
+  - Surface: #161B2E
+  - Surface raised: #1E2540
+  - Border: #2A3150
+  - Primary (gold): #F5B800
+  - Accent (purple): #B04CFF
+  - Success: #3DDC84
+  - Danger: #FF4D4D
+  - Text: #F2F4FA / muted #8A93B2
+* Radius: 12px on cards, 10px on buttons (chunky, not sharp)
+* Depth: buttons use a solid darker bottom border (4px) that compresses on
+  press, instead of soft drop shadows
+* Dark mode is the default. A light theme is optional and comes later.
+
+### Signature components
+* Player card: profile shown like a collectible card (avatar, IGN, TH badge,
+  trophies, league, verified badge)
+* Base card: screenshot, TH badge, category tag, likes/copies, creator
+* Town Hall badge: a distinct color per TH level range
+* Stat blocks: large numbers with icons (trophies, war stars, XP)
+* Resource-style counters for likes, views, and copies
+* Recruitment cards: clan badge, requirements as pill tags, status indicator
+
+### Motion and feedback
+* Button press compression, card hover lift
+* Like/bookmark: a small "pop" animation
+* Stats count up on first view
+* Reward-style toasts for achievements, verification success, and new badges
+* All motion respects prefers-reduced-motion
+
+### Layout
+* Mobile-first (most players browse on their phones)
+* Mobile: bottom tab navigation (Home, Bases, Recruit, Market, Profile)
+* Desktop: left sidebar plus top bar with global search
+* Content max width: 1200px
+
+### Accessibility
+* WCAG AA contrast minimum
+* Information is never conveyed by color alone (TH badges also show the number)
+* Keyboard navigable, visible focus states
+
+### Deliverables for this section
+* Design token list (for Tailwind config / shadcn CSS variables)
+* Component inventory with variants
+* Page layouts for: home feed, base detail, player profile, recruitment
+  listing, marketplace listing, admin
+* Empty, loading (skeleton), and error states for each main page
+
+## 18. Development Phases
 
 Create a realistic phased development plan.
 
@@ -512,7 +583,7 @@ Permitted service marketplace.
 
 Search, recommendations, achievements, analytics, etc.
 
-Improve this roadmap where necessary.
+Improve this roadmap where necessary
 
 ## Deliverables
 

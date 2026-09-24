@@ -58,27 +58,11 @@ Email verification is enforced on the dashboard. Open verification messages in M
 
 This implements the Phase 0 foundation plus Phase 1 (CoC integration & account claiming). Public player profiles, base sharing, media uploads/processing, moderation tools, and staff role-management endpoints are not implemented yet. The media table stores metadata only and defaults to `pending`; no upload endpoint exposes unprocessed files.
 
-## CoC integration (Phase 1)
-
-Signed-in, verified users link Clash of Clans accounts at `/accounts` and prove ownership with the in-game API token (Settings → More Settings → API Token). The API is wrapped behind the `ClashClient` contract and is never called in a request path — verification and snapshot refresh run as queued jobs. With no `COC_API_TOKEN` set the app resolves an in-memory fake client, so local dev and tests never reach Supercell; set the token (and its IP allowlist) to use the live adapter. Verified snapshots refresh hourly for stale accounts via the scheduler; a tag that stops resolving flips to `needs_reverify` and keeps its data. Ownership transfers (current token control wins) are written to `audit_logs` and the previous owner is notified.
-
 ## Environment (`src/.env`)
 
 `src/.env` is git-ignored, so it does **not** travel with the repo. On a fresh checkout you recreate it; `.env.docker.example` is the reference for the Docker-specific keys.
 
 **Already wired** (set during scaffolding — no action needed for local dev):
-
-| Key | Value | Why |
-| --- | --- | --- |
-| `APP_URL` | `http://localhost:8080` | matches the `web` service port |
-| `DB_*` | `pgsql` @ host `db`, database `coc` | the Postgres container |
-| `CACHE_STORE` / `QUEUE_CONNECTION` / `SESSION_DRIVER` | `database` | **no Redis** (see [`specs/10-infrastructure.md`](specs/10-infrastructure.md)) |
-| `MAIL_MAILER` / `MAIL_HOST` / `MAIL_PORT` | `smtp` / `mailpit` / `1025` | catches mail in Mailpit |
-
-**Add later, only when you build that feature** (copy the block from `.env.docker.example` and fill real values):
-
-- **R2 object storage** — the `r2` disk and S3 adapter are configured. Set `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`, `AWS_ENDPOINT` (your R2 S3 endpoint), `AWS_DEFAULT_REGION=auto`, and optionally `AWS_URL` (cookieless public CDN). Keep `FILESYSTEM_DISK=local` until credentials are available; choose `r2` for media. Pending/private objects use expiring signed URLs. Public CDN URLs are reserved for approved public media; uploads and processing arrive in Phase 3.
-- **Clash of Clans API** — `COC_API_TOKEN`, `COC_API_BASE_URL`. Needed at **Phase 1 (CoC integration)**; use your IP-bound key.
 
 **Recreating `src/.env` from scratch:**
 

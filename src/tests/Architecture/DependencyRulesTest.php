@@ -30,6 +30,7 @@ it('enforces module dependencies', function (string $source, string $target, boo
         rmdir($directory);
     }
 })->with([
+    'edge to shared value' => ['App\\Domain\\CocIntegration\\Services\\Lookup', 'App\\Support\\ValueObjects\\PlayerTag', true],
     'own model' => ['App\\Domain\\Bases\\Services\\Publisher', 'App\\Domain\\Bases\\Models\\Layout', true],
     'public service' => ['App\\Domain\\Bases\\Services\\Publisher', 'App\\Domain\\Users\\Services\\Profiles', true],
     'foreign model' => ['App\\Domain\\Bases\\Services\\Publisher', 'App\\Domain\\Users\\Models\\Profile', false],

@@ -74,6 +74,34 @@ Models living inside modules rather than `app/Models` is the one convention brea
 Laravel. It is worth it: it makes the ownership boundary visible in the file path, and
 `App\Domain\Bases\Models\BaseLayout` reads better than a flat namespace of 40 models.
 
+### Phase 0 foundation primitives
+
+All sixteen modules in [05 §2](05-architecture.md) have their own service provider, explicitly
+registered in `bootstrap/providers.php`. Providers are empty registration points until their
+features need bindings, policies or listeners. Add the subfolders shown above when their first
+class is implemented; no separate packages or automatic filesystem discovery are needed.
+
+Shared primitives live in `App\Support`, so edge modules can use them without a domain dependency:
+
+| Primitive | Contract |
+|---|---|
+| `ValueObjects\PlayerTag` | Readonly canonical `#TAG`; trims surrounding ASCII whitespace, uppercases, maps `O` to `0`, and validates the alphabet and length from `config/coc.php` (FR-COC-2). `encoded()` escapes the hash for API paths. Syntax validity does not prove the player exists. |
+| `ValueObjects\ThLevel` | Readonly positive integer; accepts integers or canonical unsigned decimal strings, rejects lossy coercion and overflow. Minimum is `coc.th_min_level` (1); there is no game-level maximum ([23 §5](23-edge-cases.md)). Publishing's minimum belongs to Bases. |
+| `Casts\PlayerTagCast`, `Casts\ThLevelCast` | Validate both reads and writes; persist scalars, preserve null, and serialize to scalars. Corrupt stored values throw rather than silently normalizing to unrelated values. |
+| `Rules\PlayerTagRule`, `Rules\ThLevelRule` | Delegate to the same constructors. Pair with `required` or `nullable`; validation does not mutate input, so services receive constructed value objects from validated data. |
+| `Enums\QueueName` | String-backed `high`, `default`, `media`, `sync`, `low` from [20 §1](20-jobs-and-scheduling.md); worker/retry policy remains in the Ops task. |
+
+The value objects expose `value`, value equality, string conversion and scalar JSON serialization.
+Their constraints are read through Laravel's configuration repository, so tests constructing them
+boot the application. No API calls are made by validation or casts.
+
+`AppServiceProvider` configures the `Date` facade to use `CarbonImmutable`; the application remains
+in UTC. Eloquent's standard timestamps and date casts use that factory too.
+
+`BaseLink` and `LayoutHash` stay in the Phase 3 publishing task listed in [25](25-development-phases.md).
+Role/status enums and their policy wiring stay in Phase 1. This foundation adds no feature routes,
+production tables, domain services or UI.
+
 ## 2. Dependency rules (enforced in CI)
 
 ```

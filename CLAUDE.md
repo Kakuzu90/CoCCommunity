@@ -64,7 +64,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] Profiles + avatar upload
 - [x] Privacy settings + public profile
 - [x] Settings area (sessions, deletion)
-- [ ] Admin v1 + audit log
+- [x] Admin v1 + audit log
 - [ ] Notifications v1
 
 ### Phase 2 — Verified CoC accounts
@@ -196,3 +196,16 @@ App http://localhost:8080 · Mail http://localhost:8025 · Storage console http:
 - Pint clean, PHPStan clean (L6, L8 on `app/Domain`), Deptrac clean.
 - CI green on both SQLite and Postgres.
 - `specs/` updated if the implementation diverged from the plan.
+
+<!-- antislop:start -->
+## antislop
+For UI, copy, people, mobile layout, or code comments work, load the antislop skill for the task:
+- Core filter, always on: `antislop`
+- UI / visual: `antislop-ui`
+- Copy & text: `antislop-copywriting`
+- People: `antislop-human`
+- Mobile / responsive: `antislop-layoutmobile`
+- Code comments: `antislop-code`
+Before starting, ask the user when antislop applies: during the work, or after it is done.
+To update antislop later: `npx antislop-ai --update`, or run `npx antislop-ai` and pick Overwrite them.
+<!-- antislop:end -->

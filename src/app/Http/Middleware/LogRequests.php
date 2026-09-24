@@ -27,6 +27,10 @@ final class LogRequests
             return;
         }
 
+        // Fall back to the discard channel when none is configured (the test default,
+        // LOG_REQUEST_CHANNEL=null, resolves to null): `Log::channel('')` would be an invalid name.
+        $channel = (string) config('logging.request_channel') ?: 'null';
+
         $userId = Auth::id();
         if ($userId !== null) {
             Context::add('user_id', $userId);
@@ -35,7 +39,7 @@ final class LogRequests
         $start = defined('LARAVEL_START') ? LARAVEL_START : $request->server('REQUEST_TIME_FLOAT');
         $durationMs = $start ? (int) round((microtime(true) - (float) $start) * 1000) : null;
 
-        Log::channel((string) config('logging.request_channel', 'json'))->info('request.handled', [
+        Log::channel($channel)->info('request.handled', [
             'method' => $request->getMethod(),
             'path' => '/'.ltrim($request->path(), '/'),
             'route' => optional($request->route())->getName(),

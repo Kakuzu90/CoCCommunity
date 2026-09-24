@@ -60,7 +60,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 
 ### Phase 1 — Identity
 - [x] Registration, login, verification, reset
-- [ ] Roles, status, policy scaffold
+- [x] Roles, status, policy scaffold
 - [ ] Profiles + avatar upload
 - [ ] Privacy settings + public profile
 - [ ] Settings area (sessions, deletion)

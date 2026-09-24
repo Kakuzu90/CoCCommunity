@@ -103,6 +103,37 @@ Three middlewares, applied in order, each with a dedicated denial page:
 2. `EnsureAccountIsActive` — blocks `restricted`, `suspended`, `banned`, `pending_deletion` writes.
 3. `EnsureHasVerifiedCocAccount` — blocks publishing, recruiting and selling.
 
+### Implementation notes (Phase 1 — roles/status/policy scaffold)
+
+- **Role hierarchy** lives on the `UserRole` enum (`level()`, `atLeast()`); status predicates live on
+  `UserStatus` (`canAuthenticate()`, `canWrite()`). Comparisons are by level, never equality.
+- **One source of truth for the matrix.** The role-gated abilities of §2/§3 are an `Ability` enum
+  (`App\Domain\Auth\Enums`), each case carrying its `minimumRole()`. `AuthServiceProvider` defines a
+  Gate per case from that mapping, so the gates cannot drift from the matrix. The four named gates in
+  §3 (`access-admin`, `manage-roles`, `resolve-disputes`, `view-audit-log`) are cases of this enum;
+  `manage-roles` == changing roles, `resolve-disputes` covers ownership and marketplace disputes. The
+  matrix test (`tests/Security/PermissionMatrixTest`) asserts every role × ability against a table
+  transcribed independently from §2.
+- **`Gate::before`** grants super admin every ability except `impersonate`, which is denied to
+  everyone (locked decision) by returning null there so the always-false ability gate stands.
+- **Policies** (`UserPolicy` today) live in `App\Domain\Auth\Policies` and are registered via
+  `Gate::policy` in `AuthServiceProvider`. They are never referenced statically by Presentation
+  (Deptrac keeps Presentation off a module's internals); controllers/components call `authorize()`
+  and the Gate resolves the policy. `UserPolicy` encodes structural rule 1 (`outranks()`: act only on
+  a strictly lower role, never self).
+- **Write-gating + role middleware** are four aliases registered centrally in `bootstrap/app.php`:
+  `verified` (`EnsureEmailIsVerified`), `active` (`EnsureAccountIsActive`), `coc.verified`
+  (`EnsureHasVerifiedCocAccount`) and `role:<name>` (`EnsureUserRole`). They read the principal
+  through an `AccountGuard` service (`Authenticatable`-typed) rather than the `User` model, again to
+  keep Presentation off module internals. The feature tasks that own each write surface apply them
+  per route; the scaffold registers the aliases and proves them with throwaway routes in
+  `tests/Feature/Auth/WriteGatingMiddlewareTest`.
+- **`has_verified_coc_account`** is derived from `verified_accounts_count > 0` until the CoC module
+  lands (Phase 2); the `coc.verified` gate reads that count.
+- **Minor fix in passing:** `LogRequests` fell back to `Log::channel('')` when no request channel is
+  configured (the test default `LOG_REQUEST_CHANNEL=null`); it now falls back to the `null` discard
+  channel. The bug only surfaced once authenticated write-gated routes exercised the terminate log.
+
 ## 4. Authentication strategy
 
 ### Mechanism

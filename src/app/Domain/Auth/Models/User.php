@@ -25,6 +25,7 @@ use Illuminate\Support\Str;
  * @property CarbonInterface|null $email_verified_at
  * @property UserRole $role
  * @property UserStatus $status
+ * @property int $verified_accounts_count
  * @property CarbonInterface|null $last_login_at
  */
 class User extends Authenticatable implements MustVerifyEmail

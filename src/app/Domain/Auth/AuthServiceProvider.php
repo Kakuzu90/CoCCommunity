@@ -2,8 +2,12 @@
 
 namespace App\Domain\Auth;
 
+use App\Domain\Auth\Enums\Ability;
+use App\Domain\Auth\Models\User;
+use App\Domain\Auth\Policies\UserPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -11,7 +15,34 @@ final class AuthServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        $this->registerAuthorization();
         $this->registerRateLimiters();
+    }
+
+    /**
+     * Policies and Gates are the only source of authorization truth (specs/04 §3, specs/11). Each
+     * matrix ability becomes a role-gated Gate whose threshold comes from the `Ability` enum, so the
+     * gates cannot drift from the matrix test. `Gate::before` grants super admin everything except
+     * the one permanently-denied ability, impersonation (a locked decision).
+     */
+    private function registerAuthorization(): void
+    {
+        Gate::policy(User::class, UserPolicy::class);
+
+        Gate::before(function (User $user, string $ability): ?bool {
+            if ($ability === Ability::Impersonate->value) {
+                return null; // Falls through to the ability gate, which denies everyone.
+            }
+
+            return $user->role->isSuperAdmin() ? true : null;
+        });
+
+        foreach (Ability::all() as $ability) {
+            Gate::define(
+                $ability->value,
+                fn (User $user): bool => $user->status->canAuthenticate() && $ability->grantedTo($user->role),
+            );
+        }
     }
 
     /**

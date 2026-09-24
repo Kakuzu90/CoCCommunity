@@ -342,6 +342,21 @@
 </x-ui.card>
 </div>
 </x-ui.card>
+<x-ui.card>
+<p class="ui-help">Roles are hierarchical and account status is orthogonal to role (specs/04 §1). Writes pass three gates in order — verified email, active status, verified in-game account — before any policy runs.</p>
+<div class="gallery-stack">
+<div>
+<span class="ui-label">Roles</span>
+<div class="gallery-row">@foreach(['user' => 'neutral', 'moderator' => 'info', 'admin' => 'warning', 'super_admin' => 'primary'] as $role => $tone)<x-ui.pill :tone="$tone">{{ \App\Domain\Auth\Enums\UserRole::from($role)->label() }}</x-ui.pill>
+@endforeach</div>
+</div>
+<div>
+<span class="ui-label">Account status</span>
+<div class="gallery-row">@foreach(['active' => 'success', 'restricted' => 'warning', 'suspended' => 'warning', 'banned' => 'danger', 'pending_deletion' => 'neutral'] as $status => $tone)<x-ui.pill :tone="$tone">{{ \App\Domain\Auth\Enums\UserStatus::from($status)->label() }}</x-ui.pill>
+@endforeach</div>
+</div>
+</div>
+</x-ui.card>
         </section>
     </main>
     <footer class="gallery-footer">

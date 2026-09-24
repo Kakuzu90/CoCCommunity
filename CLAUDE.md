@@ -64,7 +64,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] Profiles + avatar upload
 - [x] Privacy settings + public profile
 - [x] Settings area (sessions, deletion)
-- [x] Admin v1 + audit log
+- [ ] Admin v1 + audit log
 - [ ] Notifications v1
 
 ### Phase 2 — Verified CoC accounts

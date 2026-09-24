@@ -15,14 +15,14 @@ enum UserStatus: string
     case PendingDeletion = 'pending_deletion';
 
     /**
-     * Whether a session may be established. Restricted users can still sign in (their writes are
-     * curtailed downstream); suspended, banned and pending-deletion accounts cannot (specs/04 §4).
+     * Restricted users can sign in with limited writes. Pending-deletion users can sign in only to
+     * cancel during the grace window; other writes remain blocked.
      */
     public function canAuthenticate(): bool
     {
         return match ($this) {
-            self::Active, self::Restricted => true,
-            self::Suspended, self::Banned, self::PendingDeletion => false,
+            self::Active, self::Restricted, self::PendingDeletion => true,
+            self::Suspended, self::Banned => false,
         };
     }
 

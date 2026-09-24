@@ -30,3 +30,4 @@ Schedule::call(function () {
 })->everyMinute()->name('health:scheduler-heartbeat')->onOneServer();
 
 Schedule::command('platform:check-health')->everyFiveMinutes()->onOneServer()->runInBackground();
+Schedule::command('platform:anonymize-deleted')->dailyAt('03:00')->onOneServer();

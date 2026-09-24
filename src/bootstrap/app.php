@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Ops\HealthController;
 use App\Http\Middleware\AssignRequestId;
+use App\Http\Middleware\EnsureAbsoluteSessionLifetime;
 use App\Http\Middleware\EnsureAccountIsActive;
 use App\Http\Middleware\EnsureEmailIsVerified;
 use App\Http\Middleware\EnsureHasVerifiedCocAccount;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // terminate, after the status and user are known (NFR-OBS-1).
         $middleware->prepend(AssignRequestId::class);
         $middleware->append(LogRequests::class);
+        $middleware->appendToGroup('web', EnsureAbsoluteSessionLifetime::class);
 
         // Write-gating and role middleware (specs/04 §3). Applied per-route by the features that own
         // the write surface; the aliases are registered centrally so every route names them the same.

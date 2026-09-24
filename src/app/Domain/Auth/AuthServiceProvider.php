@@ -3,18 +3,30 @@
 namespace App\Domain\Auth;
 
 use App\Domain\Auth\Enums\Ability;
+use App\Domain\Auth\Enums\UserStatus;
 use App\Domain\Auth\Models\User;
 use App\Domain\Auth\Policies\UserPolicy;
+use App\Domain\Auth\Services\TrackedDatabaseSessionHandler;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 
 final class AuthServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        Session::extend('database', function ($app): TrackedDatabaseSessionHandler {
+            return new TrackedDatabaseSessionHandler(
+                $app['db']->connection(config('session.connection')),
+                (string) config('session.table'),
+                (int) config('session.lifetime'),
+                $app,
+            );
+        });
+
         $this->registerAuthorization();
         $this->registerRateLimiters();
     }
@@ -30,6 +42,10 @@ final class AuthServiceProvider extends ServiceProvider
         Gate::policy(User::class, UserPolicy::class);
 
         Gate::define('update-privacy', fn (User $user): bool => $user->hasVerifiedEmail() && $user->status->canWrite());
+        Gate::define('manage-own-sessions', fn (User $user): bool => $user->status->canAuthenticate());
+        Gate::define('manage-own-credentials', fn (User $user): bool => $user->status->canWrite());
+        Gate::define('request-own-deletion', fn (User $user): bool => $user->status->canWrite());
+        Gate::define('cancel-own-deletion', fn (User $user): bool => $user->status === UserStatus::PendingDeletion);
 
         Gate::before(function (User $user, string $ability): ?bool {
             if ($ability === Ability::Impersonate->value) {

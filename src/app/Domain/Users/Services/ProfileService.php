@@ -84,6 +84,26 @@ class ProfileService
         return $this->toData($profile);
     }
 
+    public function anonymize(int $userId): void
+    {
+        $profile = Profile::query()->where('user_id', $userId)->first();
+        if ($profile === null) {
+            return;
+        }
+
+        $avatar = $profile->avatar_media_id;
+        $profile->forceFill([
+            'display_name' => null,
+            'bio' => null,
+            'avatar_media_id' => null,
+            'country_code' => null,
+            'languages' => null,
+            'timezone' => null,
+            'socials' => null,
+        ])->save();
+        $this->media->release($avatar);
+    }
+
     /**
      * Guarantee the 1:1 profile + stats rows exist (registration creates them; this is defensive).
      * `user_id` is not fillable, so the rows are built explicitly rather than via firstOrCreate.

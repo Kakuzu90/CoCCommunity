@@ -49,4 +49,8 @@ return [
         'socials' => ['youtube', 'twitch', 'discord', 'x'],
         'social_max' => 100,
     ],
+    'deletion' => [
+        'grace_days' => 30,
+        'chunk_size' => 100,
+    ],
 ];

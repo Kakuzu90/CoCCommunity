@@ -203,6 +203,11 @@ verification — which is stronger proof than anything support could verify.
 - **Session-management columns** (`sessions.ip_hash`, `sessions.device_label`) and the handler
   override that fills them are deferred to the "Settings incl. sessions" task; the table keeps
   Laravel's default `ip_address`/`user_agent` for now so sessions work. 2FA is Phase 2.
+- **Settings task:** the database session handler now writes device label, IP hash and creation
+  time alongside Laravel's live IP/user agent. Idle expiry is 14 days and absolute expiry is 30
+  days. Pending-deletion users may sign in to cancel, but all ordinary writes remain blocked.
+  Password and email changes require the current password, rotate the remember token, and revoke
+  other sessions. Email changes send a notice to the old address and re-verify the new address.
 - **Rate limiters** `login`, `register`, `password-reset`, `verify-email-resend`, `username-check`
   are defined centrally in `AuthServiceProvider` via the `Cache` facade (Redis-swappable). The
   remaining limiters in the table below are added by the features that own them.

@@ -26,6 +26,8 @@ export default defineConfig({
             origin: /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/,
         },
         watch: {
+            usePolling: true,
+            interval: 300,
             ignored: ['**/storage/framework/views/**'],
         },
     },

@@ -4,7 +4,8 @@
             <p class="ui-eyebrow">Settings</p>
             <h1>Privacy</h1>
             <p class="ui-help">Control who sees your profile and what you share.</p>
-            <p><a href="{{ route('settings.profile.edit') }}">Profile</a> · <a href="{{ route('profile.show', auth()->user()->username) }}">View profile</a></p>
+            @include('settings.partials.nav')
+            <p><a href="{{ route('profile.show', auth()->user()->username) }}">View profile</a></p>
         </header>
 
         @if(session('status') === 'privacy-updated')

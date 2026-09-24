@@ -171,3 +171,9 @@ Account deletion (FR-AUTH-9) is a 30-day soft delete, then:
 | `marketplace_orders` | retained; buyer/seller pseudonymised after any dispute window closes |
 
 The anonymisation job is idempotent and logs to `audit_logs`.
+
+Phase 1 Settings implementation schedules deletion after 30 days, permits password-confirmed
+cancellation, and runs `platform:anonymize-deleted` daily. It tombstones the Auth row and clears
+the current Users profile and avatar via an event. CoC tags, bases, comments, disputes, orders,
+and audit logs do not exist yet; their owning phase tasks must add listeners/holds before those
+tables ship. The audit record is likewise deferred to the Phase 1 Admin/audit task.

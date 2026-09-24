@@ -38,7 +38,7 @@ final class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
-        // A suspended/banned/pending-deletion account may hold valid credentials but not a session.
+        // Suspended and banned accounts may hold valid credentials but cannot start a session.
         if ($user !== null && ($locked = $accounts->lockReason($user)) !== null) {
             Auth::logout();
             $request->session()->invalidate();

@@ -10,7 +10,7 @@ RUN apk add --no-cache bash git curl postgresql-client \
  && curl -sSLf https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions \
       -o /usr/local/bin/install-php-extensions \
  && chmod +x /usr/local/bin/install-php-extensions \
- && install-php-extensions pdo_sqlite pdo_pgsql pgsql gd zip bcmath intl pcntl opcache exif \
+ && install-php-extensions pdo_pgsql pgsql gd zip bcmath intl pcntl opcache exif \
  && rm /usr/local/bin/install-php-extensions
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

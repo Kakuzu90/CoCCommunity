@@ -48,7 +48,7 @@ At the end of every session, ask the agent to tick the checklist below and commi
 Update this as tasks complete. It is the fastest way to reorient after time away.
 
 ### Phase 0 — Foundation
-- [ ] Project setup, CI, static analysis
+- [x] Project setup, CI, static analysis
 - [ ] Domain skeleton + `Support` primitives
 - [ ] Design tokens + `x-ui.*` primitives
 - [ ] App shell, layouts, navigation

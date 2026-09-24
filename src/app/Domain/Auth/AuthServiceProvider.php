@@ -29,6 +29,8 @@ final class AuthServiceProvider extends ServiceProvider
     {
         Gate::policy(User::class, UserPolicy::class);
 
+        Gate::define('update-privacy', fn (User $user): bool => $user->hasVerifiedEmail() && $user->status->canWrite());
+
         Gate::before(function (User $user, string $ability): ?bool {
             if ($ability === Ability::Impersonate->value) {
                 return null; // Falls through to the ability gate, which denies everyone.

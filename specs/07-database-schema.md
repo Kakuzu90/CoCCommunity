@@ -105,6 +105,12 @@ rarely — and because it should be trivially cacheable as one small row.
 `show_coc_accounts (bool)`, `show_clan (bool)`, `show_activity (bool)`,
 `allow_recruitment_contact (bool)`, `allow_marketplace_contact (bool)`, `searchable (bool)`.
 
+Phase 1 implementation: registration provisions this row, and the migration backfills existing
+users. Defaults are `public`, true for account/clan/activity visibility and search, and false for
+both contact permissions. Members-only and private profile pages are excluded from indexing.
+The account, clan, activity, and contact flags are stored now and applied by their owning features
+when those surfaces ship.
+
 ### `user_stats` [M]
 Denormalised counters so profile pages are a single row read.
 

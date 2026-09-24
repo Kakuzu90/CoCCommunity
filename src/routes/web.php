@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Web\PublicProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'pages.home')->name('home');
+Route::get('/u/{username}', PublicProfileController::class)->name('profile.show');
 
 /*
  * Section landing routes exist now so navigation resolves everywhere; each renders the

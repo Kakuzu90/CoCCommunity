@@ -62,7 +62,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] Registration, login, verification, reset
 - [x] Roles, status, policy scaffold
 - [x] Profiles + avatar upload
-- [ ] Privacy settings + public profile
+- [x] Privacy settings + public profile
 - [ ] Settings area (sessions, deletion)
 - [ ] Admin v1 + audit log
 - [ ] Notifications v1

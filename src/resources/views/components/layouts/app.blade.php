@@ -1,4 +1,4 @@
-@props(['title' => null, 'description' => null])
+@props(['title' => null, 'description' => null, 'robots' => null])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -7,6 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ? $title.' · Clash Commons' : 'Clash Commons — the Clash of Clans community platform' }}</title>
     <meta name="description" content="{{ $description ?? 'Verify your Clash of Clans account, share base layouts people can trust, and find a clan that fits.' }}">
+    @if($robots)<meta name="robots" content="{{ $robots }}">@endif
     <link rel="preload" href="{{ Vite::asset('node_modules/@fontsource/lilita-one/files/lilita-one-latin-400-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles

@@ -25,6 +25,11 @@ class ProfileService
         return $this->toData($this->ensure($this->id($user)));
     }
 
+    public function getByUserId(int $userId): ProfileData
+    {
+        return $this->toData($this->ensure($userId));
+    }
+
     public function update(Authenticatable $user, ProfileInput $input): ProfileData
     {
         $profile = $this->ensure($this->id($user));

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Users\Listeners;
 
+use App\Domain\Users\Services\PrivacyService;
 use App\Domain\Users\Services\ProfileService;
 use Illuminate\Auth\Events\Registered;
 
@@ -12,10 +13,11 @@ use Illuminate\Auth\Events\Registered;
  */
 final class CreateUserProfile
 {
-    public function __construct(private readonly ProfileService $profiles) {}
+    public function __construct(private readonly ProfileService $profiles, private readonly PrivacyService $privacy) {}
 
     public function handle(Registered $event): void
     {
         $this->profiles->ensure((int) $event->user->getAuthIdentifier());
+        $this->privacy->ensure((int) $event->user->getAuthIdentifier());
     }
 }

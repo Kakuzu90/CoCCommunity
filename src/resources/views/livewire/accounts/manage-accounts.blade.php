@@ -143,6 +143,11 @@
 
                 <div class="account-actions">
                     <a class="ui-button" data-variant="secondary" data-size="sm" href="{{ route('accounts.show', $account->ulid) }}">View player</a>
+                    @if($account->status->isVerified() && ! $account->isFeatured)
+                        <x-ui.button type="button" variant="secondary" size="sm"
+                            wire:click="feature({{ $account->id }})"
+                            wire:target="feature({{ $account->id }})" wire:loading.attr="disabled">Set as featured</x-ui.button>
+                    @endif
                     @if(in_array($account->status->value, ['verified', 'unverified'], true))
                         <x-ui.button type="button" variant="secondary" size="sm"
                             wire:click="refreshAccount({{ $account->id }})"

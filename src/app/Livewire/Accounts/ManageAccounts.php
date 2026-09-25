@@ -10,6 +10,7 @@ use App\Domain\PlayerAccounts\Queries\PlayerAccountQuery;
 use App\Domain\PlayerAccounts\Services\AccountAttachService;
 use App\Domain\PlayerAccounts\Services\AccountDetachService;
 use App\Domain\PlayerAccounts\Services\DisputeService;
+use App\Domain\PlayerAccounts\Services\FeaturedAccountService;
 use App\Domain\PlayerAccounts\Services\ManualAccountRefresh;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -168,6 +169,19 @@ final class ManageAccounts extends Component
 
         $this->flash = 'That account has been released.';
         $this->reset('password', 'confirmingDetachId');
+    }
+
+    public function feature(int $id, FeaturedAccountService $service): void
+    {
+        $this->authorize('manage-own-coc-accounts');
+
+        try {
+            $service->feature($this->userId(), $id);
+        } catch (ModelNotFoundException) {
+            abort(404);
+        }
+
+        $this->flash = 'Featured account updated. It now leads your profile.';
     }
 
     public function refreshAccount(int $id, ManualAccountRefresh $service): void

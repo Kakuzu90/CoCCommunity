@@ -18,6 +18,7 @@ enum AuditAction: string
     case CocAccountVerified = 'coc_account.verified';
     case CocAccountSuperseded = 'coc_account.superseded';
     case CocAccountDetached = 'coc_account.detached';
+    case CocAccountFeatured = 'coc_account.featured';
     case CocDisputeOpened = 'coc_dispute.opened';
     case CocDisputeTransferred = 'coc_dispute.transferred';
     case CocDisputeDenied = 'coc_dispute.denied';
@@ -34,6 +35,7 @@ enum AuditAction: string
             self::CocAccountVerified => 'CoC account verified',
             self::CocAccountSuperseded => 'CoC account ownership superseded',
             self::CocAccountDetached => 'CoC account detached',
+            self::CocAccountFeatured => 'CoC account set as featured',
             self::CocDisputeOpened => 'CoC ownership dispute opened',
             self::CocDisputeTransferred => 'CoC ownership transferred by admin',
             self::CocDisputeDenied => 'CoC ownership dispute denied',

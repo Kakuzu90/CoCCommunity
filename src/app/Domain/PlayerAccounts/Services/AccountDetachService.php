@@ -26,6 +26,7 @@ final class AccountDetachService
     public function __construct(
         private readonly VerifiedAccountCounter $counter,
         private readonly AuditLogger $audit,
+        private readonly FeaturedAccountService $featured,
     ) {}
 
     public function detach(int $userId, int $accountId, ?AuditContext $context = null): void
@@ -50,6 +51,7 @@ final class AccountDetachService
             if ($wasVerified) {
                 $this->counter->decrement($userId);
             }
+            $this->featured->reconcile($userId);
 
             $this->audit->record(
                 actorId: $userId,

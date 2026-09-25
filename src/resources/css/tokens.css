@@ -11,7 +11,7 @@
     --bg-page: var(--clr-navy-900); --bg-surface: var(--clr-navy-800); --bg-surface-raised: var(--clr-navy-700);
     --bg-surface-hover: var(--clr-navy-700); --bg-scrim: color-mix(in srgb, var(--clr-navy-950) 85%, transparent);
     --border-subtle: var(--clr-navy-700); --border-default: var(--clr-navy-600); --border-strong: var(--clr-text-muted); --border-focus: var(--clr-gold-400);
-    --text-primary: var(--clr-text); --text-secondary: var(--clr-text-dim); --text-muted: var(--clr-text-muted); --text-inverse: var(--clr-text-on-gold); --text-on-gold: var(--clr-text-on-gold); --text-danger: var(--clr-red-400);
+    --text-primary: var(--clr-text); --text-secondary: var(--clr-text-dim); --text-muted: var(--clr-text-muted); --text-inverse: var(--clr-text-on-gold); --text-on-gold: var(--clr-text-on-gold); --text-danger: var(--clr-red-400); --text-success: var(--clr-green-400);
     --brand-primary: var(--clr-gold-500); --brand-primary-hover: var(--clr-gold-400); --brand-primary-press: var(--clr-gold-600); --brand-primary-shadow: var(--clr-gold-700);
     --accent: var(--clr-purple-500); --accent-hover: var(--clr-purple-400);
     --state-success: var(--clr-green-500); --state-success-press: var(--clr-green-600); --state-danger-press: var(--clr-red-600); --state-danger: var(--clr-red-500); --state-warning: var(--clr-orange-500); --state-info: var(--clr-blue-500);
@@ -29,7 +29,7 @@
     --depth-btn: 4px; --depth-btn-press: 1px; --depth-card: 3px; --depth-card-hover: 5px;
     --shadow-modal: 0 24px 48px -12px rgb(0 0 0 / .7); --shadow-glow-gold: 0 0 24px -4px rgb(245 184 0 / .45);
     --ease-pop: cubic-bezier(.34,1.56,.64,1); --ease-out: cubic-bezier(.16,1,.3,1);
-    --dur-fast: 120ms; --dur-base: 200ms; --dur-slow: 400ms;
+    --dur-fast: 120ms; --dur-base: 200ms; --dur-slow: 400ms; --dur-count: 700ms;
     --z-base: 0; --z-dropdown: 100; --z-sticky: 200; --z-modal: 300; --z-toast: 400;
     --th-tier-1: var(--text-muted); --th-tier-2: #6BA84F; --th-tier-3: var(--state-info); --th-tier-4: var(--accent);
     --th-tier-5: var(--state-warning); --th-tier-6: var(--brand-primary); --th-tier-7: var(--state-danger);

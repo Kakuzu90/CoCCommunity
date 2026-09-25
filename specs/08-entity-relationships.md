@@ -51,7 +51,7 @@
 | user → privacy_settings | 1:1 | user | cascade |
 | user → user_stats | 1:1 | user | cascade |
 | user → coc_accounts | 1:N | user | **set null + status `released`** — the tag must become reclaimable, and the history must survive |
-| user → featured coc_account | N:1 (nullable, circular) | user | set null |
+| user → featured coc_account | 1:0..1 via `coc_accounts.is_featured` (partial unique index per user) | user | flag cleared on detach; next verified account promoted |
 | coc_account → snapshots | 1:N | account | cascade |
 | coc_account → claims | 1:N | account (nullable) | set null (claims outlive the account row) |
 | coc_account → disputes | 1:N | account | restrict — a disputed account cannot be deleted |

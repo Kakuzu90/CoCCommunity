@@ -38,7 +38,6 @@ Authentication identity and platform-level status. Deliberately thin — profile
 | status | varchar(20) | `active`\|`restricted`\|`suspended`\|`banned`\|`pending_deletion` |
 | status_reason | varchar(255) null | user-visible sanction reason |
 | status_expires_at | timestamptz null | timed restriction/suspension |
-| featured_coc_account_id | bigint null FK → coc_accounts | `ON DELETE SET NULL`, deferrable (circular with coc_accounts) |
 | verified_accounts_count | int default 0 | denormalised, drives the verified badge |
 | last_login_at / last_login_ip_hash | timestamptz / varchar(64) null | IP stored hashed |
 | username_changed_at | timestamptz null | enforces the 30-day rule |
@@ -192,7 +191,7 @@ A CoC player tag attached to a website user. The central trust object of the pla
 | raw_payload | jsonb null | last full API response, for debugging and new-field backfill |
 | api_synced_at | timestamptz null | freshness for the "last updated" label |
 | api_sync_failures | smallint default 0 | drives backoff and `stale` display |
-| is_featured | bool default false | one per user, enforced by partial unique |
+| is_featured | bool default false | one per user, enforced by partial unique. The only record of the featured account (there is no FK on `users`); must be `verified` or `disputed` |
 | images_count | smallint default 0 | quota guard (max 5) |
 | created_at / updated_at / deleted_at | timestamptz | |
 

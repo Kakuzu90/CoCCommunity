@@ -101,6 +101,13 @@
     .ui-tab[aria-selected=true] { color: var(--brand-primary); border-color: var(--brand-primary); }
     [data-variant=pill] > .ui-tablist { border: none; } [data-variant=pill] .ui-tab { border: 1px solid var(--border-default); border-radius: var(--radius-full); }
     [data-variant=pill] .ui-tab[aria-selected=true] { border-color: var(--brand-primary); background: var(--bg-surface-raised); }
+    /* StatBlock: the number leads, the label sits under it (dt is first in source for screen readers). */
+    .ui-stat { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; margin: 0; }
+    .ui-stat-value { order: -1; display: flex; align-items: center; gap: var(--space-2); margin: 0; color: var(--text-primary); font-size: var(--text-stat); line-height: var(--leading-stat); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .ui-stat-icon { flex: none; color: var(--brand-primary); }
+    .ui-stat-label { color: var(--text-secondary); font-size: var(--text-sm); }
+    .ui-stat-delta { margin: 0; font-size: var(--text-xs); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .ui-stat-delta[data-direction=up] { color: var(--text-success); } .ui-stat-delta[data-direction=down] { color: var(--text-danger); }
     .ui-panel { padding-block: var(--space-5); }
     .ui-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
     .ui-pagination a, .ui-pagination span { display: grid; place-items: center; min-width: 44px; min-height: 44px; border-radius: var(--radius-sm); }
@@ -219,6 +226,13 @@
         .app-topbar-nav { display: flex; gap: var(--space-1); }
         .app-topbar-nav .app-nav-link { padding: var(--space-2) var(--space-3); }
         .home-values { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* Narrow tablets: brand word, inline nav and both auth buttons do not fit one row, so the brand keeps
+       its mark only (the link keeps its accessible name) and nav links tighten. */
+    @media (min-width: 768px) and (max-width: 1023px) {
+        .app-brand-word { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+        .app-topbar-nav .app-nav-link { padding-inline: var(--space-2); }
     }
 
     /* Desktop: left sidebar + prominent search; drop the inline top nav. */

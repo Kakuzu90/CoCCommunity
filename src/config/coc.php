@@ -130,6 +130,11 @@ return [
      * portal credentials (blocked on the operator) and a stable egress IP. Off → the documented
      * manual runbook applies and the health surface alerts when the pool goes unhealthy.
      */
+    // Town Hall colour tiers (specs/18 §4 ThBadge): highest TH level in each tier. Anything above the last
+    // entry is the top tier, so a new TH level needs no change here unless the ramp itself moves.
+    'th_tiers' => [4 => 1, 7 => 2, 10 => 3, 12 => 4, 14 => 5, 16 => 6],
+    'th_top_tier' => 7,
+
     'key_rotation' => [
         'enabled' => (bool) env('COC_KEY_ROTATION_ENABLED', false),
         'portal_email' => env('COC_PORTAL_EMAIL'),

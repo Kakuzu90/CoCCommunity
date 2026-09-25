@@ -58,16 +58,18 @@
 
 .player-card a:focus-visible, .account-detail__breadcrumb a:focus-visible { outline: 3px solid var(--border-focus); outline-offset: 3px; border-radius: var(--radius-sm); }
 
-.player-card { --card-accent: var(--th-tier-3); display: grid; gap: var(--space-4); padding: var(--space-4); border: 1px solid var(--border-default); border-top: 3px solid var(--card-accent); border-radius: var(--radius-lg); background: var(--bg-surface); min-width: 0; }
+.player-card { --card-accent: var(--th-tier-3); display: grid; gap: var(--space-4); padding: var(--space-4); border: 1px solid var(--border-default); border-top: 3px solid var(--card-edge, var(--card-accent)); border-radius: var(--radius-lg); background: var(--bg-surface); min-width: 0; }
 .player-card[data-th-tier="1"] { --card-accent: var(--th-tier-1); }
 .player-card[data-th-tier="2"] { --card-accent: var(--th-tier-2); }
 .player-card[data-th-tier="3"] { --card-accent: var(--th-tier-3); }
 .player-card[data-th-tier="4"] { --card-accent: var(--th-tier-4); }
 .player-card[data-th-tier="5"] { --card-accent: var(--th-tier-5); }
 .player-card[data-th-tier="6"] { --card-accent: var(--th-tier-6); }
-.player-card[data-th-tier="7"] { --card-accent: var(--th-tier-7); }
-.player-card[data-state="unverified"], .player-card[data-state="suspended"] { --card-accent: var(--border-strong); }
-.player-card[data-state="disputed"], .player-card[data-state="stale"] { --card-accent: var(--state-warning); }
+/* Top tier is "red + gold ring" (specs/18 §4): red stays on the TH numeral, the card edge is the gold ring,
+   so the most prominent card on a profile never reads as an error state. */
+.player-card[data-th-tier="7"] { --card-accent: var(--th-tier-7); --card-edge: var(--brand-primary); }
+.player-card[data-state="unverified"], .player-card[data-state="suspended"] { --card-accent: var(--border-strong); --card-edge: var(--border-strong); }
+.player-card[data-state="disputed"], .player-card[data-state="stale"] { --card-accent: var(--state-warning); --card-edge: var(--state-warning); }
 .player-card--hero { padding: clamp(var(--space-4), 4vw, var(--space-8)); background: linear-gradient(140deg, var(--bg-surface-raised), var(--bg-surface)); }
 .player-card--compact { gap: var(--space-2); }
 .player-card--mini { gap: var(--space-2); padding: var(--space-3); }
@@ -75,7 +77,7 @@
 .player-card__top, .player-card__footer { justify-content: space-between; }
 .player-card__th { font-weight: 700; color: var(--card-accent); }
 .player-card__th-number { padding: var(--space-2) var(--space-3); background: var(--bg-page); clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%); }
-.player-card[data-th-tier="7"] .player-card__th-number { background: color-mix(in srgb, var(--brand-primary) 20%, var(--bg-page)); }
+.player-card[data-th-tier="7"] .player-card__th-number { background: var(--bg-page); box-shadow: inset 0 0 0 2px var(--brand-primary); }
 .player-card__identity { gap: var(--space-3); min-width: 0; }
 .player-card__name { display: grid; min-width: 0; }
 .player-card__name a { color: var(--text-primary); font-family: var(--font-display); font-size: clamp(1.3rem, 3vw, 2rem); line-height: 1.2; overflow-wrap: anywhere; }
@@ -84,9 +86,14 @@
 .player-card__name .account-tag { color: var(--text-secondary); font-family: var(--font-mono); font-size: var(--text-sm); }
 .player-card__league { color: var(--text-secondary); font-size: var(--text-sm); }
 .player-card__stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); margin: 0; }
-.player-card__stats > div { padding: var(--space-3); background: var(--bg-page); border-radius: var(--radius-sm); min-width: 0; }
-.player-card__stats dt, .account-detail__stat dt { color: var(--text-secondary); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: .04em; }
-.player-card__stats dd, .account-detail__stat dd { margin: var(--space-1) 0 0; color: var(--text-primary); font-weight: 700; font-variant-numeric: tabular-nums; }
+.player-card__stats .ui-stat { padding: var(--space-3); background: var(--bg-page); border-radius: var(--radius-sm); }
+.player-card__stats .ui-stat-value { font-size: var(--text-body); line-height: var(--leading-body); }
+/* Three boxes share a phone width, so the hero figure scales with the viewport instead of overflowing. */
+.player-card--hero .player-card__stats .ui-stat-value { font-size: clamp(var(--text-body), 4.5vw, var(--text-stat)); line-height: var(--leading-stat); }
+.player-card__stats .ui-stat-value > span { min-width: 0; overflow-wrap: anywhere; }
+.player-card__stats .ui-stat-label { font-size: var(--text-xs); }
+.account-detail__stat dt { color: var(--text-secondary); font-size: var(--text-xs); text-transform: uppercase; letter-spacing: .04em; }
+.account-detail__stat dd { margin: var(--space-1) 0 0; color: var(--text-primary); font-weight: 700; font-variant-numeric: tabular-nums; }
 .player-card__footer { color: var(--text-secondary); font-size: var(--text-xs); }
 .profile-accounts { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
 .profile-accounts .player-card--hero { grid-column: 1 / -1; }

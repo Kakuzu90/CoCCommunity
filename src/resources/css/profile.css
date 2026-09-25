@@ -1,0 +1,54 @@
+/*
+ * Public profile (specs/18 §6): cover band, featured PlayerCard, then accounts. The cover carries the
+ * verified summary (highest Town Hall in the same hexagon as the PlayerCard) so the identity motif
+ * starts above the fold and the war-star total never sits beside the card's own stat boxes.
+ */
+.profile-page { display: grid; gap: var(--space-6); max-width: 56rem; margin-inline: auto; min-width: 0; }
+
+.profile-cover { display: grid; gap: var(--space-4); padding: clamp(var(--space-4), 4vw, var(--space-7)); background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); }
+.profile-cover__text { display: grid; gap: var(--space-2); min-width: 0; }
+.profile-cover h1 { margin: 0; font-size: var(--text-h1); line-height: var(--leading-h1); overflow-wrap: anywhere; }
+.profile-cover__handle { margin: 0; color: var(--text-secondary); font-family: var(--font-mono); font-size: var(--text-sm); }
+.profile-cover__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); color: var(--text-secondary); font-size: var(--text-sm); }
+.profile-cover__bio { margin: var(--space-2) 0 0; max-width: 60ch; color: var(--text-primary); overflow-wrap: anywhere; white-space: pre-line; }
+.profile-cover__actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+/* Verified summary: TH hexagon plus the counts, on the page background so it reads as one inset unit. */
+.profile-cover__summary { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-6); padding: var(--space-4); border: 1px solid var(--border-default); border-radius: var(--radius-lg); }
+.profile-th { --th-color: var(--th-tier-3); display: grid; grid-template-columns: auto auto; align-items: center; gap: var(--space-1) var(--space-2); color: var(--th-color); font-weight: 700; }
+.profile-th[data-th-tier="1"] { --th-color: var(--th-tier-1); } .profile-th[data-th-tier="2"] { --th-color: var(--th-tier-2); }
+.profile-th[data-th-tier="3"] { --th-color: var(--th-tier-3); } .profile-th[data-th-tier="4"] { --th-color: var(--th-tier-4); }
+.profile-th[data-th-tier="5"] { --th-color: var(--th-tier-5); } .profile-th[data-th-tier="6"] { --th-color: var(--th-tier-6); }
+.profile-th[data-th-tier="7"] { --th-color: var(--th-tier-7); }
+.profile-th[data-th-tier="7"] .profile-th__number { box-shadow: inset 0 0 0 2px var(--brand-primary); }
+.profile-th__number { padding: var(--space-2) var(--space-3); background: var(--bg-page); clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%); }
+.profile-th__label { grid-column: 1 / -1; color: var(--text-secondary); font-size: var(--text-xs); font-weight: 400; }
+.profile-summary { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-6); margin: 0; }
+.profile-summary .ui-stat-value { font-size: var(--text-h3); line-height: var(--leading-h3); }
+.profile-summary .ui-stat-label { font-size: var(--text-xs); }
+
+/* The verified badge reuses the tooltip trigger; restyle it as the gold badge, not a ghost button. */
+.verified-badge.ui-button { height: auto; min-height: 32px; padding: var(--space-1) var(--space-3); gap: var(--space-1); border: 1px solid color-mix(in srgb, var(--brand-primary) 45%, transparent); border-radius: var(--radius-full); color: var(--brand-primary); font-size: var(--text-xs); cursor: help; }
+.verified-badge.ui-button:focus-visible { outline: 3px solid var(--border-focus); outline-offset: 2px; }
+@media (pointer: coarse) { .verified-badge.ui-button { min-height: 44px; } }
+
+/* Base stats sit unboxed in one band so they never mirror the PlayerCard's boxed stats above them. */
+.profile-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: var(--space-5) var(--space-4); margin: 0; padding: var(--space-5) 0; border-block: 1px solid var(--border-default); }
+
+.profile-section { display: grid; gap: var(--space-4); }
+.profile-section h2 { margin: 0; font-size: var(--text-h2); line-height: var(--leading-h2); }
+.profile-tabs .ui-panel { padding-top: var(--space-5); }
+.profile-tabs .ui-panel:focus-visible { outline: 3px solid var(--border-focus); outline-offset: 4px; border-radius: var(--radius-sm); }
+.profile-accounts__footer { margin: var(--space-4) 0 0; }
+
+/* Avatar beside the text from small tablets up; the summary and owner actions stay full rows below. */
+@media (min-width: 600px) {
+    .profile-cover { grid-template-columns: auto minmax(0, 1fr); align-items: start; }
+    .profile-cover__summary, .profile-cover__actions { grid-column: 1 / -1; }
+    .profile-cover__actions { grid-column: 2; }
+}
+/* Only when the text column keeps a readable measure does the summary move up beside it. */
+@media (min-width: 1180px) {
+    .profile-cover { grid-template-columns: auto minmax(0, 1fr) auto; }
+    .profile-cover__summary { grid-column: 3; grid-row: 1; flex-direction: column; align-items: flex-start; }
+}

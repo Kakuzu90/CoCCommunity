@@ -467,6 +467,27 @@
                 </article>
             </div>
             <p class="gallery-caption mt-3">Status pill tones: <x-ui.pill tone="primary">Verified</x-ui.pill> <x-ui.pill tone="neutral">Unverified</x-ui.pill> <x-ui.pill tone="warning">Under review</x-ui.pill> <x-ui.pill tone="danger">Suspended</x-ui.pill></p>
+            <p class="ui-help mt-6">StatBlock: the number leads and the label sits under it. Icon and delta are optional. Count-up runs once on the profile stat row only, and never under reduced motion.</p>
+            <dl class="profile-stats mt-3">
+                <x-ui.stat-block :value="12" label="Bases published" icon="layers" count-up />
+                <x-ui.stat-block :value="4280" label="Trophies" :delta="142" />
+                <x-ui.stat-block :value="1937" label="War stars" :delta="-30" />
+                <x-ui.stat-block :value="0" label="Base copies" icon="document" />
+            </dl>
+            <p class="ui-help mt-6">Profile verified summary: highest Town Hall in the ThBadge hexagon, then the counts. Tier 7 adds the gold ring.</p>
+            <div class="profile-cover__summary mt-3">
+                <span class="profile-th" data-th-tier="7">
+                    <x-game.asset type="townhall" :value="17" :size="32" />
+                    <span class="profile-th__number" aria-hidden="true">TH 17</span>
+                    <span class="profile-th__label">Highest Town Hall</span>
+                </span>
+                <dl class="profile-summary">
+                    <x-ui.stat-block :value="3" label="Verified accounts" />
+                    <x-ui.stat-block :value="3106" label="War stars, all accounts" />
+                </dl>
+            </div>
+            <p class="ui-help mt-6">VerifiedBadge: focusable so the explanation is reachable by keyboard.</p>
+            <div class="mt-3"><x-player.verified-badge /></div>
         </section>
         <section class="gallery-section" id="notifications">
             <h2>Notification inbox</h2>

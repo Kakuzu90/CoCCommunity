@@ -114,7 +114,8 @@ The most important workflow on the platform. Every other trust signal derives fr
    - notify the previous holder: *"Someone verified ownership of #TAG with an in-game token. If this
      was not you, your account may be compromised — secure it and contact support."*
 3. Promote this row: `status='verified'`, `verified_at`, `verification_method='api_token'`.
-4. Increment `users.verified_accounts_count`; set as featured if it is the user's first.
+4. Increment `users.verified_accounts_count`; set as featured if the user has no featured verified or
+   under-review account. A superseded holder's featured flag moves to their next verified account.
 5. Write the claim row as `succeeded`.
 6. Write `audit_logs` (`coc_account.verified`, before/after user ids).
 7. Commit, then dispatch `CocAccountVerified` → full profile sync, clan tracking, notification,
@@ -204,7 +205,8 @@ claim (the claimant can still verify later with a token).
 **User detaches an account:**
 - Requires password re-confirmation (sensitive action).
 - `coc_accounts.user_id → null`, `status='released'`, featured flag cleared, `verified_accounts_count`
-  decremented, snapshots retained, `audit_logs` written.
+  decremented, snapshots retained, `audit_logs` written. If it was featured, the user's most recently
+  verified remaining account becomes featured.
 - Bases credited to that account keep their `user_id` (authorship) and lose the credit link.
 - If the user re-attaches later, the **same row is reused** (matched on `tag_normalized` +
   `released`) so snapshot history is continuous.

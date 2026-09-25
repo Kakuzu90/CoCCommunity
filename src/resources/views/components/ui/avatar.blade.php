@@ -1,4 +1,4 @@
-@props(['name', 'src' => null, 'size' => 48, 'verified' => false, 'loading' => false])
+@props(['name', 'src' => null, 'size' => 48, 'verified' => false, 'loading' => false, 'decorative' => false])
 @php
     if (! in_array((int) $size, [24, 32, 48, 64, 96, 128], true)) throw new InvalidArgumentException('Unknown avatar size.');
     if ($src && ! preg_match('~\A(?:https?://|/(?!/))~i', $src)) throw new InvalidArgumentException('Avatar URL must be HTTP(S) or root-relative.');
@@ -6,7 +6,7 @@
 @endphp
 <span {{ $attributes->class('ui-avatar') }} data-size="{{ $size }}" @if($verified) data-verified 
 @endif
- role="img" aria-label="{{ $name }}{{ $verified ? ', verified' : '' }}" @if($loading) aria-busy="true" 
+@if($decorative) aria-hidden="true" @else role="img" aria-label="{{ $name }}{{ $verified ? ', verified' : '' }}" @endif @if($loading) aria-busy="true" 
 @endif
  x-data="{ failed: false }">
     <span aria-hidden="true">{{ mb_strtoupper($initials) }}</span>

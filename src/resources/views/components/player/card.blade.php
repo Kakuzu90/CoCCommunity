@@ -5,15 +5,7 @@
     }
     $href ??= route('accounts.show', $account->ulid);
     $label = $account->ign.' · Town Hall '.$account->thLevel.' · '.$account->status->label();
-    $tier = match (true) {
-        $account->thLevel <= 4 => 1,
-        $account->thLevel <= 7 => 2,
-        $account->thLevel <= 10 => 3,
-        $account->thLevel <= 12 => 4,
-        $account->thLevel <= 14 => 5,
-        $account->thLevel <= 16 => 6,
-        default => 7,
-    };
+    $tier = collect(config('coc.th_tiers'))->first(fn (int $tier, int $max): bool => $account->thLevel <= $max) ?? config('coc.th_top_tier');
 @endphp
 <article {{ $attributes->class('player-card player-card--'.$variant) }} data-state="{{ $account->stale ? 'stale' : $account->status->value }}" data-th-tier="{{ $tier }}">
     <div class="player-card__top">
@@ -42,11 +34,12 @@
     @if($variant !== 'mini')
         <dl class="player-card__stats">
             @foreach(['trophies' => 'Trophies', 'war_stars' => 'War stars', 'xp_level' => 'XP level'] as $key => $title)
-                <div><dt>{{ $title }}</dt><dd>{{ number_format($account->stats[$key]['value']) }}</dd></div>
+                <x-ui.stat-block :value="$account->stats[$key]['value']" :label="$title" :delta="$account->stats[$key]['delta']" />
             @endforeach
         </dl>
         <div class="player-card__footer">
-            @if($account->clanTag)<span>Clan {{ $account->clanTag }}{{ $account->clanRole ? ' · '.ucfirst($account->clanRole) : '' }}</span>@endif
+            @if($account->clanTag)<span>Clan {{ $account->clanTag }}{{ $account->clanRole ? ' · '.ucfirst($account->clanRole) : '' }}</span>
+            @elseif(! $account->clanShared)<span>Clan not shared</span>@endif
             <span>@if($account->stale)Saved data · @endif{{ $account->syncedAge ? 'Updated '.$account->syncedAge : 'Not synced yet' }}</span>
         </div>
     @endif

@@ -48,6 +48,7 @@ final class AccountAttachService
         private readonly UserDirectory $directory,
         private readonly VerifiedAccountCounter $counter,
         private readonly AuditLogger $audit,
+        private readonly FeaturedAccountService $featured,
     ) {}
 
     /**
@@ -152,16 +153,13 @@ final class AccountAttachService
             'api_sync_failures' => 0,
         ]);
 
-        $isFirst = CocAccount::query()
-            ->where('user_id', $userId)
-            ->where('status', CocAccountStatus::Verified->value)
-            ->when($account->exists, fn ($q) => $q->where('id', '!=', $account->id))
-            ->doesntExist();
-        if ($isFirst) {
-            $account->forceFill(['is_featured' => true]);
-        }
-
         $account->save();
+
+        // The first verified account becomes featured; a superseded holder falls back to their next one.
+        $this->featured->reconcile($userId);
+        if ($previousHolderId !== null) {
+            $this->featured->reconcile($previousHolderId);
+        }
 
         $this->counter->increment($userId);
         $this->claim($userId, $normalized, ClaimStatus::Succeeded, null, (int) $account->id, $context);

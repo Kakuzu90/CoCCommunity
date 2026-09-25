@@ -40,6 +40,7 @@ final class DisputeResolutionService
         private readonly VerifiedAccountCounter $counter,
         private readonly ModerationRecorder $moderation,
         private readonly AuditLogger $audit,
+        private readonly FeaturedAccountService $featured,
     ) {}
 
     /** Admin transfers the tag to the claimant (specs/13 §5 step 5 transfer). */
@@ -139,6 +140,9 @@ final class DisputeResolutionService
                     $this->counter->decrement((int) $held->user_id);
                 }
                 $held->forceFill(['status' => CocAccountStatus::Suspended->value])->save();
+                if ($held->user_id !== null) {
+                    $this->featured->reconcile((int) $held->user_id);
+                }
             }
 
             $moderationId = $this->moderation->record(
@@ -264,16 +268,12 @@ final class DisputeResolutionService
             'api_sync_failures' => 0,
         ]);
 
-        $isFirst = CocAccount::query()
-            ->where('user_id', $newOwnerId)
-            ->where('status', CocAccountStatus::Verified->value)
-            ->when($account->exists, fn ($q) => $q->where('id', '!=', $account->id))
-            ->doesntExist();
-        if ($isFirst) {
-            $account->forceFill(['is_featured' => true]);
-        }
-
         $account->save();
+
+        $this->featured->reconcile($newOwnerId);
+        if ($previousHolderId !== null) {
+            $this->featured->reconcile($previousHolderId);
+        }
 
         $this->counter->increment($newOwnerId);
         event(new CocAccountVerified((int) $account->id, $newOwnerId, $previousHolderId));

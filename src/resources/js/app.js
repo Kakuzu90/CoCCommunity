@@ -121,8 +121,18 @@ Alpine.data('uiDropdown' , () => ({
         items[index]?.focus();
     },
 }));
-Alpine.data('uiTabs', () => ({
+// Linkable tabs mirror the open panel in the URL hash (#<id>-panel-<key>) so a tab can be shared.
+Alpine.data('uiTabs', ({ linkable = false } = {}) => ({
     active: 0,
+    init() {
+        if (!linkable) return;
+        const panels = [...this.$el.querySelectorAll(':scope > [role=tabpanel]')];
+        const fromHash = panels.findIndex(panel => '#' + panel.id === location.hash);
+        if (fromHash > 0) this.active = fromHash;
+        this.$watch('active', index => {
+            if (panels[index]) history.replaceState(null, '', '#' + panels[index].id);
+        });
+    },
     navigate(event) {
         const tabs = [...event.currentTarget.querySelectorAll('[role=tab]')];
         if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) return;
@@ -130,6 +140,32 @@ Alpine.data('uiTabs', () => ({
         this.active = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (this.active + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
         tabs[this.active]?.focus();
     },
+}));
+// StatBlock count-up (specs/18 §4): runs once when the figure scrolls into view, and never under
+// reduced motion. The real value is already in the markup, so without JS nothing is lost.
+Alpine.data('uiCountUp', (target) => ({
+    observer: null,
+    init() {
+        if (target <= 0 || matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+        const duration = parseFloat(getComputedStyle(this.$el).getPropertyValue('--dur-count')) || 0;
+        if (duration <= 0) return;
+        const format = new Intl.NumberFormat('en-US');
+        this.$el.textContent = '0';
+        this.observer = new IntersectionObserver(entries => {
+            if (!entries.some(entry => entry.isIntersecting)) return;
+            this.observer.disconnect();
+            const start = performance.now();
+            const step = now => {
+                const progress = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                this.$el.textContent = format.format(Math.round(target * eased));
+                if (progress < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        });
+        this.observer.observe(this.$el);
+    },
+    destroy() { this.observer?.disconnect(); },
 }));
 Alpine.data('uiSentinel', () => ({
     observer: null,

@@ -1,5 +1,5 @@
-@props(['id', 'tabs', 'variant' => 'underline', 'label' => 'Sections'])
-<div {{ $attributes }} data-variant="{{ $variant }}" x-data="uiTabs">
+@props(['id', 'tabs', 'variant' => 'underline', 'label' => 'Sections', 'linkable' => false])
+<div {{ $attributes }} data-variant="{{ $variant }}" x-data="uiTabs({ linkable: @js((bool) $linkable) })">
     <div role="tablist" aria-label="{{ $label }}" class="ui-tablist" @keydown="navigate($event)">
     @foreach($tabs as $key => $text)
         <button type="button" role="tab" id="{{ $id }}-tab-{{ $key }}" aria-controls="{{ $id }}-panel-{{ $key }}" class="ui-tab" :aria-selected="(active === {{ $loop->index }}).toString()" :tabindex="active === {{ $loop->index }} ? 0 : -1" @click="active = {{ $loop->index }}">{{ $text }}</button>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Domain\PlayerAccounts\Data\ProfileAccounts;
 use App\Domain\PlayerAccounts\Queries\AccountDetailQuery;
 use App\Domain\Users\Services\PublicProfileReadModel;
 use App\Http\Controllers\Controller;
@@ -15,9 +16,12 @@ class PublicProfileController extends Controller
         $result = $profiles->find($username, $request->user()?->getAuthIdentifier());
         abort_if($result === null, 404);
 
+        $viewerId = $request->user()?->getAuthIdentifier();
         $result['accounts'] = $result['state'] === 'visible'
-            ? $accounts->forProfile($result['profile']->profile->userId, $request->user()?->getAuthIdentifier())
-            : [];
+            ? $accounts->forProfile($result['profile']->profile->userId, $viewerId)
+            : ProfileAccounts::empty();
+        $result['isOwner'] = $result['state'] === 'visible' && $viewerId === $result['profile']->profile->userId;
+        $result['basePublishing'] = (bool) config('features.base_publishing');
 
         return view('pages.profile', $result);
     }

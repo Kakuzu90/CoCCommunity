@@ -4,45 +4,85 @@
             :body="$state === 'members' ? 'Sign in to view this profile.' : 'This member has chosen not to share their profile.'" />
     </x-layouts.app>
 @else
-    <x-layouts.app :title="($profile->profile->displayName ?: $profile->username).' (@'.$profile->username.')'"
+    @php
+        $name = $profile->profile->displayName ?: $profile->username;
+        $country = $profile->profile->countryCode;
+        $countryName = $country && class_exists(\Locale::class) ? \Locale::getDisplayRegion('-'.$country, 'en') : $country;
+        $highestTh = $accounts->highestThLevel;
+        $thTier = $highestTh === null ? null
+            : (collect(config('coc.th_tiers'))->first(fn (int $tier, int $max): bool => $highestTh <= $max) ?? config('coc.th_top_tier'));
+    @endphp
+    <x-layouts.app :title="$name.' (@'.$profile->username.')'"
         :description="'Clash Commons profile for @'.$profile->username" :robots="$profile->searchable ? null : 'noindex, nofollow'">
-        <div class="settings-page">
-            <header class="settings-head">
-                <x-ui.avatar :name="$profile->profile->displayName ?: $profile->username" :src="$profile->profile->avatar?->url('card')" size="96" />
-                <h1>{{ $profile->profile->displayName ?: $profile->username }}</h1>
-                <p class="ui-help">{{ '@'.$profile->username }} @if($profile->verified) · Verified player @endif · Member since {{ $profile->joinedAt->format('F Y') }}</p>
-                @if($profile->profile->countryCode)<p>{{ $profile->profile->countryCode }}</p>@endif
-                @if($profile->profile->bio)<p>{{ $profile->profile->bio }}</p>@endif
-                @auth
-                    @if(auth()->user()->username === $profile->username)<p><a href="{{ route('settings.profile.edit') }}">Edit profile</a> · <a href="{{ route('settings.privacy.edit') }}">Privacy settings</a></p>@endif
-                @endauth
-            </header>
-            <section class="settings-card" aria-label="Player stats">
-                <h2 class="settings-card-title">Stats</h2>
-                <div class="settings-grid">
-                    <p>Bases published: {{ $profile->basesPublished }}</p>
-                    <p>Likes received: {{ $profile->likesReceived }}</p>
-                    <p>Copies: {{ $profile->copies }}</p>
-                    <p>War stars: {{ number_format(array_sum(array_map(fn ($account) => $account->stats['war_stars']['value'], $accounts))) }}</p>
-                </div>
-            </section>
-            <section class="settings-card">
-                <h2 class="settings-card-title">Accounts</h2>
-                @if($accounts)
-                    <div class="profile-accounts">
-                        @foreach($accounts as $account)
-                            <x-player.card :account="$account" :variant="$account->featured ? 'hero' : 'standard'" />
-                        @endforeach
+        <div class="profile-page">
+            <header class="profile-cover" @if($isOwner) data-owner @endif>
+                {{-- Decorative: the h1 beside it already names the person, so screen readers hear it once. --}}
+                <x-ui.avatar :name="$name" :src="$profile->profile->avatar?->url('card')" size="96" :verified="$profile->verified" decorative />
+                <div class="profile-cover__text">
+                    <h1>{{ $name }}</h1>
+                    <p class="profile-cover__handle">{{ '@'.$profile->username }}</p>
+                    <div class="profile-cover__meta">
+                        @if($profile->verified)<x-player.verified-badge />@endif
+                        <span>Member since {{ $profile->joinedAt->format('F Y') }}</span>
+                        @if($countryName)<span>{{ $countryName }}</span>@endif
                     </div>
-                @else
-                    <p class="ui-help">{{ auth()->id() === $profile->profile->userId ? 'No accounts attached yet.' : 'No public accounts yet.' }}</p>
-                    @if(auth()->id() === $profile->profile->userId)<a href="{{ route('accounts.index') }}">Attach an account</a>@endif
+                    @if($profile->profile->bio)<p class="profile-cover__bio">{{ $profile->profile->bio }}</p>@endif
+                </div>
+
+                @if($accounts->verifiedCount > 0)
+                    <div class="profile-cover__summary">
+                        <span class="profile-th" data-th-tier="{{ $thTier }}">
+                            <x-game.asset type="townhall" :value="$highestTh" :size="32" />
+                            <span class="profile-th__number" aria-hidden="true">TH {{ $highestTh }}</span>
+                            <span class="profile-th__label">Highest Town Hall</span>
+                        </span>
+                        <dl class="profile-summary">
+                            <x-ui.stat-block :value="$accounts->verifiedCount" :label="$accounts->verifiedCount === 1 ? 'Verified account' : 'Verified accounts'" />
+                            {{-- With one account the total equals the featured card's figure, so it only shows for two or more. --}}
+                            @if($accounts->verifiedCount > 1)
+                                <x-ui.stat-block :value="$accounts->warStars" label="War stars, all accounts" count-up />
+                            @endif
+                        </dl>
+                    </div>
                 @endif
-            </section>
-            <section class="settings-card">
-                <h2 class="settings-card-title">Bases</h2>
-                <p class="ui-help">No published bases yet.</p>
-            </section>
+
+                @if($isOwner)
+                    <div class="profile-cover__actions">
+                        <a class="ui-button" data-variant="secondary" data-size="sm" href="{{ route('settings.profile.edit') }}">Edit profile</a>
+                        <a class="ui-button" data-variant="ghost" data-size="sm" href="{{ route('settings.privacy.edit') }}">Privacy settings</a>
+                    </div>
+                @endif
+            </header>
+
+            @if($accounts->featured)
+                <section class="profile-featured" aria-label="Featured account">
+                    <x-player.card :account="$accounts->featured" variant="hero" />
+                </section>
+            @endif
+
+            @if($basePublishing)
+                <section aria-label="Base stats">
+                    <dl class="profile-stats">
+                        <x-ui.stat-block :value="$profile->basesPublished" label="Bases published" count-up />
+                        <x-ui.stat-block :value="$profile->likesReceived" label="Likes received" count-up />
+                        <x-ui.stat-block :value="$profile->copies" label="Base copies" count-up />
+                    </dl>
+                </section>
+
+                <x-ui.tabs id="profile" label="Profile sections" :tabs="['accounts' => 'Accounts', 'bases' => 'Bases']" class="profile-tabs" linkable>
+                    <x-slot:accounts>
+                        @include('pages.partials.profile-accounts')
+                    </x-slot:accounts>
+                    <x-slot:bases>
+                        <p class="ui-help">No published bases yet.</p>
+                    </x-slot:bases>
+                </x-ui.tabs>
+            @else
+                <section class="profile-section" aria-labelledby="profile-accounts-heading">
+                    <h2 id="profile-accounts-heading">{{ $accounts->featured && $accounts->others ? 'Other accounts' : 'Accounts' }}</h2>
+                    @include('pages.partials.profile-accounts')
+                </section>
+            @endif
         </div>
     </x-layouts.app>
 @endif

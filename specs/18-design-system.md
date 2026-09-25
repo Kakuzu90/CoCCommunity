@@ -379,6 +379,16 @@ copies, war stars across accounts) → tabs: Accounts · Bases · Activity (P2) 
 *Empty (no bases):* own → "publish your first base" CTA; others → muted message.
 *Loading:* cover + avatar skeleton, then tab content skeletons.
 *Error (private profile):* "This profile is private" card, nothing else disclosed.
+*As built (Phase 2):* the cover band carries a verified summary: highest Town Hall in the ThBadge
+hexagon, the verified-account count and, for two or more accounts, war stars across them (the only
+count-up on the page). With one account that total equals the featured card, so it is omitted. Base
+stats (bases, likes received, copies) and the Accounts · Bases tabs appear only when
+`features.base_publishing` is on (Phase 3); until then an "Accounts" section follows the hero card.
+Tabs are linkable (`#profile-panel-<key>`). Bookmarks ships with bookmarks in Phase 3. The country
+shows as its English name, not a flag (flag glyphs render as letters on Windows). The page is
+server-rendered, so there is no loading skeleton. Other viewers see verified accounts and ones under
+review. The top-tier PlayerCard keeps red on the TH numeral and uses gold for the card edge (the
+"gold ring"), so it never reads as an error.
 
 ### CoC account detail (`/accounts/{ulid}`)
 PlayerCard hero → verification status banner → stat blocks with deltas → hero/troop/spell/equipment

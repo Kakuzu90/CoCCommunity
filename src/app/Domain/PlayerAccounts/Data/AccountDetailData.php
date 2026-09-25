@@ -29,5 +29,6 @@ final readonly class AccountDetailData
         public int $imagesCount,
         public array $stats,
         public array $progression,
+        public bool $clanShared = true,
     ) {}
 }

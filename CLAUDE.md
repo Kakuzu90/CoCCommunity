@@ -69,7 +69,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 
 ### Phase 2 — Verified CoC accounts
 - [x] API client, decorators, key pool
-- [ ] Attach + token verification flow
+- [x] Attach + token verification flow
 - [ ] Conflicts, disputes, ownership transfer
 - [ ] Tiered sync + snapshots
 - [ ] PlayerCard, account detail, progression

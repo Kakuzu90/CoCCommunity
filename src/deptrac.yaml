@@ -34,7 +34,7 @@ deptrac:
     - name: CocIntegrationPublic
       collectors:
         - type: classLike
-          value: '^App\\Domain\\CocIntegration\\(Contracts|Services|Data|Events|Enums)\\.*$'
+          value: '^App\\Domain\\CocIntegration\\(Contracts|Services|Data|Events|Enums|Exceptions)\\.*$'
     - name: CocIntegrationApplication
       collectors:
         - type: classLike
@@ -42,11 +42,11 @@ deptrac:
     - name: CocIntegrationInternal
       collectors:
         - type: classLike
-          value: '^App\\Domain\\CocIntegration\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+          value: '^App\\Domain\\CocIntegration\\(?!(?:Contracts|Services|Data|Events|Enums|Exceptions|Actions|Queries)\\).*$'
     - name: PlayerAccountsPublic
       collectors:
         - type: classLike
-          value: '^App\\Domain\\PlayerAccounts\\(Contracts|Services|Data|Events|Enums)\\.*$'
+          value: '^App\\Domain\\PlayerAccounts\\(Contracts|Services|Data|Events|Enums|Exceptions)\\.*$'
     - name: PlayerAccountsApplication
       collectors:
         - type: classLike
@@ -54,7 +54,7 @@ deptrac:
     - name: PlayerAccountsInternal
       collectors:
         - type: classLike
-          value: '^App\\Domain\\PlayerAccounts\\(?!(?:Contracts|Services|Data|Events|Enums|Actions|Queries)\\).*$'
+          value: '^App\\Domain\\PlayerAccounts\\(?!(?:Contracts|Services|Data|Events|Enums|Exceptions|Actions|Queries)\\).*$'
     - name: ClansPublic
       collectors:
         - type: classLike

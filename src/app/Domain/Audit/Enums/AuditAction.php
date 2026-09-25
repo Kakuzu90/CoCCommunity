@@ -15,6 +15,9 @@ enum AuditAction: string
     case UserSuspended = 'user.suspended';
     case UserBanned = 'user.banned';
     case SanctionLifted = 'user.sanction_lifted';
+    case CocAccountVerified = 'coc_account.verified';
+    case CocAccountSuperseded = 'coc_account.superseded';
+    case CocAccountDetached = 'coc_account.detached';
 
     public function label(): string
     {
@@ -24,6 +27,9 @@ enum AuditAction: string
             self::UserSuspended => 'User suspended',
             self::UserBanned => 'User banned',
             self::SanctionLifted => 'Sanction lifted',
+            self::CocAccountVerified => 'CoC account verified',
+            self::CocAccountSuperseded => 'CoC account ownership superseded',
+            self::CocAccountDetached => 'CoC account detached',
         };
     }
 

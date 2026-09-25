@@ -148,6 +148,15 @@ Denormalised counters so profile pages are a single row read.
 
 ## Clash of Clans accounts
 
+> **Implemented (Phase 2 "Attach + token verification flow").** `coc_accounts` and `coc_account_claims`
+> ship now; `coc_account_disputes` lands with the disputes task, `coc_account_snapshots` with tiered sync,
+> and `clans`/`clan_memberships` with the clan work. Portability divergences for the SQLite CI leg: JSON
+> columns use `->jsonb()` (Laravel maps it to `text` on SQLite); the partial unique indexes
+> (`WHERE status = 'verified'`, `WHERE is_featured`) are created with raw `CREATE UNIQUE INDEX ... WHERE`,
+> which both drivers accept; the `CHECK` constraints are Postgres-only (app validation covers SQLite). A
+> `previous_user_id` audit column (referenced by §3.1) was added to `coc_accounts`, and `clan_id` carries no
+> FK until the `clans` table exists.
+
 ### `coc_accounts` [M]
 A CoC player tag attached to a website user. The central trust object of the platform.
 

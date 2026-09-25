@@ -64,6 +64,13 @@ return [
         'maintenance_default' => (int) env('COC_CIRCUIT_MAINTENANCE_DEFAULT', 1800), // fallback if no end time
     ],
 
+    // Attach + token verification limits, per user (specs/13 §3 step 2, specs/09 §9). Tokens are
+    // short-lived, so verification must stay immediate; the caps only blunt brute-force and abuse.
+    'attach' => [
+        'attempts_per_hour' => (int) env('COC_ATTACH_ATTEMPTS_PER_HOUR', 5),
+        'verify_attempts_per_hour' => (int) env('COC_VERIFY_ATTEMPTS_PER_HOUR', 5),
+    ],
+
     // Key pool health (specs/09 §3). A key marked unhealthy (bad key or IP binding) stays out of
     // rotation for this long before a probe may try it again — long enough to page an operator.
     'keys' => [

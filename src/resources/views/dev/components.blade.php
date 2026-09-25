@@ -29,7 +29,7 @@
 <h1>A common language.<br>Room to make it yours.</h1>
 <p class="gallery-description">Bold where we celebrate. Clear where we work. The building blocks of Clash Commons, from the first tap to the next milestone.</p>
 </div>
-        <nav class="gallery-nav" aria-label="Component sections">@foreach(['foundations' => 'Foundations', 'actions' => 'Actions', 'forms' => 'Forms', 'identity' => 'Identity', 'surfaces' => 'Surfaces', 'feedback' => 'Feedback', 'navigation' => 'Navigation', 'game-assets' => 'Game assets', 'auth' => 'Auth', 'admin' => 'Admin'] as $id => $text)<a href="#{{ $id }}">{{ $text }}</a>
+        <nav class="gallery-nav" aria-label="Component sections">@foreach(['foundations' => 'Foundations', 'actions' => 'Actions', 'forms' => 'Forms', 'identity' => 'Identity', 'surfaces' => 'Surfaces', 'feedback' => 'Feedback', 'navigation' => 'Navigation', 'game-assets' => 'Game assets', 'auth' => 'Auth', 'admin' => 'Admin', 'player-accounts' => 'Player accounts'] as $id => $text)<a href="#{{ $id }}">{{ $text }}</a>
 
 @endforeach
 </nav>
@@ -411,6 +411,34 @@
 </table></div>
 </div>
 </x-ui.card>
+        </section>
+        <section class="gallery-section" id="player-accounts">
+            <h2>Player accounts</h2>
+            <p class="ui-help">Attached accounts read as a row: identity, progression, then status. Status is a labelled pill, never colour alone, so it survives colour-blind and greyscale viewing.</p>
+            <div class="accounts-list mt-6">
+                <article class="account-row">
+                    <div class="account-identity">
+                        <p class="account-name">Barch Enjoyer</p>
+                        <p class="account-tag ui-help">#2PP0LJQ</p>
+                    </div>
+                    <p class="account-meta ui-help">Town Hall 15 · 4,280 trophies · Legend League</p>
+                    <div class="account-status">
+                        <x-ui.badge variant="featured">Featured</x-ui.badge>
+                        <x-ui.pill tone="primary">Verified</x-ui.pill>
+                    </div>
+                    <div class="account-actions"><x-ui.button variant="ghost" size="sm">Detach</x-ui.button></div>
+                </article>
+                <article class="account-row">
+                    <div class="account-identity">
+                        <p class="account-name">Second Base</p>
+                        <p class="account-tag ui-help">#9VU2LY0</p>
+                    </div>
+                    <p class="account-meta ui-help">Town Hall 12 · 2,100 trophies</p>
+                    <div class="account-status"><x-ui.pill tone="neutral">Unverified</x-ui.pill></div>
+                    <div class="account-actions"><x-ui.button variant="ghost" size="sm">Detach</x-ui.button></div>
+                </article>
+            </div>
+            <p class="gallery-caption mt-3">Status pill tones: <x-ui.pill tone="primary">Verified</x-ui.pill> <x-ui.pill tone="neutral">Unverified</x-ui.pill> <x-ui.pill tone="warning">Under review</x-ui.pill> <x-ui.pill tone="danger">Suspended</x-ui.pill></p>
         </section>
         <section class="gallery-section" id="notifications">
             <h2>Notification inbox</h2>

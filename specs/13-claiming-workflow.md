@@ -2,6 +2,18 @@
 
 The most important workflow on the platform. Every other trust signal derives from it.
 
+> **Implemented (Phase 2 "Attach + token verification flow").** Shipped: the attach preview (§3 steps 1-5,
+> "Is this you?"), token verification with the single authoritative transaction (§3.1) including silent
+> supersede of an existing verified holder, the conflict *message* (§4) pointing at the token-transfer
+> path, released-row reuse, and detach/release (§6, with `current_password` re-confirmation). The surface
+> is a Livewire page at `/accounts` (`App\Livewire\Accounts\ManageAccounts`) over `AccountAttachService`
+> and `AccountDetachService` in the `PlayerAccounts` module; the write gate is `manage-own-coc-accounts`.
+> Deferred to later tasks and **not** built here: the **dispute workflow** (§5) and the dispute CTA in the
+> conflict view, **re-verification** (§7), the ban/deletion auto-release *timers* (§6 — detach is manual),
+> and standalone "add an unverified advisory claim without a token". Notifications for verified/superseded/
+> released are wired; the deeper `CocAccountVerified` fan-out (full sync, clan tracking, search indexing)
+> is an event seam later tasks subscribe to.
+
 ## 1. Rules
 
 1. A player tag has **at most one verified owner** at any time, platform-wide.

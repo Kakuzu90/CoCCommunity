@@ -343,6 +343,14 @@ Two-column base grid, bottom nav becomes a top nav, filters become a collapsible
 Each page below specifies its structure and its three required states
 (**empty**, **loading/skeleton**, **error**).
 
+> **Implemented (Phase 2).** The account management surface `/accounts` (attach + token verification, and
+> the attached-account list) is built as a Livewire page reusing the `x-ui.*` primitives and the shared
+> `.settings-*` cards, with account-specific layout in `resources/css/accounts.css`. Two-step flow: tag
+> lookup → an "Is this you?" confirmation card → in-game token entry; account status is shown as a labelled
+> pill (never colour alone), featured accounts carry the `x-ui.badge` featured variant, and detach asks for
+> the current password inline. Empty and error states use `x-ui.empty-state` and `x-ui.input` field errors.
+> A gallery entry lives under `/dev/components#player-accounts`.
+
 ### Home feed (`/`)
 Hero strip (logged-out: value proposition + register CTA; logged-in: featured player card + quick
 actions) → TH filter chip row (sticky on scroll) → sort tabs (Trending / New / Most Copied) →

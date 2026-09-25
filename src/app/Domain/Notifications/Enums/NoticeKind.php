@@ -12,6 +12,9 @@ enum NoticeKind: string
     case Suspended = 'suspended';
     case Banned = 'banned';
     case SanctionLifted = 'sanction_lifted';
+    case AccountVerified = 'account_verified';
+    case AccountSuperseded = 'account_superseded';
+    case TagReleased = 'tag_released';
 
     public function title(): string
     {
@@ -24,6 +27,9 @@ enum NoticeKind: string
             self::Suspended => 'Your account is suspended',
             self::Banned => 'Your account is banned',
             self::SanctionLifted => 'Your account sanction was lifted',
+            self::AccountVerified => 'Account verified',
+            self::AccountSuperseded => 'Ownership of your account changed',
+            self::TagReleased => 'Account released',
         };
     }
 
@@ -38,6 +44,9 @@ enum NoticeKind: string
             self::Suspended => 'You cannot sign in while your account is suspended.',
             self::Banned => 'You can no longer sign in to this account.',
             self::SanctionLifted => 'You can use your account again.',
+            self::AccountVerified => 'Your Clash of Clans account is now verified.',
+            self::AccountSuperseded => 'Someone verified ownership of this tag with an in-game token. If this was not you, your account may be compromised: secure it and contact support.',
+            self::TagReleased => 'A Clash of Clans account was released from your profile.',
         };
     }
 
@@ -45,19 +54,22 @@ enum NoticeKind: string
     {
         return match ($this) {
             self::Warning, self::Restricted, self::SanctionLifted => 'moderation',
+            self::AccountVerified, self::TagReleased => 'account',
             default => 'security',
         };
     }
 
     public function sendsEmail(): bool
     {
-        return $this !== self::EmailVerified;
+        // In-app only for the routine, non-security account events.
+        return ! in_array($this, [self::EmailVerified, self::AccountVerified, self::TagReleased], true);
     }
 
     public function targetRoute(): ?string
     {
         return match ($this) {
             self::PasswordChanged, self::NewSignIn => 'settings.sessions.index',
+            self::AccountVerified, self::AccountSuperseded, self::TagReleased => 'accounts.index',
             self::EmailVerified, self::SanctionLifted => 'home',
             default => null,
         };

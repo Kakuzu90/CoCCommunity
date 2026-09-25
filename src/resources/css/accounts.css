@@ -1,0 +1,50 @@
+/*
+ * "My accounts" attach + verification surface (specs/13, 18 §6). Reuses the shared .settings-* cards and
+ * x-ui.* primitives; only the account rows and the confirmation card need their own layout. Two-column on
+ * wider screens, stacked on phones, with 44px controls inherited from .ui-control.
+ */
+.accounts-page { display: grid; gap: var(--space-6); }
+
+.accounts-form { display: flex; flex-direction: column; gap: var(--space-4); }
+.accounts-confirm { display: grid; gap: var(--space-4); }
+
+.accounts-steps {
+    margin: 0;
+    padding-left: var(--space-5);
+    display: grid;
+    gap: var(--space-1);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+}
+
+.account-name { margin: 0; font-weight: 600; font-size: var(--text-h3); line-height: var(--leading-h3); }
+.account-tag { font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+
+.account-preview { display: grid; gap: var(--space-1); }
+.account-facts { display: flex; flex-wrap: wrap; gap: var(--space-4); margin: var(--space-2) 0 0; }
+.account-facts > div { display: grid; gap: 2px; }
+.account-facts dt { font-size: var(--text-xs); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.account-facts dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.account-stale { margin: 0; }
+
+.accounts-list { display: grid; gap: var(--space-3); }
+.accounts-list h2 { margin: 0; font-size: var(--text-h3); line-height: var(--leading-h3); }
+
+.account-row {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+}
+.account-identity { display: grid; gap: 2px; }
+.account-meta { margin: 0; font-variant-numeric: tabular-nums; }
+.account-status { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.account-actions { display: flex; justify-content: flex-start; }
+.account-detach { display: grid; gap: var(--space-3); width: 100%; }
+
+@media (min-width: 720px) {
+    .account-row { grid-template-columns: 1.4fr 1.6fr auto auto; align-items: center; gap: var(--space-4); }
+    .account-actions { justify-content: flex-end; }
+}

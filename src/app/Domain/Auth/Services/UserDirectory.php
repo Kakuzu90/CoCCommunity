@@ -18,6 +18,14 @@ use Illuminate\Support\Facades\DB;
  */
 final class UserDirectory
 {
+    /** The handle for a user id, or null if unknown — used to name a tag's current holder (specs/13 §4). */
+    public function usernameById(int $id): ?string
+    {
+        $username = DB::table('users')->where('id', $id)->value('username');
+
+        return is_string($username) ? $username : null;
+    }
+
     /**
      * @param  int|null  $excludeId  the viewing admin's own id, kept out of the list (they manage
      *                               their own account through Settings, not the moderation tools)

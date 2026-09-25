@@ -23,11 +23,21 @@
                     <p>Bases published: {{ $profile->basesPublished }}</p>
                     <p>Likes received: {{ $profile->likesReceived }}</p>
                     <p>Copies: {{ $profile->copies }}</p>
+                    <p>War stars: {{ number_format(array_sum(array_map(fn ($account) => $account->stats['war_stars']['value'], $accounts))) }}</p>
                 </div>
             </section>
             <section class="settings-card">
                 <h2 class="settings-card-title">Accounts</h2>
-                <p class="ui-help">No public accounts yet.</p>
+                @if($accounts)
+                    <div class="profile-accounts">
+                        @foreach($accounts as $account)
+                            <x-player.card :account="$account" :variant="$account->featured ? 'hero' : 'standard'" />
+                        @endforeach
+                    </div>
+                @else
+                    <p class="ui-help">{{ auth()->id() === $profile->profile->userId ? 'No accounts attached yet.' : 'No public accounts yet.' }}</p>
+                    @if(auth()->id() === $profile->profile->userId)<a href="{{ route('accounts.index') }}">Attach an account</a>@endif
+                @endif
             </section>
             <section class="settings-card">
                 <h2 class="settings-card-title">Bases</h2>

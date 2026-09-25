@@ -144,17 +144,17 @@ Alpine.data('uiSentinel', () => ({
 // Direct-to-storage avatar upload (specs/10 §3): the browser presigns an intent, PUTs the file
 // straight to storage, polls the idempotent complete endpoint until the pipeline reports the media
 // ready, then submits the attach form with its ULID. The app never proxies the bytes.
-Alpine.data('avatarUploader', () => ({
+const directImageUploader = (collection, maxSizeMb) => ({
     busy: false, statusText: '', error: '', ulid: '', preview: null,
     async pick(event) {
         const file = event.target.files[0];
         if (!file) return;
         this.error = '';
         if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { this.error = 'Choose a JPG, PNG or WebP image.'; this.reset(event); return; }
-        if (file.size > 2 * 1024 * 1024) { this.error = 'That image is larger than 2 MB.'; this.reset(event); return; }
+        if (file.size > maxSizeMb * 1024 * 1024) { this.error = `That image is larger than ${maxSizeMb} MB.`; this.reset(event); return; }
         this.busy = true; this.statusText = 'Uploading…';
         try {
-            const ticket = await this.post('/uploads/intent', { collection: 'avatar', filename: file.name, size: file.size, mime: file.type });
+            const ticket = await this.post('/uploads/intent', { collection, filename: file.name, size: file.size, mime: file.type });
             const put = await fetch(ticket.upload_url, { method: 'PUT', headers: ticket.headers, body: file });
             if (!put.ok) throw new Error('put');
             this.statusText = 'Processing…';
@@ -187,7 +187,9 @@ Alpine.data('avatarUploader', () => ({
     fail(message) { this.error = message; this.busy = false; this.statusText = ''; },
     reset(event) { if (event?.target) event.target.value = ''; },
     csrf() { return document.querySelector('meta[name=csrf-token]')?.content || ''; },
-}));
+});
+Alpine.data('avatarUploader', () => directImageUploader('avatar', 2));
+Alpine.data('accountImageUploader', () => directImageUploader('account_image', 5));
 
 // Free-text tag entry (profile languages): type a value and press Enter to add a removable chip.
 // Each chip is mirrored to a hidden input so the form posts a plain `name[]` array.

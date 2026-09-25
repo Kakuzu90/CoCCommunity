@@ -29,12 +29,16 @@ class MediaLibraryService implements MediaLibrary
             ->where('ulid', $ulid)
             ->where('user_id', $user->getAuthIdentifier())
             ->where('collection', $collection->value)
+            ->lockForUpdate()
             ->first();
 
         if ($media === null || ! in_array($media->status, self::ATTACHABLE, true)) {
             throw ValidationException::withMessages([
                 'media' => 'That upload is not available to attach.',
             ]);
+        }
+        if ($media->attachable_id !== null) {
+            throw ValidationException::withMessages(['media' => 'That upload has already been attached.']);
         }
 
         $media->attachable_type = $attachable->getMorphClass();
@@ -61,18 +65,43 @@ class MediaLibraryService implements MediaLibrary
             return null;
         }
 
+        return $this->toImage($media);
+    }
+
+    /** @return list<MediaImage> */
+    public function imagesFor(Model $attachable, MediaCollection $collection): array
+    {
+        return array_values(Media::query()->with('variants')
+            ->where('attachable_type', $attachable->getMorphClass())
+            ->where('attachable_id', $attachable->getKey())
+            ->where('collection', $collection->value)
+            ->where('status', MediaStatus::Ready->value)
+            ->orderBy('position')->orderBy('id')->get()
+            ->map(fn (Media $media): MediaImage => $this->toImage($media))->all());
+    }
+
+    public function releaseAttached(string $ulid, MediaCollection $collection, Model $attachable): bool
+    {
+        $media = Media::query()->where('ulid', $ulid)
+            ->where('collection', $collection->value)
+            ->where('attachable_type', $attachable->getMorphClass())
+            ->where('attachable_id', $attachable->getKey())->lockForUpdate()->first();
+        if ($media === null) {
+            return false;
+        }
+        $this->release($media->id);
+
+        return true;
+    }
+
+    private function toImage(Media $media): MediaImage
+    {
         $variants = [];
         foreach ($media->variants as $variant) {
             $variants[$variant->variant] = $this->urls->public($variant->path);
         }
 
-        return new MediaImage(
-            ulid: $media->ulid,
-            collection: $media->collection->value,
-            width: $media->width,
-            height: $media->height,
-            variants: $variants,
-        );
+        return new MediaImage($media->ulid, $media->collection->value, $media->width, $media->height, $variants);
     }
 
     public function release(?int $mediaId): void

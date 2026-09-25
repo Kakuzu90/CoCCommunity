@@ -138,6 +138,7 @@
                 </div>
 
                 <div class="account-actions">
+                    <a class="account-detail-link" href="{{ route('accounts.show', $account->ulid) }}">View player</a>
                     @if($confirmingDetachId === $account->id)
                         <form wire:submit="detach" class="account-detach">
                             <x-ui.input id="detach-password-{{ $account->id }}" type="password"

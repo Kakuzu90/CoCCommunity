@@ -72,7 +72,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] Attach + token verification flow
 - [x] Conflicts, disputes, ownership transfer
 - [x] Tiered sync + snapshots
-- [ ] PlayerCard, account detail, progression
+- [x] PlayerCard, account detail, progression
 - [ ] Asset pack v1
 - [ ] Profile v2
 

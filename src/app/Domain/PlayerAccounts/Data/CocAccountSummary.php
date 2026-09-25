@@ -12,6 +12,7 @@ final readonly class CocAccountSummary
 {
     public function __construct(
         public int $id,
+        public string $ulid,
         public string $tag,
         public string $ign,
         public int $thLevel,
@@ -30,6 +31,7 @@ final readonly class CocAccountSummary
     {
         return new self(
             id: $account->id,
+            ulid: $account->ulid,
             tag: $account->tag,
             ign: $account->ign,
             thLevel: $account->th_level,

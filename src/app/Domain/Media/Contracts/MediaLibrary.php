@@ -25,6 +25,12 @@ interface MediaLibrary
     /** Render-ready view of a processed image, or null when the id is null/missing/not ready. */
     public function resolve(?int $mediaId): ?MediaImage;
 
+    /** @return list<MediaImage> Ready images attached to a parent, in display order. */
+    public function imagesFor(Model $attachable, MediaCollection $collection): array;
+
+    /** Detach one matching image; false when it is absent or belongs to another parent. */
+    public function releaseAttached(string $ulid, MediaCollection $collection, Model $attachable): bool;
+
     /**
      * Detach a media record and hand it back to the orphan sweeper (a replaced avatar, a removed
      * screenshot). A no-op for a null/missing id. The object is deleted by the sweeper, not here.

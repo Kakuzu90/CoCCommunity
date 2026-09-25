@@ -414,6 +414,23 @@
         </section>
         <section class="gallery-section" id="player-accounts">
             <h2>Player accounts</h2>
+            @php
+                $sampleCard = fn ($status, $stale = false) => new \App\Domain\PlayerAccounts\Data\AccountDetailData(
+                    id: 1, ulid: '01K00000000000000000000000', tag: '#2PP0LJQ', ign: 'Barch Enjoyer',
+                    thLevel: 15, status: $status, featured: $status === \App\Domain\PlayerAccounts\Enums\CocAccountStatus::Verified,
+                    clanTag: '#8GJ2', clanRole: 'elder', leagueId: 29000022, leagueName: 'Legend League',
+                    syncedAtIso: now()->subHours(3)->toIso8601String(), syncedAge: '3 hours ago', stale: $stale, owner: false, imagesCount: 0,
+                    stats: ['trophies' => ['value' => 4280, 'delta' => 50], 'war_stars' => ['value' => 980, 'delta' => 4], 'xp_level' => ['value' => 210, 'delta' => 1]],
+                    progression: [],
+                );
+            @endphp
+            <div class="profile-accounts mt-6">
+                <x-player.card :account="$sampleCard(\App\Domain\PlayerAccounts\Enums\CocAccountStatus::Verified)" variant="hero" href="#player-accounts" />
+                <x-player.card :account="$sampleCard(\App\Domain\PlayerAccounts\Enums\CocAccountStatus::Verified)" variant="standard" href="#player-accounts" />
+                <x-player.card :account="$sampleCard(\App\Domain\PlayerAccounts\Enums\CocAccountStatus::Unverified)" variant="compact" href="#player-accounts" />
+                <x-player.card :account="$sampleCard(\App\Domain\PlayerAccounts\Enums\CocAccountStatus::Disputed)" variant="mini" href="#player-accounts" />
+                <x-player.card :account="$sampleCard(\App\Domain\PlayerAccounts\Enums\CocAccountStatus::Verified, true)" variant="standard" href="#player-accounts" />
+            </div>
             <p class="ui-help">Attached accounts read as a row: identity, progression, then status. Status is a labelled pill, never colour alone, so it survives colour-blind and greyscale viewing.</p>
             <div class="accounts-list mt-6">
                 <article class="account-row">

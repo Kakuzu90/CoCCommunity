@@ -29,10 +29,15 @@ final class PlayerAccountQuery
         $stale = SyncState::query()
             ->where('resource_type', 'coc_account')
             ->whereIn('resource_id', $accounts->pluck('id'))
-            ->pluck('stale', 'resource_id');
+            ->get(['resource_id', 'stale', 'consecutive_failures'])
+            ->keyBy('resource_id');
 
         return array_values($accounts
-            ->map(fn (CocAccount $account): CocAccountSummary => CocAccountSummary::fromModel($account, (bool) $stale->get($account->id, false)))
+            ->map(function (CocAccount $account) use ($stale): CocAccountSummary {
+                $state = $stale->get($account->id);
+
+                return CocAccountSummary::fromModel($account, $state !== null && ($state->stale || $state->consecutive_failures > 0));
+            })
             ->all());
     }
 }

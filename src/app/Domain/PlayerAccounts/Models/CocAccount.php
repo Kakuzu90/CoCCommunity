@@ -46,6 +46,7 @@ use Illuminate\Support\Carbon;
  * @property array<string, mixed>|null $raw_payload
  * @property ?Carbon $api_synced_at
  * @property ?Carbon $verified_at
+ * @property int $images_count
  */
 final class CocAccount extends Model
 {

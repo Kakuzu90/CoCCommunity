@@ -152,6 +152,11 @@ by the first consumer (avatars, Phase 1):
   `ready` image, else null.
 - `release(?int $mediaId): void` — detaches and re-arms `expires_at` so the orphan sweeper reclaims a
   replaced/removed item (the object is deleted by the sweeper, not inline).
+- `imagesFor($parent, MediaCollection): list<MediaImage>` — returns only ready images attached to a
+  parent, ordered for the account gallery.
+- `releaseAttached($ulid, MediaCollection, $parent): bool` — scopes a gallery removal to its
+  collection and parent before handing the image to the orphan sweeper. The consuming service
+  authorizes the current parent owner, including after an account transfer.
 
 Per-parent quota assertions (≤2 screenshots, 1 avatar, …) live in each consumer's attach path; the
 avatar consumer enforces its 1-per-profile rule by replacing and releasing the previous media.

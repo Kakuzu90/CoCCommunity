@@ -44,6 +44,7 @@ return [
     // Per-user total storage (recomputed nightly into user_stats — a later task owns the job).
     'user_soft_cap' => $mb(500),
     'user_soft_cap_warn' => 0.8,
+    'account_images_limit' => 5,
 
     /*
      * Collections active in this phase are image-only. `base_video` and `evidence` are declared in

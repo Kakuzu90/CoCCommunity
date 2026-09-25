@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Web\AccountImageController;
 use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\PublicProfileController;
+use App\Livewire\Accounts\AccountDetail;
 use App\Livewire\Accounts\ManageAccounts;
 use App\Livewire\Accounts\ManageDisputes;
 use Illuminate\Support\Facades\Route;
@@ -16,7 +18,12 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     // Ownership disputes: file from the conflict on /accounts; respond, add info or withdraw here.
     // Every write re-checks the acting user is the claimant or holder in the service (specs/13 §5).
     Route::get('/accounts/disputes', ManageDisputes::class)->name('accounts.disputes.index');
+    Route::post('/accounts/{ulid}/images', [AccountImageController::class, 'store'])->whereUlid('ulid')->name('accounts.images.store');
+    Route::delete('/accounts/{ulid}/images/{mediaUlid}', [AccountImageController::class, 'destroy'])
+        ->whereUlid('ulid')->whereUlid('mediaUlid')->name('accounts.images.destroy');
 });
+
+Route::get('/accounts/{ulid}', AccountDetail::class)->whereUlid('ulid')->name('accounts.show');
 
 Route::middleware(['auth', 'can:manage-own-notifications'])->group(function (): void {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

@@ -28,7 +28,7 @@ return [
     'admin' => [
         ['key' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'dashboard', 'route' => 'admin.dashboard', 'active' => 'admin.dashboard', 'enabled' => true],
         ['key' => 'reports', 'label' => 'Reports', 'icon' => 'flag', 'route' => null, 'active' => 'admin.reports.*', 'enabled' => false],
-        ['key' => 'disputes', 'label' => 'Disputes', 'icon' => 'scale', 'route' => null, 'active' => 'admin.disputes.*', 'enabled' => false],
+        ['key' => 'disputes', 'label' => 'Disputes', 'icon' => 'scale', 'route' => 'admin.disputes.index', 'active' => 'admin.disputes.*', 'enabled' => true],
         ['key' => 'users', 'label' => 'Users', 'icon' => 'user', 'route' => 'admin.users.index', 'active' => 'admin.users.*', 'enabled' => true],
         ['key' => 'content', 'label' => 'Content', 'icon' => 'document', 'route' => null, 'active' => 'admin.content.*', 'enabled' => false],
         ['key' => 'media', 'label' => 'Media', 'icon' => 'image', 'route' => null, 'active' => 'admin.media.*', 'enabled' => false],

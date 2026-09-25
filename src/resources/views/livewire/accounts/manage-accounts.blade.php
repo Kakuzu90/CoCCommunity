@@ -56,9 +56,36 @@
                 @if($preview['conflictHolder'])
                     <x-ui.alert tone="warning" title="This account is already verified">
                         {{ $preview['tag'] }} is currently verified by {{ '@'.$preview['conflictHolder'] }}. If it is yours,
-                        verifying with your in-game token transfers it to you right away. If you cannot get the token,
-                        support can help you open an ownership review.
+                        verifying with your in-game token transfers it to you right away. That is the fastest path. If you
+                        cannot get the token (you lost the device, or recovered the account through Supercell), you can open
+                        an ownership dispute for a moderator to review.
                     </x-ui.alert>
+
+                    @if($openingDispute)
+                        <form wire:submit="openDispute" class="adm-form accounts-form accounts-dispute" wire:key="dispute-form">
+                            <div>
+                                <h3>Open an ownership dispute</h3>
+                                <p class="ui-help">Disputes are slow and evidence-based. Absent decisive proof the current holder keeps the tag, so explain clearly why this account is yours.</p>
+                            </div>
+                            <x-ui.textarea id="disputeReason" label="Why is this account yours?" wire:model="disputeReason"
+                                :error="$errors->first('disputeReason')" rows="4" maxlength="{{ (int) config('coc.dispute.reason_max') }}"
+                                hint="At least 20 characters. Describe changes only the owner would know, such as recent name or clan changes." />
+                            <x-ui.textarea id="disputeNotes" label="Anything else (optional)" wire:model="disputeNotes"
+                                :error="$errors->first('disputeNotes')" rows="2" maxlength="2000"
+                                hint="Do not paste real-world ID documents. Use an in-game token or in-game screenshots." />
+                            <div class="settings-actions">
+                                <x-ui.button type="submit" variant="danger" wire:target="openDispute" wire:loading.attr="disabled">
+                                    <span wire:loading.remove wire:target="openDispute">File dispute</span>
+                                    <span wire:loading wire:target="openDispute">Filing…</span>
+                                </x-ui.button>
+                                <x-ui.button type="button" variant="ghost" wire:click="$set('openingDispute', false)">Cancel</x-ui.button>
+                            </div>
+                        </form>
+                    @else
+                        <div class="settings-actions">
+                            <x-ui.button type="button" variant="ghost" wire:click="startDispute">I can't get the token — open a dispute</x-ui.button>
+                        </div>
+                    @endif
                 @endif
 
                 <form wire:submit="verify" class="adm-form accounts-form">

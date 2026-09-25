@@ -18,6 +18,10 @@ enum AuditAction: string
     case CocAccountVerified = 'coc_account.verified';
     case CocAccountSuperseded = 'coc_account.superseded';
     case CocAccountDetached = 'coc_account.detached';
+    case CocDisputeOpened = 'coc_dispute.opened';
+    case CocDisputeTransferred = 'coc_dispute.transferred';
+    case CocDisputeDenied = 'coc_dispute.denied';
+    case CocDisputeTagSuspended = 'coc_dispute.tag_suspended';
 
     public function label(): string
     {
@@ -30,6 +34,10 @@ enum AuditAction: string
             self::CocAccountVerified => 'CoC account verified',
             self::CocAccountSuperseded => 'CoC account ownership superseded',
             self::CocAccountDetached => 'CoC account detached',
+            self::CocDisputeOpened => 'CoC ownership dispute opened',
+            self::CocDisputeTransferred => 'CoC ownership transferred by admin',
+            self::CocDisputeDenied => 'CoC ownership dispute denied',
+            self::CocDisputeTagSuspended => 'CoC tag suspended after dispute',
         };
     }
 

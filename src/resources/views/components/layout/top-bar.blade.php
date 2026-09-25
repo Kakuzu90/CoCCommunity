@@ -27,6 +27,7 @@
             <x-ui.dropdown label="Account">
                 <a href="{{ route('settings.profile.edit') }}" class="ui-menu-item" role="menuitem" tabindex="-1">Edit profile</a>
                 <a href="{{ route('accounts.index') }}" class="ui-menu-item" role="menuitem" tabindex="-1">My accounts</a>
+                <a href="{{ route('accounts.disputes.index') }}" class="ui-menu-item" role="menuitem" tabindex="-1">Disputes</a>
                 <a href="{{ route('settings.profile.edit') }}" class="ui-menu-item" role="menuitem" tabindex="-1">Settings</a>
                 @can('access-admin')
                     <a href="{{ route('admin.dashboard') }}" class="ui-menu-item" role="menuitem" tabindex="-1">Admin</a>

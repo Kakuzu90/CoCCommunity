@@ -3,6 +3,7 @@
 use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\PublicProfileController;
 use App\Livewire\Accounts\ManageAccounts;
+use App\Livewire\Accounts\ManageDisputes;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'pages.home')->name('home');
@@ -12,6 +13,9 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     // Attach + verify in-game accounts (specs/13). Viewing is read-only for any verified user; the
     // attach/detach writes re-check the manage-own-coc-accounts gate inside the component.
     Route::get('/accounts', ManageAccounts::class)->name('accounts.index');
+    // Ownership disputes: file from the conflict on /accounts; respond, add info or withdraw here.
+    // Every write re-checks the acting user is the claimant or holder in the service (specs/13 §5).
+    Route::get('/accounts/disputes', ManageDisputes::class)->name('accounts.disputes.index');
 });
 
 Route::middleware(['auth', 'can:manage-own-notifications'])->group(function (): void {

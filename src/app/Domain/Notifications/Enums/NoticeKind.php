@@ -15,6 +15,8 @@ enum NoticeKind: string
     case AccountVerified = 'account_verified';
     case AccountSuperseded = 'account_superseded';
     case TagReleased = 'tag_released';
+    case DisputeOpened = 'dispute_opened';
+    case DisputeDecided = 'dispute_decided';
 
     public function title(): string
     {
@@ -30,6 +32,8 @@ enum NoticeKind: string
             self::AccountVerified => 'Account verified',
             self::AccountSuperseded => 'Ownership of your account changed',
             self::TagReleased => 'Account released',
+            self::DisputeOpened => 'Ownership dispute opened on your account',
+            self::DisputeDecided => 'An ownership dispute was decided',
         };
     }
 
@@ -47,6 +51,8 @@ enum NoticeKind: string
             self::AccountVerified => 'Your Clash of Clans account is now verified.',
             self::AccountSuperseded => 'Someone verified ownership of this tag with an in-game token. If this was not you, your account may be compromised: secure it and contact support.',
             self::TagReleased => 'A Clash of Clans account was released from your profile.',
+            self::DisputeOpened => 'Someone opened an ownership dispute for one of your verified accounts. Respond within 7 days: the fastest way to end it is to re-verify with a fresh in-game token.',
+            self::DisputeDecided => 'A moderator reviewed an ownership dispute involving your account. Open your disputes to see the decision.',
         };
     }
 
@@ -55,13 +61,15 @@ enum NoticeKind: string
         return match ($this) {
             self::Warning, self::Restricted, self::SanctionLifted => 'moderation',
             self::AccountVerified, self::TagReleased => 'account',
+            self::DisputeOpened, self::DisputeDecided => 'account',
             default => 'security',
         };
     }
 
     public function sendsEmail(): bool
     {
-        // In-app only for the routine, non-security account events.
+        // In-app only for the routine, non-security account events. Disputes are contested ownership,
+        // so both parties get email as well as an in-app notice (specs/13 §8).
         return ! in_array($this, [self::EmailVerified, self::AccountVerified, self::TagReleased], true);
     }
 
@@ -70,6 +78,7 @@ enum NoticeKind: string
         return match ($this) {
             self::PasswordChanged, self::NewSignIn => 'settings.sessions.index',
             self::AccountVerified, self::AccountSuperseded, self::TagReleased => 'accounts.index',
+            self::DisputeOpened, self::DisputeDecided => 'accounts.disputes.index',
             self::EmailVerified, self::SanctionLifted => 'home',
             default => null,
         };

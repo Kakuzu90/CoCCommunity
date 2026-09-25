@@ -98,5 +98,18 @@ return [
                 'thumb' => ['width' => 320],
             ],
         ],
+        // Ownership-dispute evidence (specs/13 §5). Private: staff-only, never public, each access
+        // audit-logged. Screenshots from inside the game — kept small, stored behind the private prefix.
+        'evidence' => [
+            'kind' => 'image',
+            'visibility' => 'private',
+            'max_size' => $mb(5),
+            'declared_mimes' => ['image/jpeg', 'image/png', 'image/webp'],
+            'extensions' => ['jpg', 'jpeg', 'png', 'webp'],
+            'variants' => [
+                'full' => ['width' => 1600],
+                'thumb' => ['width' => 320],
+            ],
+        ],
     ],
 ];

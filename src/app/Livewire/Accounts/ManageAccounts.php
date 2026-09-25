@@ -3,9 +3,11 @@
 namespace App\Livewire\Accounts;
 
 use App\Domain\PlayerAccounts\Exceptions\AccountAttachException;
+use App\Domain\PlayerAccounts\Exceptions\DisputeException;
 use App\Domain\PlayerAccounts\Queries\PlayerAccountQuery;
 use App\Domain\PlayerAccounts\Services\AccountAttachService;
 use App\Domain\PlayerAccounts\Services\AccountDetachService;
+use App\Domain\PlayerAccounts\Services\DisputeService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Locked;
@@ -31,6 +33,12 @@ final class ManageAccounts extends Component
 
     #[Locked]
     public ?int $confirmingDetachId = null;
+
+    public bool $openingDispute = false;
+
+    public string $disputeReason = '';
+
+    public string $disputeNotes = '';
 
     public string $flash = '';
 
@@ -90,8 +98,43 @@ final class ManageAccounts extends Component
 
     public function cancel(): void
     {
-        $this->reset('tag', 'token', 'preview');
+        $this->reset('tag', 'token', 'preview', 'openingDispute', 'disputeReason', 'disputeNotes');
         $this->resetErrorBag();
+    }
+
+    public function startDispute(): void
+    {
+        $this->openingDispute = true;
+        $this->resetErrorBag(['disputeReason', 'disputeNotes']);
+    }
+
+    /**
+     * Open an ownership dispute against the current verified holder (specs/13 §4, §5). Only reachable
+     * from a conflict: the tag was previewed and is verified by someone else. Ownership does not move
+     * here — the tag goes under review and a human decides.
+     */
+    public function openDispute(DisputeService $service): void
+    {
+        $this->authorize('open-coc-dispute');
+        abort_if($this->preview === null || $this->preview['conflictHolder'] === null, 400);
+        $this->validate([
+            'disputeReason' => ['required', 'string', 'min:20', 'max:'.(int) config('coc.dispute.reason_max')],
+            'disputeNotes' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $user = auth()->user();
+        abort_if($user === null, 403);
+
+        try {
+            $service->open($user, $this->preview['tag'], $this->disputeReason, $this->disputeNotes);
+        } catch (DisputeException $e) {
+            $this->addError('disputeReason', $e->getMessage());
+
+            return;
+        }
+
+        $this->flash = 'Your dispute was filed. The current holder has 7 days to respond, then a moderator reviews it. Track it under Disputes.';
+        $this->reset('tag', 'token', 'preview', 'openingDispute', 'disputeReason', 'disputeNotes');
     }
 
     public function confirmDetach(int $id): void

@@ -20,12 +20,14 @@ use App\Domain\PlayerAccounts\Enums\ClaimFailureReason;
 use App\Domain\PlayerAccounts\Enums\ClaimMethod;
 use App\Domain\PlayerAccounts\Enums\ClaimStatus;
 use App\Domain\PlayerAccounts\Enums\CocAccountStatus;
+use App\Domain\PlayerAccounts\Enums\DisputeStatus;
 use App\Domain\PlayerAccounts\Enums\VerificationMethod;
 use App\Domain\PlayerAccounts\Enums\VerificationOutcome;
 use App\Domain\PlayerAccounts\Events\CocAccountVerified;
 use App\Domain\PlayerAccounts\Exceptions\AccountAttachException;
 use App\Domain\PlayerAccounts\Models\CocAccount;
 use App\Domain\PlayerAccounts\Models\CocAccountClaim;
+use App\Domain\PlayerAccounts\Models\CocAccountDispute;
 use App\Support\ValueObjects\PlayerTag;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
@@ -116,7 +118,9 @@ final class AccountAttachService
 
         $superseded = false;
         $previousHolderId = null;
-        $holder = $rows->first(fn (CocAccount $r): bool => $r->status === CocAccountStatus::Verified && $r->user_id !== $userId);
+        // A token beats an existing verified holder AND a holder currently under dispute — possession of
+        // a live token is proof of present control (specs/13 §3.1, §5 step 3a).
+        $holder = $rows->first(fn (CocAccount $r): bool => in_array($r->status, [CocAccountStatus::Verified, CocAccountStatus::Disputed], true) && $r->user_id !== $userId);
         if ($holder !== null) {
             $previousHolderId = (int) $holder->user_id;
             $holder->forceFill([
@@ -179,7 +183,52 @@ final class AccountAttachService
         }
         event(new CocAccountVerified((int) $account->id, $userId, $previousHolderId));
 
+        $this->autoResolveDisputes($normalized, $userId);
+
         return new VerificationResult(VerificationOutcome::Verified, $superseded, (int) $account->id);
+    }
+
+    /**
+     * A token verification ends every live dispute on the tag at once (specs/13 §3.1 step 8, §5 step 3a):
+     * the claimant who just verified wins (`auto_resolved`); the holder who defended by token beats the
+     * claim (`resolved_denied`); a third party's token supersedes both, so the dispute is moot
+     * (`auto_resolved`). Both parties are notified of the decision. Runs inside the verify transaction.
+     */
+    private function autoResolveDisputes(string $normalized, int $verifierId): void
+    {
+        $disputes = CocAccountDispute::query()
+            ->where('tag_normalized', $normalized)
+            ->whereIn('status', DisputeStatus::liveValues())
+            ->lockForUpdate()
+            ->get();
+
+        foreach ($disputes as $dispute) {
+            $holderDefended = (int) $dispute->current_holder_id === $verifierId;
+            $status = $holderDefended ? DisputeStatus::ResolvedDenied : DisputeStatus::AutoResolved;
+
+            $dispute->decision_note = $holderDefended
+                ? 'Holder re-verified with an in-game token; the claim is denied.'
+                : 'Resolved automatically by a token verification on the tag.';
+            $dispute->forceFill([
+                'status' => $status->value,
+                'decided_by' => $verifierId,
+                'decided_at' => now(),
+            ])->save();
+
+            CocAccountClaim::query()
+                ->where('tag_normalized', $normalized)
+                ->where('user_id', $dispute->claimant_id)
+                ->where('method', 'dispute')
+                ->where('status', ClaimStatus::Pending->value)
+                ->update([
+                    'status' => ($dispute->claimant_id === $verifierId ? ClaimStatus::Succeeded : ClaimStatus::Rejected)->value,
+                ]);
+
+            event(new NoticeRequested($dispute->claimant_id, NoticeKind::DisputeDecided));
+            if ($dispute->current_holder_id !== null && (int) $dispute->current_holder_id !== $dispute->claimant_id) {
+                event(new NoticeRequested((int) $dispute->current_holder_id, NoticeKind::DisputeDecided));
+            }
+        }
     }
 
     private function fetchPlayer(PlayerTag $tag): PlayerData

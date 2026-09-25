@@ -71,6 +71,19 @@ return [
         'verify_attempts_per_hour' => (int) env('COC_VERIFY_ATTEMPTS_PER_HOUR', 5),
     ],
 
+    // Ownership dispute guardrails (specs/13 §5). Disputes are the slow, manual, evidence-based path
+    // for the honest owner who cannot produce a token; the limits blunt griefing without blocking a
+    // genuine claim. Windows are days.
+    'dispute' => [
+        'max_open_per_user' => (int) env('COC_DISPUTE_MAX_OPEN', 2),
+        'holder_response_days' => (int) env('COC_DISPUTE_HOLDER_RESPONSE_DAYS', 7),
+        'denied_bar_count' => (int) env('COC_DISPUTE_DENIED_BAR_COUNT', 2),
+        'denied_bar_days' => (int) env('COC_DISPUTE_DENIED_BAR_DAYS', 90),
+        'auto_withdraw_days' => (int) env('COC_DISPUTE_AUTO_WITHDRAW_DAYS', 30),
+        'reason_max' => (int) env('COC_DISPUTE_REASON_MAX', 1000),
+        'max_evidence' => (int) env('COC_DISPUTE_MAX_EVIDENCE', 3),
+    ],
+
     // Key pool health (specs/09 §3). A key marked unhealthy (bad key or IP binding) stays out of
     // rotation for this long before a probe may try it again — long enough to page an operator.
     'keys' => [

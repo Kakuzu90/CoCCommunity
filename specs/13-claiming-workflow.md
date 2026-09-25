@@ -8,11 +8,34 @@ The most important workflow on the platform. Every other trust signal derives fr
 > path, released-row reuse, and detach/release (§6, with `current_password` re-confirmation). The surface
 > is a Livewire page at `/accounts` (`App\Livewire\Accounts\ManageAccounts`) over `AccountAttachService`
 > and `AccountDetachService` in the `PlayerAccounts` module; the write gate is `manage-own-coc-accounts`.
-> Deferred to later tasks and **not** built here: the **dispute workflow** (§5) and the dispute CTA in the
-> conflict view, **re-verification** (§7), the ban/deletion auto-release *timers* (§6 — detach is manual),
-> and standalone "add an unverified advisory claim without a token". Notifications for verified/superseded/
-> released are wired; the deeper `CocAccountVerified` fan-out (full sync, clan tracking, search indexing)
-> is an event seam later tasks subscribe to.
+> Deferred to later tasks and **not** built here: **re-verification** (§7), the ban/deletion auto-release
+> *timers* (§6 — detach is manual), and standalone "add an unverified advisory claim without a token".
+> Notifications for verified/superseded/released are wired; the deeper `CocAccountVerified` fan-out (full
+> sync, clan tracking, search indexing) is an event seam later tasks subscribe to.
+>
+> **Implemented (Phase 2 "Conflicts, disputes, ownership transfer").** Shipped: the full dispute lifecycle
+> (§4-§6) over `DisputeService` (open/holder-respond/claimant-respond/withdraw) and
+> `DisputeResolutionService` (admin transfer/deny/suspend/request-info, plus the holder's voluntary
+> release), each a single locked transaction that serialises against a token verification. Guardrails
+> (`config('coc.dispute')`): one live dispute per claimant per tag (also a partial unique index), a cap on
+> concurrent open disputes, and a 90-day bar after repeated denials. Token verification auto-resolves live
+> disputes (§3.1 step 8, §5 step 3a): the claimant's as `auto_resolved`, the defending holder's as
+> `resolved_denied`. Every decision writes a `moderation_actions` row (verbs `transfer_ownership`,
+> `dismiss`, `suspend`) and an `audit_logs` row, and notifies both parties (`DisputeOpened`,
+> `DisputeDecided`). Surfaces: the conflict CTA on `/accounts` opens a dispute, `/accounts/disputes`
+> (`ManageDisputes`) is the member's respond/withdraw page, and the admin queue + review live at
+> `/admin/disputes` (`DisputeController` + the `ResolveDispute` Livewire panel) behind `resolve-disputes`
+> and `force-ownership-transfer`. Gate for filing: `open-coc-dispute`.
+>
+> **Divergences / deferred within this task.** Evidence is modelled as `{notes, media[], holder_response}`
+> and the service attaches evidence images through the private `evidence` media collection, but the
+> claimant-facing form collects the reason and free-text notes only — the in-form image *upload* UI is a
+> follow-up (admins already see attached media counts and the access path is gated). The scheduled
+> reminders (§8 day-3/day-6) and the 30-day inactivity auto-withdraw (§5 guardrails) are not wired as jobs;
+> their clock columns (`holder_responds_by`, `last_claimant_activity_at`) ship so a scheduler can add them
+> without a migration. A third-denied-dispute `false_ownership` report (§5 guardrails) is a manual admin
+> follow-up. "awaiting admin" from §5 step 3b maps to the `open` status (with admin) since the column's
+> enum has no separate value.
 
 ## 1. Rules
 

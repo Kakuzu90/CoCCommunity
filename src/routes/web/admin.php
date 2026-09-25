@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DisputeController;
 use App\Http\Controllers\Admin\SanctionController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -26,4 +27,9 @@ Route::middleware(['auth', 'verified', 'role:admin'])
         Route::delete('users/{username}/sanctions', [SanctionController::class, 'destroy'])->name('users.sanctions.destroy');
 
         Route::get('logs', [AuditLogController::class, 'index'])->name('logs.index');
+
+        // Ownership disputes queue + review (specs/13 §5 step 4). The resolve actions re-check the
+        // `resolve-disputes` ability (and `force-ownership-transfer` for a transfer) at the service.
+        Route::get('disputes', [DisputeController::class, 'index'])->name('disputes.index');
+        Route::get('disputes/{ulid}', [DisputeController::class, 'show'])->name('disputes.show');
     });

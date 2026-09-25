@@ -27,6 +27,26 @@ final class UserDirectory
     }
 
     /**
+     * Handles for a set of user ids, keyed by id — used to name the parties on a list of disputes
+     * without an N+1 (specs/13 §5). Missing ids are simply absent from the map.
+     *
+     * @param  array<int, int>  $ids
+     * @return array<int, string>
+     */
+    public function usernamesByIds(array $ids): array
+    {
+        $ids = array_values(array_unique(array_filter($ids)));
+        if ($ids === []) {
+            return [];
+        }
+
+        /** @var array<int, string> $map */
+        $map = DB::table('users')->whereIn('id', $ids)->pluck('username', 'id')->all();
+
+        return $map;
+    }
+
+    /**
      * @param  int|null  $excludeId  the viewing admin's own id, kept out of the list (they manage
      *                               their own account through Settings, not the moderation tools)
      * @return LengthAwarePaginator<int, AdminUserSummary>

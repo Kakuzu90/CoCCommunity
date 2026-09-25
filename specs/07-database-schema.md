@@ -148,14 +148,17 @@ Denormalised counters so profile pages are a single row read.
 
 ## Clash of Clans accounts
 
-> **Implemented (Phase 2 "Attach + token verification flow").** `coc_accounts` and `coc_account_claims`
-> ship now; `coc_account_disputes` lands with the disputes task, `coc_account_snapshots` with tiered sync,
-> and `clans`/`clan_memberships` with the clan work. Portability divergences for the SQLite CI leg: JSON
-> columns use `->jsonb()` (Laravel maps it to `text` on SQLite); the partial unique indexes
-> (`WHERE status = 'verified'`, `WHERE is_featured`) are created with raw `CREATE UNIQUE INDEX ... WHERE`,
-> which both drivers accept; the `CHECK` constraints are Postgres-only (app validation covers SQLite). A
+> **Implemented (Phase 2 "Attach + token verification flow" and "Conflicts, disputes, ownership
+> transfer").** `coc_accounts`, `coc_account_claims` and `coc_account_disputes` ship now;
+> `coc_account_snapshots` lands with tiered sync, and `clans`/`clan_memberships` with the clan work.
+> Portability divergences for the SQLite CI leg: JSON columns use `->jsonb()` (Laravel maps it to `text`
+> on SQLite); the partial unique indexes (`WHERE status = 'verified'`, `WHERE is_featured`, and the
+> disputes' live-per-claimant guard) are created with raw `CREATE UNIQUE INDEX ... WHERE`, which both
+> drivers accept; the `CHECK` constraints are Postgres-only (app validation covers SQLite). A
 > `previous_user_id` audit column (referenced by §3.1) was added to `coc_accounts`, and `clan_id` carries no
-> FK until the `clans` table exists.
+> FK until the `clans` table exists. `coc_account_disputes` additionally carries `ulid` (the opaque admin
+> route key), `holder_responds_by` and `last_claimant_activity_at` (the 7-day response and 30-day
+> auto-withdraw clocks); `evidence` is `{notes, media[], holder_response}`.
 
 ### `coc_accounts` [M]
 A CoC player tag attached to a website user. The central trust object of the platform.

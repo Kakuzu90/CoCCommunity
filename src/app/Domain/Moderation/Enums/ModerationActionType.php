@@ -14,6 +14,8 @@ enum ModerationActionType: string
     case Suspend = 'suspend';
     case Ban = 'ban';
     case Unban = 'unban';
+    case Dismiss = 'dismiss';
+    case TransferOwnership = 'transfer_ownership';
 
     public function label(): string
     {
@@ -23,6 +25,8 @@ enum ModerationActionType: string
             self::Suspend => 'Suspend',
             self::Ban => 'Ban',
             self::Unban => 'Lift sanction',
+            self::Dismiss => 'Dismiss',
+            self::TransferOwnership => 'Transfer ownership',
         };
     }
 }

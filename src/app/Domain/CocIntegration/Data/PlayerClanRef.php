@@ -15,8 +15,12 @@ final readonly class PlayerClanRef
         public ?string $badgeUrl = null,
     ) {}
 
-    /** @param array<string, mixed>|null $raw */
-    public static function fromArray(?array $raw): ?self
+    /**
+     * @param  array<string, mixed>|null  $raw  the player payload's `clan` object
+     * @param  string|null  $role  the player's clan role, which the API returns at the top level of the
+     *                             player payload, not inside `clan` (specs/09 §8)
+     */
+    public static function fromArray(?array $raw, ?string $role = null): ?self
     {
         if ($raw === null || ! isset($raw['tag'])) {
             return null;
@@ -27,7 +31,7 @@ final readonly class PlayerClanRef
         return new self(
             tag: (string) $raw['tag'],
             name: (string) ($raw['name'] ?? ''),
-            role: isset($raw['role']) ? (string) $raw['role'] : null,
+            role: $role !== null ? $role : (isset($raw['role']) ? (string) $raw['role'] : null),
             badgeUrl: isset($badges['medium']) ? (string) $badges['medium'] : (isset($badges['small']) ? (string) $badges['small'] : null),
         );
     }

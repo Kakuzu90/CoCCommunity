@@ -35,7 +35,7 @@ final class CocAccount extends Model
         'builder_trophies', 'war_stars', 'attack_wins', 'defense_wins', 'donations',
         'donations_received', 'clan_tag', 'clan_id', 'clan_role', 'league_id', 'league_name',
         'league_icon_url', 'troops', 'heroes', 'spells', 'hero_equipment', 'labels',
-        'raw_payload', 'api_synced_at',
+        'achievements', 'raw_payload', 'api_synced_at',
     ];
 
     protected function casts(): array
@@ -51,6 +51,7 @@ final class CocAccount extends Model
             'spells' => 'array',
             'hero_equipment' => 'array',
             'labels' => 'array',
+            'achievements' => 'array',
             'raw_payload' => 'array',
         ];
     }

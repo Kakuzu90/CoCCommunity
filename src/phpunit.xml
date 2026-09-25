@@ -29,6 +29,8 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
+        <env name="COC_DRIVER" value="fake"/>
+        <env name="COC_API_TOKEN" value=""/>
         <env name="LOG_REQUEST_CHANNEL" value="null"/>
         <env name="TURNSTILE_ENABLED" value="false"/>
         <env name="AUTH_CHECK_COMPROMISED" value="false"/>

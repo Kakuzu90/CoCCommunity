@@ -8,7 +8,6 @@ use App\Domain\Audit\Services\AuditLogger;
 use App\Domain\Auth\Services\UserDirectory;
 use App\Domain\Auth\Services\VerifiedAccountCounter;
 use App\Domain\CocIntegration\Data\PlayerData;
-use App\Domain\CocIntegration\Data\UnitData;
 use App\Domain\CocIntegration\Exceptions\CocApiException;
 use App\Domain\CocIntegration\Services\PlayerLookup;
 use App\Domain\CocIntegration\Services\TokenVerifier;
@@ -258,6 +257,8 @@ final class AccountAttachService
         return [
             'ign' => $player->name,
             'th_level' => max(1, $player->townHallLevel),
+            'builder_hall_level' => $player->builderHallLevel,
+            'builder_trophies' => $player->builderTrophies,
             'xp_level' => $player->expLevel,
             'trophies' => $player->trophies,
             'best_trophies' => $player->bestTrophies,
@@ -271,26 +272,20 @@ final class AccountAttachService
             'league_id' => $player->league?->id,
             'league_name' => $player->league?->name,
             'league_icon_url' => $player->league?->iconUrl,
-            'heroes' => $this->units($player->heroes),
-            'troops' => $this->units($player->troops),
-            'spells' => $this->units($player->spells),
-            'hero_equipment' => $this->units($player->heroEquipment),
-            'labels' => $player->labels,
+            // Store the progression lists straight from the API payload so nothing is lost in mapping —
+            // label icons and achievements are preserved (specs/09 §8). The per-hero `equipment` loadout
+            // is dropped: every equipment piece already lives in the hero_equipment column.
+            'heroes' => array_map(
+                static fn (mixed $hero): mixed => is_array($hero) ? array_diff_key($hero, ['equipment' => null]) : $hero,
+                $player->raw['heroes'] ?? [],
+            ),
+            'troops' => $player->raw['troops'] ?? [],
+            'spells' => $player->raw['spells'] ?? [],
+            'hero_equipment' => $player->raw['heroEquipment'] ?? [],
+            'labels' => $player->raw['labels'] ?? [],
+            'achievements' => $player->raw['achievements'] ?? [],
+            'raw_payload' => $player->raw,
             'api_synced_at' => now(),
         ];
-    }
-
-    /**
-     * @param  list<UnitData>  $units
-     * @return list<array<string, mixed>>
-     */
-    private function units(array $units): array
-    {
-        return array_map(static fn (UnitData $u): array => [
-            'name' => $u->name,
-            'level' => $u->level,
-            'maxLevel' => $u->maxLevel,
-            'village' => $u->village,
-        ], $units);
     }
 }

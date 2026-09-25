@@ -27,7 +27,7 @@ return [
      */
     'tokens' => array_values(array_filter(array_map(
         'trim',
-        explode(',', (string) env('COC_API_TOKENS', env('COC_API_TOKEN', ''))),
+        explode(',', (string) env('COC_API_TOKEN', '')),
     ))),
 
     // Connect / total request timeouts in seconds (specs/09 §7 network row). A timeout is a failure.

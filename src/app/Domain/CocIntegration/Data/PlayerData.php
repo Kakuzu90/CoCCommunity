@@ -18,6 +18,7 @@ final readonly class PlayerData
      * @param  list<UnitData>  $troops
      * @param  list<UnitData>  $spells
      * @param  list<UnitData>  $heroEquipment
+     * @param  array<string, mixed>  $raw  the untouched API payload, kept for lossless storage and backfill
      */
     public function __construct(
         public string $tag,
@@ -31,6 +32,8 @@ final readonly class PlayerData
         public int $defenseWins,
         public int $donations,
         public int $donationsReceived,
+        public ?int $builderHallLevel = null,
+        public int $builderTrophies = 0,
         public ?LeagueData $league = null,
         public ?PlayerClanRef $clan = null,
         public array $labels = [],
@@ -40,6 +43,7 @@ final readonly class PlayerData
         public array $heroEquipment = [],
         public bool $stale = false,
         public ?CarbonImmutable $fetchedAt = null,
+        public array $raw = [],
     ) {}
 
     /**
@@ -61,14 +65,22 @@ final readonly class PlayerData
             defenseWins: (int) ($raw['defenseWins'] ?? 0),
             donations: (int) ($raw['donations'] ?? 0),
             donationsReceived: (int) ($raw['donationsReceived'] ?? 0),
-            league: LeagueData::fromArray(is_array($raw['league'] ?? null) ? $raw['league'] : null),
-            clan: PlayerClanRef::fromArray(is_array($raw['clan'] ?? null) ? $raw['clan'] : null),
+            builderHallLevel: isset($raw['builderHallLevel']) ? (int) $raw['builderHallLevel'] : null,
+            builderTrophies: (int) ($raw['builderBaseTrophies'] ?? $raw['versusTrophies'] ?? 0),
+            // The ranked home-village league is `leagueTier` in the current API (`league` is the legacy
+            // key); the player's clan role is a top-level field, not part of the `clan` object (specs/09 §8).
+            league: LeagueData::fromArray(is_array($raw['leagueTier'] ?? null) ? $raw['leagueTier'] : (is_array($raw['league'] ?? null) ? $raw['league'] : null)),
+            clan: PlayerClanRef::fromArray(
+                is_array($raw['clan'] ?? null) ? $raw['clan'] : null,
+                isset($raw['role']) ? (string) $raw['role'] : null,
+            ),
             labels: self::labels($raw['labels'] ?? []),
             heroes: self::units($raw['heroes'] ?? []),
             troops: self::units($raw['troops'] ?? []),
             spells: self::units($raw['spells'] ?? []),
             heroEquipment: self::units($raw['heroEquipment'] ?? []),
             fetchedAt: $fetchedAt,
+            raw: $raw,
         );
     }
 
@@ -80,11 +92,14 @@ final readonly class PlayerData
         }
 
         return new self(
-            $this->tag, $this->name, $this->townHallLevel, $this->expLevel, $this->trophies,
-            $this->bestTrophies, $this->warStars, $this->attackWins, $this->defenseWins,
-            $this->donations, $this->donationsReceived, $this->league, $this->clan, $this->labels,
-            $this->heroes, $this->troops, $this->spells, $this->heroEquipment,
-            stale: true, fetchedAt: $this->fetchedAt,
+            tag: $this->tag, name: $this->name, townHallLevel: $this->townHallLevel,
+            expLevel: $this->expLevel, trophies: $this->trophies, bestTrophies: $this->bestTrophies,
+            warStars: $this->warStars, attackWins: $this->attackWins, defenseWins: $this->defenseWins,
+            donations: $this->donations, donationsReceived: $this->donationsReceived,
+            builderHallLevel: $this->builderHallLevel, builderTrophies: $this->builderTrophies,
+            league: $this->league, clan: $this->clan, labels: $this->labels, heroes: $this->heroes,
+            troops: $this->troops, spells: $this->spells, heroEquipment: $this->heroEquipment,
+            stale: true, fetchedAt: $this->fetchedAt, raw: $this->raw,
         );
     }
 

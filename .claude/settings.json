@@ -9,5 +9,19 @@
   },
   "enabledPlugins": {
     "ui-ux-pro-max@ui-ux-pro-max-skill": true
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-uiux.sh\"",
+            "statusMessage": "Checking UI-skill gate"
+          }
+        ]
+      }
+    ]
   }
 }

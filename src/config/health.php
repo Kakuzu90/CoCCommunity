@@ -13,6 +13,7 @@ return [
     'cache' => [
         'external' => 'health:external',
         'scheduler' => 'health:scheduler',
+        'coc' => 'health:coc',
     ],
 
     // How long a cached external-check result stays fresh (seconds). Slightly over its 5-min cadence.

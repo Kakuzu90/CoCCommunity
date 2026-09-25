@@ -68,7 +68,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] Notifications v1
 
 ### Phase 2 — Verified CoC accounts
-- [ ] API client, decorators, key pool
+- [x] API client, decorators, key pool
 - [ ] Attach + token verification flow
 - [ ] Conflicts, disputes, ownership transfer
 - [ ] Tiered sync + snapshots

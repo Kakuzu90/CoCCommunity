@@ -70,15 +70,27 @@ final class HealthReporter
     /** Cached: the last external reachability result written by platform:check-health. */
     public function storage(): HealthCheck
     {
+        return $this->cached('storage', (string) config('health.cache.external'));
+    }
+
+    /** Cached: the last CoC key-pool/circuit result written by platform:check-health (specs/09 §3). */
+    public function coc(): HealthCheck
+    {
+        return $this->cached('coc_api', (string) config('health.cache.coc'));
+    }
+
+    /** Read a scheduled check's cached result, keeping the slow probe off the request path. */
+    private function cached(string $name, string $cacheKey): HealthCheck
+    {
         /** @var array{status: string, message: string, at?: string}|null $cached */
-        $cached = Cache::get((string) config('health.cache.external'));
+        $cached = Cache::get($cacheKey);
         if ($cached === null) {
-            return new HealthCheck('storage', HealthStatus::Unknown, 'no check has run yet');
+            return new HealthCheck($name, HealthStatus::Unknown, 'no check has run yet');
         }
 
         $status = HealthStatus::tryFrom($cached['status']) ?? HealthStatus::Unknown;
 
-        return new HealthCheck('storage', $status, $cached['message'], ['checked_at' => $cached['at'] ?? null]);
+        return new HealthCheck($name, $status, $cached['message'], ['checked_at' => $cached['at'] ?? null]);
     }
 
     /** Live probe of object-storage reachability — run on a schedule, then cached for /health. */
@@ -107,7 +119,7 @@ final class HealthReporter
     public function summary(): array
     {
         $database = $this->database();
-        $checks = [$database, $this->queue(), $this->storage()];
+        $checks = [$database, $this->queue(), $this->storage(), $this->coc()];
 
         $overall = HealthStatus::Ok;
         $out = [];

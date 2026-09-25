@@ -23,6 +23,20 @@ Domain services ─▶ PlayerLookup / ClanLookup / TokenVerifier   (use-case ser
 Decorator order at the container binding: `Cached( Throttled( Http ) )`. Caching sits outermost so
 a cache hit costs no rate-limit budget.
 
+> **Implemented (Phase 2 "API client, decorators, key pool").** The client ships with the two
+> endpoints every decorator needs: `player(PlayerTag)` and `verifyToken(PlayerTag, token)`. Clan
+> lookup, clan search and the static leagues/locations data (§2) are deferred to the Phase 4 clan
+> work; `PlayerLookup`, `TokenVerifier` and `CocHealthProbe` are the module's public seam. The stack
+> lives under `App\Domain\CocIntegration` (`Contracts`, `Data`, `Enums`, `Exceptions`, `Http` for the
+> three clients, `KeyManagement` for `CocKeyPool`, `Resilience` for the breaker and request log,
+> `Testing` for the fake). `config('coc.driver')` selects `fake` (default, no key needed) or the live
+> `http` stack. Two items from this doc land with later tasks, not here: the **sync tiers/scheduler**
+> config and jobs (§6) belong to "Tiered sync + snapshots", and **automated key rotation** via the
+> developer portal (§3) stays disabled behind `coc.key_rotation.enabled` until portal credentials and
+> a stable egress IP exist — the manual runbook plus the health alert is the interim. The request log's
+> `cached` column is written only for outbound calls for now (pure cache hits are not logged, to avoid
+> a DB write per page view); it flips to `true` when a served-stale response is logged in the sync task.
+
 ## 2. Endpoints used
 
 | Use case | Endpoint | Method | Notes |

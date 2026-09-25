@@ -32,3 +32,4 @@ Schedule::call(function () {
 Schedule::command('platform:check-health')->everyFiveMinutes()->onOneServer()->runInBackground();
 Schedule::command('platform:anonymize-deleted')->dailyAt('03:00')->onOneServer();
 Schedule::command('notifications:prune')->dailyAt('02:15')->onOneServer();
+Schedule::command('coc:prune-api-requests')->dailyAt('02:30')->onOneServer();

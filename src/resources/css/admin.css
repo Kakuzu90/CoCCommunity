@@ -108,5 +108,16 @@
 
 .adm-back { color: var(--text-secondary); text-decoration: none; font-size: var(--text-sm); display: inline-flex; align-items: center; gap: var(--space-1); }
 .adm-back:hover { color: var(--text-primary); }
+
+/* Dispute review (specs/13 §5). Reuses the admin panel/button tokens; only the layout is new. */
+.adm-dispute { display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-4); }
+.adm-dispute-block { border-top: 1px solid var(--border-subtle); padding-top: var(--space-4); }
+.adm-dispute-block h3 { font-family: var(--font-body); font-weight: 700; color: var(--text-primary); margin: 0 0 var(--space-2); font-size: var(--text-sm); }
+.adm-dispute-block p { margin: 0; color: var(--text-primary); font-size: var(--text-sm); }
+.adm-callout { border: 1px solid color-mix(in srgb, var(--state-warning) 40%, transparent); background: color-mix(in srgb, var(--state-warning) 8%, transparent); border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); }
+.adm-callout p { margin: 0; font-size: var(--text-sm); color: var(--text-secondary); }
+.adm-resolve { border-top: 1px solid var(--border-subtle); padding-top: var(--space-4); }
+.adm-resolve h3 { font-family: var(--font-body); font-weight: 700; color: var(--text-primary); margin: 0 0 var(--space-1); font-size: var(--text-sm); }
+.adm-resolve-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
 .adm-flip { transform: scaleX(-1); }
 [x-cloak] { display: none !important; }

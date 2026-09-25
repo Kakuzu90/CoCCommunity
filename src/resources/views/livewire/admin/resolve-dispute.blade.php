@@ -9,13 +9,13 @@
             :error="$errors->first('note')" rows="3" maxlength="2000"
             hint="Explain the reasoning. Stored on the immutable moderation record; the parties see a short version." />
 
-        <div class="settings-actions adm-resolve-actions">
-            <x-ui.button type="button" wire:click="transfer"
-                wire:confirm="Transfer this tag to the claimant? This moves verified ownership and is audited.">Transfer to claimant</x-ui.button>
-            <x-ui.button type="button" variant="ghost" wire:click="deny">Deny (holder keeps it)</x-ui.button>
-            <x-ui.button type="button" variant="ghost" wire:click="requestInfo">Request more info</x-ui.button>
-            <x-ui.button type="button" variant="danger" wire:click="suspend"
-                wire:confirm="Suspend this tag? Neither party will hold it.">Suspend tag</x-ui.button>
+        <div class="adm-resolve-actions">
+            <button type="button" class="adm-btn" data-tone="primary" wire:click="transfer"
+                wire:confirm="Transfer this tag to the claimant? This moves verified ownership and is audited.">Transfer to claimant</button>
+            <button type="button" class="adm-btn" wire:click="deny">Deny (holder keeps it)</button>
+            <button type="button" class="adm-btn adm-btn-ghost" wire:click="requestInfo">Request more info</button>
+            <button type="button" class="adm-btn" data-tone="danger" wire:click="suspend"
+                wire:confirm="Suspend this tag? Neither party will hold it.">Suspend tag</button>
         </div>
     @endif
 </div>

@@ -1,8 +1,8 @@
 <x-layouts.admin :title="'Dispute #'.$dispute->tagNormalized" heading="Review dispute">
     <section class="adm-panel adm-dispute">
-        <a href="{{ route('admin.disputes.index') }}" class="adm-btn adm-btn-ghost">&larr; Back to queue</a>
+        <a href="{{ route('admin.disputes.index') }}" class="adm-back">&larr; Back to queue</a>
 
-        <dl class="adm-facts">
+        <dl class="adm-dl adm-dispute-facts">
             <div><dt>Tag</dt><dd class="adm-mono">#{{ $dispute->tagNormalized }}</dd></div>
             <div><dt>Status</dt><dd>{{ $dispute->status->label() }}</dd></div>
             <div><dt>Claimant</dt><dd>{{ $dispute->claimantName ?? '–' }}</dd></div>

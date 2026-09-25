@@ -74,7 +74,7 @@
                                 :error="$errors->first('disputeNotes')" rows="2" maxlength="2000"
                                 hint="Do not paste real-world ID documents. Use an in-game token or in-game screenshots." />
                             <div class="settings-actions">
-                                <x-ui.button type="submit" variant="danger" wire:target="openDispute" wire:loading.attr="disabled">
+                                <x-ui.button type="submit" wire:target="openDispute" wire:loading.attr="disabled">
                                     <span wire:loading.remove wire:target="openDispute">File dispute</span>
                                     <span wire:loading wire:target="openDispute">Filing…</span>
                                 </x-ui.button>

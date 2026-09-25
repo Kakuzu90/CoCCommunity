@@ -138,6 +138,11 @@ Do not load the spec set in numerical order. It is a reading order for people, n
 One phase task per session. Finish it, make its tests pass, stop. Do not drift into adjacent tasks
 in the same phase — say what is next instead.
 
+Run the task's focused tests and required checks. Do not repeatedly run a slow full suite after
+those pass. If the full suite times out or needs another long run, stop and tell the developer
+it can be run later. Report exactly what passed and leave the full suite marked unverified;
+CI green remains a release gate.
+
 ## Locked decisions
 
 Changing one of these means revisiting specs, not just code.

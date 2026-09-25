@@ -10,16 +10,16 @@
         </select>
         <div class="ui-control-wrap" x-cloak x-show="ready">
             <button type="button" id="{{ $id }}" x-ref="trigger" class="ui-control ui-select-trigger" aria-haspopup="listbox" :aria-expanded="open" aria-controls="{{ $id }}-list" :disabled="disabled" @click="open ? close(true) : show()" @if($error) aria-invalid="true" @endif @if($described) aria-describedby="{{ $described }}" @endif>
-                <span x-text="selectedLabel" :class="{ 'ui-help': !value }"></span><span aria-hidden="true">▾</span>
+                <span x-text="selectedLabel" :class="{ 'ui-help': !value }"></span><x-ui.icon name="chevron" :size="16" />
             </button>
-            <button type="button" class="ui-select-clear" x-show="value && !disabled && !$refs.native.required" aria-label="Clear {{ $label }}" @click="choose('')">×</button>
+            <button type="button" class="ui-select-clear" x-show="value && !disabled && !$refs.native.required" aria-label="Clear {{ $label }}" @click="choose('')"><x-ui.icon name="close" :size="16" /></button>
         </div>
         <div class="ui-select-popup" x-cloak x-show="open">
             <input x-ref="search" class="ui-control ui-select-search" type="text" autocomplete="off" aria-label="Search {{ $label }} options" role="combobox" aria-autocomplete="list" :aria-expanded="open" aria-controls="{{ $id }}-list" :aria-activedescendant="activeId" x-model="query" @input="active = 0" @if(!$searchable) readonly @endif placeholder="{{ $searchable ? 'Search options…' : 'Choose an option' }}">
             <div id="{{ $id }}-list" x-ref="list" class="ui-select-options" role="listbox" aria-label="{{ $label }}">
                 <template x-for="(option, index) in filtered" :key="option.value">
                     <div :id="$refs.list.id + '-' + index" role="option" :aria-selected="value === option.value" class="ui-select-option" :class="{ 'is-active': active === index }" @mouseenter="active = index" @mousedown.prevent @click="choose(option.value)">
-                        <span x-text="option.label"></span><span aria-hidden="true" x-show="value === option.value">✓</span>
+                        <span x-text="option.label"></span><x-ui.icon name="check" :size="16" x-show="value === option.value" />
                     </div>
                 </template>
             </div>

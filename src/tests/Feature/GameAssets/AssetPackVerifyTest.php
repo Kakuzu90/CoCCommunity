@@ -27,6 +27,23 @@ beforeEach(function () {
     config(['assets.disk' => 'r2', 'assets.prefix' => 'game']);
 });
 
+it('identifies the active placeholder pack without claiming game assets were published', function () {
+    config(['assets.manifest_path' => resource_path('game-assets'), 'assets.pack_version' => 1]);
+
+    $this->artisan('assets:verify-pack')
+        ->expectsOutput('assets:verify-pack — game/1/ is an empty placeholder pack (0 game assets published).')
+        ->assertSuccessful();
+});
+
+it('still flags stray objects in the placeholder pack prefix', function () {
+    config(['assets.manifest_path' => resource_path('game-assets'), 'assets.pack_version' => 1]);
+    Storage::disk('r2')->put('game/1/units/stray.png', 'stray');
+
+    $this->artisan('assets:verify-pack')
+        ->expectsOutput('extra: game/1/units/stray.png')
+        ->assertFailed();
+});
+
 it('passes when every object matches the manifest', function () {
     seedVersion(1, ['units/a.png' => MediaTesting::pngBytes()]);
 

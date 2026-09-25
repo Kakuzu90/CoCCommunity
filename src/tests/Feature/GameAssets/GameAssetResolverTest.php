@@ -34,11 +34,28 @@ it('resolves a catalogued unit to its versioned, unmodified URL', function () {
 });
 
 it('falls back to a labelled placeholder for an unknown unit', function () {
-    $asset = resolverWith([])->unit('mystery-troop');
+    $asset = resolverWith([
+        ['key' => 'units/barbarian.png', 'slug' => 'barbarian', 'name' => 'Barbarian', 'category' => 'unit', 'sha256' => 'x', 'bytes' => 1],
+    ])->unit('mystery-troop');
 
     expect($asset->isPlaceholder())->toBeTrue()
         ->and($asset->url)->toBeNull()
         ->and($asset->name)->toBe('Mystery Troop');
+});
+
+it('uses labelled placeholders for the active empty pack', function () {
+    config([
+        'assets.enabled' => true,
+        'assets.manifest_path' => resource_path('game-assets'),
+        'assets.pack_version' => 1,
+    ]);
+
+    $resolver = new ManifestGameAssetResolver(new ManifestReader);
+
+    expect($resolver->unit('barbarian')->isPlaceholder())->toBeTrue()
+        ->and($resolver->unit('barbarian')->name)->toBe('Barbarian')
+        ->and($resolver->townHall(15)->isPlaceholder())->toBeTrue()
+        ->and($resolver->league(29000022, 'Legend League')->isPlaceholder())->toBeTrue();
 });
 
 it('always carries a name for Town Halls and leagues even without a pack', function () {

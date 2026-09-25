@@ -8,6 +8,7 @@ it('renders an accessible placeholder when the asset is unknown', function () {
     $html->assertSee('role="img"', false);
     $html->assertSee('aria-label="Town Hall 15"', false);
     $html->assertSee('game-asset--placeholder', false);
+    $html->assertSee('>15</span>', false);
     $html->assertDontSee('<img', false);
 });
 

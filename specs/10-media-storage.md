@@ -322,6 +322,10 @@ does not permit ([18 §2](18-design-system.md)).
 So `GameAssetResolver` has two paths: manifest lookup for the static catalogue, pass-through of the
 stored API URL for clan badges. Callers do not know or care which.
 
+Until curated originals are available, version 1 is an empty placeholder manifest. Unit, Town Hall
+and league lookups render the original labelled fallback in `<x-game.asset>`; there are no game
+assets to checksum. The first curated pack uses a new versioned prefix.
+
 ### 11.2 Upload procedure (a runbook, not a feature)
 
 1. Staff assemble the asset pack locally, preserving the **original files byte-for-byte** — no

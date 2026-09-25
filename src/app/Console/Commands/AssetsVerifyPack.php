@@ -26,6 +26,12 @@ class AssetsVerifyPack extends Command
         }
 
         if ($report->ok()) {
+            if ($report->checked === 0) {
+                $this->info("assets:verify-pack — game/{$version}/ is an empty placeholder pack (0 game assets published).");
+
+                return self::SUCCESS;
+            }
+
             $this->info("assets:verify-pack — game/{$version}/ matches its manifest ({$report->checked} assets).");
 
             return self::SUCCESS;

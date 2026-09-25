@@ -73,7 +73,8 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] Conflicts, disputes, ownership transfer
 - [x] Tiered sync + snapshots
 - [x] PlayerCard, account detail, progression
-- [ ] Asset pack v1
+- [ ] Asset pack v1 (curated files pending)
+  - [x] Placeholder release: labelled fallbacks with an empty manifest
 - [ ] Profile v2
 
 ### Phase 3 — Bases + moderation (MVP ships here)

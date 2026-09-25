@@ -23,6 +23,9 @@
         };
     }
     $px = (int) $size;
+    $placeholderMark = $asset->category === 'townhall' && ctype_digit((string) $asset->slug)
+        ? $asset->slug
+        : mb_strtoupper(mb_substr($asset->name, 0, 1));
 @endphp
 @if ($asset->isPlaceholder())
     <span
@@ -31,7 +34,7 @@
         aria-label="{{ $asset->name }}"
         data-category="{{ $asset->category }}"
     >
-        <span class="game-asset__mark" aria-hidden="true">{{ mb_strtoupper(mb_substr($asset->name, 0, 1)) }}</span>
+        <span class="game-asset__mark" aria-hidden="true">{{ $placeholderMark }}</span>
     </span>
 @else
     <img

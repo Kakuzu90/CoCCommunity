@@ -135,3 +135,34 @@ Digest options: `none` (default), `daily`, `weekly` — a single email summarisi
 - Security-category tests: assert they cannot be disabled.
 - Volume test: 1000 likes on one base produce ≤24 notification rows in a day.
 - Email content tests: no secret, no token, no third-party email address in any rendered template.
+
+## 9. Phase 1 implementation
+
+Notifications v1 implements FR-NOTIF-1, the identity/moderation entries of FR-NOTIF-2, and
+FR-NOTIF-3. CoC, content, recruitment and marketplace events are wired when their owning features
+ship. Preferences, aggregation, digests, bounce handling and non-security email caps remain v2.
+
+- `/notifications` has category filters, pagination, mark-read on opening, and mark-all-read.
+  The bell previews ten rows, caps its badge at 99+, and uses `wire:poll.60s.visible`; Livewire also
+  suppresses normal polling in background tabs. Restricted and unverified users can read their own
+  notices. Every write rechecks the Gate and scopes by both user id and morph type, including staff.
+- `NoticeRequested` is dispatched after commit to the queued `SendNotice` listener. `Notifier`
+  crosses Auth through `NotificationRecipient`, never its model. `AccountNotice` uses Laravel's
+  notification system with an idempotent database channel on `high` and mail on `low`.
+  Event UUIDs survive queue retries; an inbox retry cannot reset a read timestamp or create a second row.
+  Mail transport remains at-least-once, as with Laravel's queued mail channel.
+- Existing verification/reset mail is queued on `low`. Password changes/resets, new sign-ins,
+  warnings, restrictions, suspensions, bans and lifted sanctions produce in-app notices; all except
+  email verification also send mail. Email changes notify the old and new addresses separately,
+  plus send a verification link. Messages contain no internal moderation notes or other addresses.
+  New-browser detection compares the user agent with unexpired sessions; it is an alert heuristic,
+  not device authentication. Two-factor and automatic sanction-expiry events await those features.
+- Notification titles/messages and destinations come from `NoticeKind`, not stored HTML or URLs.
+  Unknown types render “This content is no longer available” and stay in the inbox when opened.
+- Counts use `notif:unread:{user}` for 60 seconds with invalidation on writes, reads and pruning.
+  `notifications:prune` runs at 02:15. Read rows older than 90 days and unread rows older than 180
+  days expire. The 500-row cap is also enforced on insertion under a per-user database lock:
+  oldest read rows go first, then oldest unread rows only if needed to honor the hard cap.
+  Account anonymization removes the inbox; late deliveries skip deleted accounts.
+- Browser CI now uses a persistent SQLite file and database sessions, allowing authenticated
+  navigation tests. `NotificationBrowserSeeder` supplies explicit test fixtures only in local/testing.

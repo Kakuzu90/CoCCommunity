@@ -2,13 +2,19 @@
 
 namespace App\Domain\Auth\Notifications;
 
-use Illuminate\Bus\Queueable;
+use App\Support\Traits\QueuesSecurityMail;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OldEmailChangedNotification extends Notification
+class OldEmailChangedNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use QueuesSecurityMail;
+
+    public function __construct()
+    {
+        $this->afterCommit();
+    }
 
     /** @return list<string> */
     public function via(object $notifiable): array

@@ -71,9 +71,12 @@ jobs:
     env:
       APP_ENV: testing
       DB_CONNECTION: sqlite
-      DB_DATABASE: ':memory:'
-      SESSION_DRIVER: array
+      DB_DATABASE: '${{ github.workspace }}/src/database/browser.sqlite'
+      SESSION_DRIVER: database
       CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      TURNSTILE_ENABLED: 'false'
       UI_BASE_URL: http://127.0.0.1:8000
     steps:
       - uses: actions/checkout@v4
@@ -93,6 +96,8 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps chromium
+      - run: touch database/browser.sqlite
+      - run: php artisan migrate --force
       - run: npm run test:browser
       - uses: actions/upload-artifact@v4
         if: failure()

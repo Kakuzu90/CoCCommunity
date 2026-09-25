@@ -2,15 +2,24 @@
 
 namespace App\Domain\Auth\Notifications;
 
+use App\Support\Traits\QueuesSecurityMail;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
 /**
  * Branded email-verification message (specs/16). Uses the framework's signed-URL machinery; only
  * the copy is ours. Full templated notifications land with Notifications v1.
  */
-final class VerifyEmailNotification extends VerifyEmail
+final class VerifyEmailNotification extends VerifyEmail implements ShouldQueue
 {
+    use QueuesSecurityMail;
+
+    public function __construct()
+    {
+        $this->afterCommit();
+    }
+
     protected function buildMailMessage($url): MailMessage
     {
         return (new MailMessage)

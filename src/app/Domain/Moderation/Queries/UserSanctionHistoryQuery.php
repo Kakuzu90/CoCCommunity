@@ -18,7 +18,7 @@ final class UserSanctionHistoryQuery
     /** @return list<SanctionSummary> */
     public function forUser(int $userId): array
     {
-        return DB::table('user_sanctions')
+        return array_values(DB::table('user_sanctions')
             ->leftJoin('users as issuers', 'issuers.id', '=', 'user_sanctions.issued_by')
             ->leftJoin('users as lifters', 'lifters.id', '=', 'user_sanctions.lifted_by')
             ->where('user_sanctions.user_id', $userId)
@@ -29,8 +29,8 @@ final class UserSanctionHistoryQuery
                 'lifters.username as lifted_by_username',
             )
             ->get()
-            ->map(fn (object $row): SanctionSummary => $this->toSummary($row))
-            ->all();
+            ->map(fn (\stdClass $row): SanctionSummary => $this->toSummary($row))
+            ->all());
     }
 
     public function activeCount(int $userId): int
@@ -44,7 +44,7 @@ final class UserSanctionHistoryQuery
             ->count();
     }
 
-    private function toSummary(object $row): SanctionSummary
+    private function toSummary(\stdClass $row): SanctionSummary
     {
         $expiresAt = $row->expires_at === null ? null : CarbonImmutable::parse($row->expires_at);
         $liftedAt = $row->lifted_at === null ? null : CarbonImmutable::parse($row->lifted_at);

@@ -412,6 +412,18 @@
 </div>
 </x-ui.card>
         </section>
+        <section class="gallery-section" id="notifications">
+            <h2>Notification inbox</h2>
+            <p class="ui-help">The bell shows your ten latest updates, with unread labels and links to the full inbox.</p>
+            @auth
+                @can('manage-own-notifications')
+                    <livewire:components.notification-bell />
+                    <a href="{{ route('notifications.index') }}" class="ui-button">Open your notifications</a>
+                @endcan
+            @else
+                <a href="{{ route('login') }}" class="ui-button">Sign in to preview your notifications</a>
+            @endauth
+        </section>
     </main>
     <footer class="gallery-footer">
 <p>Clash Commons · Component library · Local development</p>

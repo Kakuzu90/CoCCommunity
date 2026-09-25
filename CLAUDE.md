@@ -65,7 +65,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] Privacy settings + public profile
 - [x] Settings area (sessions, deletion)
 - [x] Admin v1 + audit log
-- [ ] Notifications v1
+- [x] Notifications v1
 
 ### Phase 2 — Verified CoC accounts
 - [ ] API client, decorators, key pool

@@ -9,5 +9,6 @@
 @import './tokens.css';
 @import './ui.css';
 @import './admin.css';
+@import './notifications.css';
 @source '../**/*.blade.php';
 @source '../**/*.js';

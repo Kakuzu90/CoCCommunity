@@ -2,7 +2,8 @@
 
 namespace App\Domain\Auth\Notifications;
 
-use Illuminate\Bus\Queueable;
+use App\Support\Traits\QueuesSecurityMail;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -11,9 +12,14 @@ use Illuminate\Notifications\Notification;
  * account-existence signal is delivered by email, never by the registration form. It doubles as a
  * heads-up to the real owner that someone attempted to sign up with their address.
  */
-final class ExistingAccountNotification extends Notification
+final class ExistingAccountNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use QueuesSecurityMail;
+
+    public function __construct()
+    {
+        $this->afterCommit();
+    }
 
     /** @return array<int, string> */
     public function via(object $notifiable): array

@@ -49,7 +49,7 @@ final class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
         if ($user !== null) {
-            $accounts->recordLogin($user, $request->ip());
+            $accounts->recordLogin($user, $request->ip(), $request->userAgent());
         }
 
         return redirect()->intended(route('home'));

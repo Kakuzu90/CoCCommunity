@@ -210,7 +210,7 @@ deptrac:
     - name: Framework
       collectors:
         - type: classLike
-          value: '^(?:Illuminate|Livewire|Carbon|Database\\Factories)\\.*$'
+          value: '^(?:Illuminate|Livewire|Carbon|Database\\Factories|Symfony\\Component\\HttpFoundation|Intervention\\Image)\\.*$'
     - name: Bootstrap
       collectors:
         - type: classLike

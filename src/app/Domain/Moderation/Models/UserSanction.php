@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $id
  * @property int $user_id
+ * @property int $issued_by
  * @property SanctionType $type
  * @property string $reason_code
  * @property string $public_reason

@@ -1,10 +1,17 @@
 <?php
 
+use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\PublicProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'pages.home')->name('home');
 Route::get('/u/{username}', PublicProfileController::class)->name('profile.show');
+
+Route::middleware(['auth', 'can:manage-own-notifications'])->group(function (): void {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'read'])->whereUuid('id')->name('notifications.read');
+});
 
 /*
  * Section landing routes exist now so navigation resolves everywhere; each renders the

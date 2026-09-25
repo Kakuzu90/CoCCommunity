@@ -22,9 +22,7 @@
         </a>
 
         @auth
-            <a href="{{ route('home') }}" class="app-iconbtn" aria-label="Notifications">
-                <x-ui.icon name="bell" size="24" />
-            </a>
+            @can('manage-own-notifications')<livewire:components.notification-bell />@endcan
             {{-- Public profile (/u/{username}) arrives with the public-profile task; role-gated staff links join this menu. --}}
             <x-ui.dropdown label="Account">
                 <a href="{{ route('settings.profile.edit') }}" class="ui-menu-item" role="menuitem" tabindex="-1">Edit profile</a>

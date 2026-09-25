@@ -43,7 +43,7 @@ final class AuditLogQuery
             )
             ->paginate($perPage);
 
-        $paginator->through(fn (object $row): AuditEntry => $this->toEntry($row));
+        $paginator->through(fn (\stdClass $row): AuditEntry => $this->toEntry($row));
 
         return $paginator;
     }
@@ -51,15 +51,15 @@ final class AuditLogQuery
     /** @return list<array{value: string, label: string}> distinct actions present, for the filter bar */
     public function actionOptions(): array
     {
-        return DB::table('audit_logs')
+        return array_values(DB::table('audit_logs')
             ->distinct()
             ->orderBy('action')
             ->pluck('action')
             ->map(fn (string $action): array => ['value' => $action, 'label' => AuditAction::labelFor($action)])
-            ->all();
+            ->all());
     }
 
-    private function toEntry(object $row): AuditEntry
+    private function toEntry(\stdClass $row): AuditEntry
     {
         return new AuditEntry(
             id: (int) $row->id,

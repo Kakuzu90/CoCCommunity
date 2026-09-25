@@ -29,7 +29,7 @@ final class UserDirectory
             ->whereNull('deleted_at')
             ->when($excludeId !== null, fn ($q) => $q->where('id', '!=', $excludeId))
             ->when($filters->search !== null, function ($q) use ($filters): void {
-                $term = '%'.$this->escapeLike($filters->search).'%';
+                $term = '%'.$this->escapeLike($filters->search ?? '').'%';
                 $q->where(function ($inner) use ($term): void {
                     $inner->where('username', 'like', $term)
                         ->orWhere('email', 'like', $term);
@@ -44,7 +44,7 @@ final class UserDirectory
             ->select('id', 'username', 'email', 'role', 'status', 'verified_accounts_count', 'created_at', 'last_login_at')
             ->paginate($perPage);
 
-        $paginator->through(fn (object $row): AdminUserSummary => new AdminUserSummary(
+        $paginator->through(fn (\stdClass $row): AdminUserSummary => new AdminUserSummary(
             id: (int) $row->id,
             username: $row->username,
             email: $row->email,

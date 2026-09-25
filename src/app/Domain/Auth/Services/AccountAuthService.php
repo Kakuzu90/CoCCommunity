@@ -3,6 +3,8 @@
 namespace App\Domain\Auth\Services;
 
 use App\Domain\Auth\Models\User;
+use App\Domain\Notifications\Enums\NoticeKind;
+use App\Domain\Notifications\Events\NoticeRequested;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\DB;
@@ -25,16 +27,24 @@ final class AccountAuthService
         return $user->status->canAuthenticate() ? null : $user->status->lockedMessage();
     }
 
-    public function recordLogin(Authenticatable $user, ?string $ip): void
+    public function recordLogin(Authenticatable $user, ?string $ip, ?string $userAgent = null): void
     {
         if (! $user instanceof User) {
             return;
         }
 
+        $knownDevice = $userAgent !== null && DB::table('sessions')->where('user_id', $user->id)
+            ->where('last_activity', '>=', now()->subMinutes((int) config('session.lifetime'))->timestamp)
+            ->where('user_agent', $userAgent)->exists();
+
         $user->forceFill([
             'last_login_at' => now(),
             'last_login_ip_hash' => $ip === null ? null : hash('sha256', $ip),
         ])->save();
+
+        if (! $knownDevice) {
+            event(new NoticeRequested($user->id, NoticeKind::NewSignIn));
+        }
     }
 
     /** Set a new password, cycle the remember token and revoke every session (specs/11). */

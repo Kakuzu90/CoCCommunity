@@ -11,7 +11,7 @@
     --bg-page: var(--clr-navy-900); --bg-surface: var(--clr-navy-800); --bg-surface-raised: var(--clr-navy-700);
     --bg-surface-hover: var(--clr-navy-700); --bg-scrim: color-mix(in srgb, var(--clr-navy-950) 85%, transparent);
     --border-subtle: var(--clr-navy-700); --border-default: var(--clr-navy-600); --border-strong: var(--clr-text-muted); --border-focus: var(--clr-gold-400);
-    --text-primary: var(--clr-text); --text-secondary: var(--clr-text-dim); --text-muted: var(--clr-text-muted); --text-inverse: var(--clr-text-on-gold); --text-on-gold: var(--clr-text-on-gold);
+    --text-primary: var(--clr-text); --text-secondary: var(--clr-text-dim); --text-muted: var(--clr-text-muted); --text-inverse: var(--clr-text-on-gold); --text-on-gold: var(--clr-text-on-gold); --text-danger: var(--clr-red-400);
     --brand-primary: var(--clr-gold-500); --brand-primary-hover: var(--clr-gold-400); --brand-primary-press: var(--clr-gold-600); --brand-primary-shadow: var(--clr-gold-700);
     --accent: var(--clr-purple-500); --accent-hover: var(--clr-purple-400);
     --state-success: var(--clr-green-500); --state-success-press: var(--clr-green-600); --state-danger-press: var(--clr-red-600); --state-danger: var(--clr-red-500); --state-warning: var(--clr-orange-500); --state-info: var(--clr-blue-500);

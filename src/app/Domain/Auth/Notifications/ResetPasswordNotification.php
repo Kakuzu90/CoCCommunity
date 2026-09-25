@@ -2,12 +2,22 @@
 
 namespace App\Domain\Auth\Notifications;
 
+use App\Support\Traits\QueuesSecurityMail;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
 /** Branded password-reset message (specs/16). Token single-use, 60-minute expiry (specs/11). */
-final class ResetPasswordNotification extends ResetPassword
+final class ResetPasswordNotification extends ResetPassword implements ShouldQueue
 {
+    use QueuesSecurityMail;
+
+    public function __construct(string $token)
+    {
+        parent::__construct($token);
+        $this->afterCommit();
+    }
+
     public function toMail($notifiable): MailMessage
     {
         $url = url(route('password.reset', ['token' => $this->token, 'email' => $notifiable->getEmailForPasswordReset()], false));

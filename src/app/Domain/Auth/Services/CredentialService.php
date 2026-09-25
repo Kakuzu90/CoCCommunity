@@ -3,7 +3,10 @@
 namespace App\Domain\Auth\Services;
 
 use App\Domain\Auth\Models\User;
+use App\Domain\Auth\Notifications\NewEmailChangedNotification;
 use App\Domain\Auth\Notifications\OldEmailChangedNotification;
+use App\Domain\Notifications\Enums\NoticeKind;
+use App\Domain\Notifications\Events\NoticeRequested;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
@@ -17,6 +20,7 @@ class CredentialService
         $user = $this->user($principal);
         $user->forceFill(['password' => $password, 'remember_token' => Str::random(60)])->save();
         $this->sessions->revokeOthers($user, $currentSessionId);
+        event(new NoticeRequested($user->id, NoticeKind::PasswordChanged));
     }
 
     public function changeEmail(Authenticatable $principal, string $email, string $currentSessionId): void
@@ -30,6 +34,7 @@ class CredentialService
         ])->save();
         $this->sessions->revokeOthers($user, $currentSessionId);
         Notification::route('mail', $old)->notify(new OldEmailChangedNotification);
+        Notification::route('mail', $email)->notify(new NewEmailChangedNotification);
         $user->sendEmailVerificationNotification();
     }
 

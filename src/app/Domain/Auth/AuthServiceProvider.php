@@ -43,6 +43,7 @@ final class AuthServiceProvider extends ServiceProvider
 
         Gate::define('update-privacy', fn (User $user): bool => $user->hasVerifiedEmail() && $user->status->canWrite());
         Gate::define('manage-own-sessions', fn (User $user): bool => $user->status->canAuthenticate());
+        Gate::define('manage-own-notifications', fn (User $user): bool => $user->status->canAuthenticate());
         Gate::define('manage-own-credentials', fn (User $user): bool => $user->status->canWrite());
         Gate::define('request-own-deletion', fn (User $user): bool => $user->status->canWrite());
         Gate::define('cancel-own-deletion', fn (User $user): bool => $user->status === UserStatus::PendingDeletion);

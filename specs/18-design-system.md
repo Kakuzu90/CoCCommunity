@@ -411,8 +411,13 @@ Always shows a persistent, dismissible **"we do not handle payments"** banner on
 interstitial before a first order.
 
 ### Notifications (`/notifications`)
-Grouped list, unread highlighted with a gold left border, filter tabs by category, mark-all-read.
-*Empty:* "You're all caught up" with an illustration.
+Chronological rows, with unread entries on a raised navy surface and an explicit gold “Unread” label,
+category filters, pagination, and mark-all-read. Grouped social entries arrive with Notifications v2.
+*Empty:* "You're all caught up" with the existing bell icon. The bell includes loading, offline,
+database-error/retry and empty states; its popup closes with Escape or an outside click.
+Signed-in compact headers retain the brand mark and accessible full name below 1024px. Tablet
+navigation already includes Search, so the duplicate search icon is omitted to keep the bell and
+account control within the viewport.
 
 ### Settings (`/settings/*`)
 Sub-nav (Profile · Privacy · Accounts · Security · Notifications · Danger zone) with plain, dense

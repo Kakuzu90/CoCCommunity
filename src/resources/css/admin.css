@@ -72,8 +72,8 @@
 .adm-status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
 .adm-status[data-status="active"] { color: var(--state-success); background: color-mix(in srgb, var(--state-success) 14%, transparent); }
 .adm-status[data-status="restricted"] { color: var(--state-warning); background: color-mix(in srgb, var(--state-warning) 14%, transparent); }
-.adm-status[data-status="suspended"] { color: var(--state-danger); background: color-mix(in srgb, var(--state-danger) 14%, transparent); }
-.adm-status[data-status="banned"] { color: var(--state-danger); background: color-mix(in srgb, var(--state-danger) 20%, transparent); }
+.adm-status[data-status="suspended"] { color: var(--text-danger); background: color-mix(in srgb, var(--state-danger) 14%, transparent); }
+.adm-status[data-status="banned"] { color: var(--text-danger); background: color-mix(in srgb, var(--state-danger) 20%, transparent); }
 .adm-status[data-status="pending_deletion"] { color: var(--text-muted); background: color-mix(in srgb, var(--text-muted) 14%, transparent); }
 
 .adm-role { font-size: var(--text-xs); color: var(--text-secondary); text-transform: uppercase; letter-spacing: .04em; }

@@ -12,6 +12,8 @@ use App\Domain\Moderation\Enums\ReasonCode;
 use App\Domain\Moderation\Enums\SanctionType;
 use App\Domain\Moderation\Models\ModerationAction;
 use App\Domain\Moderation\Models\UserSanction;
+use App\Domain\Notifications\Enums\NoticeKind;
+use App\Domain\Notifications\Events\NoticeRequested;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -100,6 +102,13 @@ final class SanctionService
                 ],
             );
 
+            event(new NoticeRequested($targetId, match ($type) {
+                SanctionType::Warning => NoticeKind::Warning,
+                SanctionType::Restriction => NoticeKind::Restricted,
+                SanctionType::Suspension => NoticeKind::Suspended,
+                SanctionType::Ban => NoticeKind::Banned,
+            }));
+
             return new SanctionResult(
                 sanctionId: $sanction->id,
                 targetUsername: $change->targetUsername,
@@ -151,6 +160,8 @@ final class SanctionService
                 after: ['status' => $change->after->value],
                 metadata: ['reason' => $reason],
             );
+
+            event(new NoticeRequested($targetId, NoticeKind::SanctionLifted));
 
             return new SanctionResult(
                 sanctionId: $action->id,

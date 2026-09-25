@@ -227,6 +227,102 @@ const directImageUploader = (collection, maxSizeMb) => ({
 Alpine.data('avatarUploader', () => directImageUploader('avatar', 2));
 Alpine.data('accountImageUploader', () => directImageUploader('account_image', 5));
 
+Alpine.data('baseComposer', () => ({
+    items: [], linkFeedback: '',
+    get pendingCount() { return this.items.filter(item => ['uploading', 'processing'].includes(item.status)).length; },
+    get failedCount() { return this.items.filter(item => item.status === 'failed').length; },
+    init() {
+        const old = this.$el.dataset.oldScreenshots.split(',').filter(Boolean);
+        const draft = this.$el.dataset.hasErrors === '1' ? null : this.readDraft();
+        const ids = old.length ? old : (draft?.screenshots || []);
+        this.items = ids.map((ulid, index) => ({ key: ulid, name: `Saved screenshot ${index + 1}`, file: null, status: 'ready', progress: 100, error: '', ulid }));
+        if (draft && this.$el.dataset.hasErrors !== '1') {
+            for (const [name, value] of Object.entries(draft.fields || {})) {
+                const controls = this.$el.querySelectorAll(`[name="${name}"]`);
+                for (const control of controls) {
+                    if (control.type === 'radio') control.checked = control.value === value;
+                    else control.value = value;
+                }
+            }
+        }
+        this.checkLink(this.$el.querySelector('[name="base_link"]')?.value || '');
+    },
+    readDraft() {
+        try { return JSON.parse(localStorage.getItem('clashcommons-base-draft') || 'null'); }
+        catch { return null; }
+    },
+    saveDraft() {
+        const fields = {};
+        for (const control of this.$el.querySelectorAll('input[name], textarea[name], select[name]')) {
+            if (['hidden', 'file'].includes(control.type) || (control.type === 'radio' && !control.checked)) continue;
+            fields[control.name] = control.value;
+        }
+        try { localStorage.setItem('clashcommons-base-draft', JSON.stringify({ fields, screenshots: this.items.filter(item => item.status === 'ready').map(item => item.ulid) })); }
+        catch { /* Private browsing may block local storage; publishing still works. */ }
+    },
+    checkLink(value) {
+        if (!value.trim()) { this.linkFeedback = ''; return; }
+        try {
+            const url = new URL(value);
+            this.linkFeedback = url.protocol === 'https:' && url.hostname === 'link.clashofclans.com'
+                && url.searchParams.get('action') === 'OpenLayout' && !!url.searchParams.get('id')
+                ? 'OpenLayout link detected. The layout ID will be checked when you publish.'
+                : 'Use a base link copied from Clash of Clans.';
+        } catch { this.linkFeedback = 'Use a base link copied from Clash of Clans.'; }
+    },
+    addTag(tag) {
+        const field = this.$el.querySelector('[name="tags_text"]');
+        const tags = field.value.split(',').map(value => value.trim()).filter(Boolean);
+        if (!tags.includes(tag) && tags.length < 10) tags.push(tag);
+        field.value = tags.join(', ');
+        this.saveDraft();
+    },
+    addFiles(files) {
+        for (const file of Array.from(files)) {
+            if (this.items.length >= 2) break;
+            const item = { key: crypto.randomUUID(), name: file.name, file, status: 'uploading', progress: 0, error: '', ulid: '' };
+            this.items.push(item);
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+                item.status = 'failed'; item.error = 'Choose a JPG, PNG or WebP image up to 5 MB.'; item.file = null;
+            } else this.upload(item);
+        }
+    },
+    async upload(item) {
+        item.status = 'uploading'; item.error = ''; item.progress = 0;
+        try {
+            const ticket = await this.post('/uploads/intent', { collection: 'base_screenshot', filename: item.file.name, size: item.file.size, mime: item.file.type });
+            await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('PUT', ticket.upload_url);
+                for (const [name, value] of Object.entries(ticket.headers)) xhr.setRequestHeader(name, value);
+                xhr.upload.onprogress = event => { if (event.lengthComputable) item.progress = Math.round(event.loaded / event.total * 100); };
+                xhr.onload = () => xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error('Upload failed'));
+                xhr.onerror = () => reject(new Error('Upload failed'));
+                xhr.send(item.file);
+            });
+            item.status = 'processing';
+            for (let attempt = 0; attempt < 60; attempt++) {
+                const result = await this.post(`/uploads/${ticket.media_ulid}/complete`, {});
+                if (result.status === 'ready') {
+                    item.status = 'ready'; item.ulid = ticket.media_ulid; item.file = null; this.saveDraft(); return;
+                }
+                if (['failed', 'quarantined'].includes(result.status)) throw new Error('That image could not be processed.');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            throw new Error('Processing is taking longer than expected. Retry the upload.');
+        } catch (error) {
+            item.status = 'failed'; item.error = error.message || 'Upload failed. Please try again.';
+        }
+    },
+    retry(item) { if (item.file) this.upload(item); },
+    remove(item) { this.items = this.items.filter(candidate => candidate.key !== item.key); this.saveDraft(); },
+    async post(url, body) {
+        const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '' }, body: JSON.stringify(body) });
+        if (!response.ok) throw new Error('Upload failed. Please try again.');
+        return response.json();
+    },
+}));
+
 // Free-text tag entry (profile languages): type a value and press Enter to add a removable chip.
 // Each chip is mirrored to a hidden input so the form posts a plain `name[]` array.
 Alpine.data('tagInput', ({ tags = [], max = 5, maxLength = 30 } = {}) => ({

@@ -78,7 +78,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] Profile v2
 
 ### Phase 3 — Bases + moderation (MVP ships here)
-- [ ] Publishing + composer
+- [x] Publishing + composer
 - [ ] Video processing
 - [ ] Feed, trending, landing pages
 - [ ] Likes, bookmarks, comments, counters

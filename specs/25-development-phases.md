@@ -271,11 +271,16 @@ user input, files, or crosses a trust boundary.
 |---|---|---|
 | Publishing + composer | [07](07-database-schema.md) (bases), [10](10-media-storage.md), [18 §6](18-design-system.md) | [23 §3](23-edge-cases.md) |
 | Video processing | [10 §6, §11](10-media-storage.md), [20](20-jobs-and-scheduling.md) | [03 §1](03-non-functional-requirements.md) |
+
 | Feed, trending, landing pages | [17](17-search-and-discovery.md), [21](21-caching-strategy.md) | [20](20-jobs-and-scheduling.md), [22 §6](22-scaling.md) |
 | Likes, bookmarks, comments, counters | [07](07-database-schema.md), [08 §5](08-entity-relationships.md) | [16](16-notifications.md) |
 | Search v1 | [17](17-search-and-discovery.md), [07](07-database-schema.md) | [21](21-caching-strategy.md) |
 | Moderation v1 | [12](12-moderation-system.md), [07](07-database-schema.md) (moderation) | [16](16-notifications.md), [04](04-roles-and-permissions.md) |
 | SEO surfaces | [17 §6](17-search-and-discovery.md), [18](18-design-system.md) | — |
+
+The publishing task wires the optional video attachment and media-ready transition. The separate
+video-processing task enables `base_video` upload intents, transcode/poster generation, and the
+composer's replay-video control.
 
 ### Phases 4–6
 

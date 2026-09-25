@@ -351,7 +351,7 @@ that every feed query reads.
 **Indexes:** `(trending_score DESC)`, `(likes_count DESC)`, `(copies_count DESC)`.
 
 ### `base_tags` [M]
-`id`, `name (citext, unique)`, `slug (unique)`, `usage_count`, `is_suggested (bool)`,
+`id`, `name (stored lowercase, 24 chars)`, `slug (unique)`, `usage_count`, `is_suggested (bool)`,
 `is_blocked (bool)`, `created_by null`.
 **Index:** `(usage_count DESC) WHERE NOT is_blocked`.
 
@@ -360,6 +360,10 @@ Pivot. `base_layout_id`, `base_tag_id`, PK on both, cascade both ways. Index on 
 
 > Kept as a simple pivot rather than a polymorphic `taggables` table: only bases are tagged in the
 > MVP, and a polymorphic pivot costs index efficiency for a generality we don't need yet.
+
+The Phase 3 publishing migration stores normalised lowercase names and uses the unique slug for
+case-insensitive tag identity on both SQLite and PostgreSQL. The generated `search_vector` and its
+GIN index are added with Search v1, when tag snapshots and indexing are implemented.
 
 ### `base_likes` [M]
 `id`, `base_layout_id (FK, cascade)`, `user_id (FK, cascade)`, `created_at`.

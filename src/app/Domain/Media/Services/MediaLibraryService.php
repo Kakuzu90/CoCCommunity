@@ -3,6 +3,7 @@
 namespace App\Domain\Media\Services;
 
 use App\Domain\Media\Contracts\MediaLibrary;
+use App\Domain\Media\Data\MediaAttachment;
 use App\Domain\Media\Data\MediaImage;
 use App\Domain\Media\Enums\MediaCollection;
 use App\Domain\Media\Enums\MediaStatus;
@@ -23,7 +24,7 @@ class MediaLibraryService implements MediaLibrary
 
     public function __construct(private readonly MediaUrlResolver $urls) {}
 
-    public function attach(Authenticatable $user, string $ulid, MediaCollection $collection, Model $attachable): int
+    public function attach(Authenticatable $user, string $ulid, MediaCollection $collection, Model $attachable, int $position = 0): int
     {
         $media = Media::query()
             ->where('ulid', $ulid)
@@ -43,10 +44,28 @@ class MediaLibraryService implements MediaLibrary
 
         $media->attachable_type = $attachable->getMorphClass();
         $media->attachable_id = $attachable->getKey();
+        $media->position = $position;
         $media->expires_at = null; // Attachment makes it permanent (specs/10 §9).
         $media->save();
 
         return $media->id;
+    }
+
+    public function attachmentFor(int $mediaId): ?MediaAttachment
+    {
+        $media = Media::query()->whereKey($mediaId)->first();
+        if ($media === null || $media->attachable_type === null || $media->attachable_id === null) {
+            return null;
+        }
+
+        return new MediaAttachment($media->attachable_type, $media->attachable_id, $media->status);
+    }
+
+    public function allAttachedReady(Model $attachable): bool
+    {
+        return ! Media::query()->where('attachable_type', $attachable->getMorphClass())
+            ->where('attachable_id', $attachable->getKey())
+            ->where('status', '!=', MediaStatus::Ready->value)->exists();
     }
 
     public function resolve(?int $mediaId): ?MediaImage

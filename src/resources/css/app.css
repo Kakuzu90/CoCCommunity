@@ -12,5 +12,6 @@
 @import './notifications.css';
 @import './accounts.css';
 @import './profile.css';
+@import './bases.css';
 @source '../**/*.blade.php';
 @source '../**/*.js';

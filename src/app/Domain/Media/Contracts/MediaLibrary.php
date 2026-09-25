@@ -2,6 +2,7 @@
 
 namespace App\Domain\Media\Contracts;
 
+use App\Domain\Media\Data\MediaAttachment;
 use App\Domain\Media\Data\MediaImage;
 use App\Domain\Media\Enums\MediaCollection;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -20,7 +21,11 @@ interface MediaLibrary
      * Returns the media id. Throws when the media is missing, foreign, the wrong collection, or in a
      * state that cannot be attached.
      */
-    public function attach(Authenticatable $user, string $ulid, MediaCollection $collection, Model $attachable): int;
+    public function attach(Authenticatable $user, string $ulid, MediaCollection $collection, Model $attachable, int $position = 0): int;
+
+    public function attachmentFor(int $mediaId): ?MediaAttachment;
+
+    public function allAttachedReady(Model $attachable): bool;
 
     /** Render-ready view of a processed image, or null when the id is null/missing/not ready. */
     public function resolve(?int $mediaId): ?MediaImage;

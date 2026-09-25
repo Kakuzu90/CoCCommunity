@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Web\AccountImageController;
+use App\Http\Controllers\Web\BaseComposerController;
 use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\PublicProfileController;
 use App\Livewire\Accounts\AccountDetail;
@@ -25,6 +26,13 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 
 Route::get('/accounts/{ulid}', AccountDetail::class)->whereUlid('ulid')->name('accounts.show');
 
+Route::middleware(['auth', 'verified', 'active', 'coc.verified'])->group(function (): void {
+    Route::get('/bases/create', [BaseComposerController::class, 'create'])->name('bases.create');
+    Route::post('/bases', [BaseComposerController::class, 'store'])->middleware('throttle:base-publish')->name('bases.store');
+});
+Route::get('/bases/submitted/{ulid}', [BaseComposerController::class, 'submitted'])
+    ->middleware('auth')->whereUlid('ulid')->name('bases.submitted');
+
 Route::middleware(['auth', 'can:manage-own-notifications'])->group(function (): void {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
@@ -35,10 +43,7 @@ Route::middleware(['auth', 'can:manage-own-notifications'])->group(function (): 
  * Section landing routes exist now so navigation resolves everywhere; each renders the
  * app shell around a placeholder until its phase builds the real surface.
  */
-Route::view('/bases', 'pages.placeholder', [
-    'heading' => 'Base sharing is on the way',
-    'body' => 'Publishing, the feed and trending layouts arrive in Phase 3.',
-])->name('bases.index');
+Route::view('/bases', 'bases.index')->name('bases.index');
 
 Route::view('/recruit', 'pages.placeholder', [
     'heading' => 'Recruitment is coming',

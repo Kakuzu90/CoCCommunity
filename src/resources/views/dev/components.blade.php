@@ -438,21 +438,32 @@
                         <p class="account-name">Barch Enjoyer</p>
                         <p class="account-tag ui-help">#2PP0LJQ</p>
                     </div>
-                    <p class="account-meta ui-help">Town Hall 15 · 4,280 trophies · Legend League</p>
+                    <div class="account-stats">
+                        <p class="account-meta ui-help">Town Hall 15 · 4,280 trophies · Legend League</p>
+                        <p class="account-sync-age ui-help">Updated 4 minutes ago.</p>
+                    </div>
                     <div class="account-status">
                         <x-ui.badge variant="featured">Featured</x-ui.badge>
                         <x-ui.pill tone="primary">Verified</x-ui.pill>
                     </div>
-                    <div class="account-actions"><x-ui.button variant="ghost" size="sm">Detach</x-ui.button></div>
+                    <div class="account-actions">
+                        <a class="ui-button" data-variant="secondary" data-size="sm" href="#player-accounts">View player</a>
+                        <x-ui.button variant="secondary" size="sm">Refresh</x-ui.button>
+                        <x-ui.button variant="danger" size="sm" class="account-detach-trigger">Detach</x-ui.button>
+                    </div>
                 </article>
                 <article class="account-row">
                     <div class="account-identity">
                         <p class="account-name">Second Base</p>
                         <p class="account-tag ui-help">#9VU2LY0</p>
                     </div>
-                    <p class="account-meta ui-help">Town Hall 12 · 2,100 trophies</p>
+                    <div class="account-stats"><p class="account-meta ui-help">Town Hall 12 · 2,100 trophies</p></div>
                     <div class="account-status"><x-ui.pill tone="neutral">Unverified</x-ui.pill></div>
-                    <div class="account-actions"><x-ui.button variant="ghost" size="sm">Detach</x-ui.button></div>
+                    <div class="account-actions">
+                        <a class="ui-button" data-variant="secondary" data-size="sm" href="#player-accounts">View player</a>
+                        <x-ui.button variant="secondary" size="sm">Refresh</x-ui.button>
+                        <x-ui.button variant="danger" size="sm" class="account-detach-trigger">Detach</x-ui.button>
+                    </div>
                 </article>
             </div>
             <p class="gallery-caption mt-3">Status pill tones: <x-ui.pill tone="primary">Verified</x-ui.pill> <x-ui.pill tone="neutral">Unverified</x-ui.pill> <x-ui.pill tone="warning">Under review</x-ui.pill> <x-ui.pill tone="danger">Suspended</x-ui.pill></p>

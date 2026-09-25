@@ -39,7 +39,8 @@
                 </div>
             </form>
         @else
-            <div class="accounts-confirm" wire:key="confirm-{{ $preview['tag'] }}">
+            <div class="accounts-confirm" wire:key="confirm-{{ $preview['tag'] }}"
+                x-data x-init="$nextTick(() => document.getElementById('token')?.focus())">
                 <h2 id="attach-heading">Is this you?</h2>
 
                 <x-ui.card class="account-preview">
@@ -100,7 +101,8 @@
                     <x-ui.input id="token" label="In-game API token" wire:model="token"
                         :error="$errors->first('token')"
                         hint="Tokens expire after a few minutes. Copy a fresh one right before you paste."
-                        autocomplete="off" spellcheck="false" />
+                        autocomplete="off" spellcheck="false"
+                        x-data x-init="$nextTick(() => $el.focus())" />
                     <div class="settings-actions">
                         <x-ui.button type="submit" wire:target="verify" wire:loading.attr="disabled">
                             <span wire:loading.remove wire:target="verify">Verify ownership</span>
@@ -123,14 +125,16 @@
                     <p class="account-tag ui-help">{{ $account->tag }}</p>
                 </div>
 
-                <p class="account-meta ui-help">
-                    Town Hall {{ $account->thLevel }} · {{ number_format($account->trophies) }} trophies{{ $account->leagueName ? ' · '.$account->leagueName : '' }}
-                </p>
-                @if($account->syncedAtIso)
-                    <p class="account-sync-age ui-help" @if($account->stale) role="status" @endif>
-                        {{ $account->stale ? 'Game data unavailable. Showing saved data from ' : 'Updated ' }}<time datetime="{{ $account->syncedAtIso }}">{{ $account->syncedAge }}</time>.
+                <div class="account-stats">
+                    <p class="account-meta ui-help">
+                        Town Hall {{ $account->thLevel }} · {{ number_format($account->trophies) }} trophies{{ $account->leagueName ? ' · '.$account->leagueName : '' }}
                     </p>
-                @endif
+                    @if($account->syncedAtIso)
+                        <p class="account-sync-age ui-help" @if($account->stale) role="status" @endif>
+                            {{ $account->stale ? 'Game data unavailable. Showing saved data from ' : 'Updated ' }}<time datetime="{{ $account->syncedAtIso }}">{{ $account->syncedAge }}</time>.
+                        </p>
+                    @endif
+                </div>
 
                 <div class="account-status">
                     @if($account->isFeatured)<x-ui.badge variant="featured">Featured</x-ui.badge>@endif
@@ -138,31 +142,33 @@
                 </div>
 
                 <div class="account-actions">
-                    <a class="account-detail-link" href="{{ route('accounts.show', $account->ulid) }}">View player</a>
-                    @if($confirmingDetachId === $account->id)
-                        <form wire:submit="detach" class="account-detach">
-                            <x-ui.input id="detach-password-{{ $account->id }}" type="password"
-                                label="Confirm your password to release this account" wire:model="password"
-                                :error="$errors->first('password')" autocomplete="current-password" />
-                            <div class="settings-actions">
-                                <x-ui.button type="submit" variant="danger" size="sm"
-                                    wire:target="detach" wire:loading.attr="disabled">Release account</x-ui.button>
-                                <x-ui.button type="button" variant="ghost" size="sm" wire:click="cancelDetach">Keep it</x-ui.button>
-                            </div>
-                        </form>
-                    @else
-                        @if(in_array($account->status->value, ['verified', 'unverified'], true))
-                            <x-ui.button type="button" variant="ghost" size="sm"
-                                wire:click="refreshAccount({{ $account->id }})"
-                                wire:target="refreshAccount({{ $account->id }})" wire:loading.attr="disabled">
-                                <span wire:loading.remove wire:target="refreshAccount({{ $account->id }})">Refresh</span>
-                                <span wire:loading wire:target="refreshAccount({{ $account->id }})">Refreshing…</span>
-                            </x-ui.button>
-                        @endif
-                        <x-ui.button type="button" variant="ghost" size="sm"
+                    <a class="ui-button" data-variant="secondary" data-size="sm" href="{{ route('accounts.show', $account->ulid) }}">View player</a>
+                    @if(in_array($account->status->value, ['verified', 'unverified'], true))
+                        <x-ui.button type="button" variant="secondary" size="sm"
+                            wire:click="refreshAccount({{ $account->id }})"
+                            wire:target="refreshAccount({{ $account->id }})" wire:loading.attr="disabled">
+                            <span wire:loading.remove wire:target="refreshAccount({{ $account->id }})">Refresh</span>
+                            <span wire:loading wire:target="refreshAccount({{ $account->id }})">Refreshing…</span>
+                        </x-ui.button>
+                    @endif
+                    @if($confirmingDetachId !== $account->id)
+                        <x-ui.button type="button" variant="danger" size="sm" class="account-detach-trigger"
                             wire:click="confirmDetach({{ $account->id }})">Detach</x-ui.button>
                     @endif
                 </div>
+
+                @if($confirmingDetachId === $account->id)
+                    <form wire:submit="detach" class="account-detach">
+                        <x-ui.input id="detach-password-{{ $account->id }}" type="password"
+                            label="Confirm your password to release this account" wire:model="password"
+                            :error="$errors->first('password')" autocomplete="current-password" />
+                        <div class="settings-actions">
+                            <x-ui.button type="submit" variant="danger" size="sm"
+                                wire:target="detach" wire:loading.attr="disabled">Release account</x-ui.button>
+                            <x-ui.button type="button" variant="ghost" size="sm" wire:click="cancelDetach">Keep it</x-ui.button>
+                        </div>
+                    </form>
+                @endif
             </article>
         @empty
             <x-ui.empty-state title="No accounts attached yet"

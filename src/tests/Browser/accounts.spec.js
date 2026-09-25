@@ -46,6 +46,12 @@ test('attach + token verification flow resolves and detaches', async ({ page }) 
     await expect(row.getByText('Verified', { exact: true })).toBeVisible();
     await expect(row.getByText('Featured', { exact: true })).toBeVisible();
 
+    await row.getByRole('button', { name: 'Refresh', exact: true }).click();
+    await expect(page.getByRole('status').filter({ hasText: 'Game data refreshed.' })).toBeVisible();
+    await expect(row.getByText(/Updated .* ago/)).toBeVisible();
+    await row.getByRole('button', { name: 'Refresh', exact: true }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'refreshed recently' })).toBeVisible();
+
     // No horizontal overflow across phone, landscape and tablet widths.
     for (const viewport of [{ width: 375, height: 812 }, { width: 812, height: 375 }, { width: 768, height: 1024 }]) {
         await page.setViewportSize(viewport);

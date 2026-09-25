@@ -129,7 +129,7 @@ tier, and the scheduler picks due rows.
 | `hot` | Owner active in the last 7 days, or account viewed in the last 24 h, or featured | 2 hours |
 | `warm` | Verified, owner active in the last 30 days | 12 hours |
 | `cold` | Everything else verified | 72 hours |
-| `frozen` | 5+ consecutive failures, or account not found | 7 days, then stop and flag |
+| `frozen` | 5+ consecutive failures, including repeated not-found responses | 7 days, then stop and flag if the retry fails |
 
 Unverified accounts are **not** background-synced at all — only on manual refresh. They are not
 trusted data and not worth the budget.
@@ -153,6 +153,16 @@ trusted data and not worth the budget.
 Rate-limited to 1 per 10 minutes per account (FR-COC-9), executed **synchronously** with a 3-second
 timeout so the user sees the result; on timeout it falls back to dispatching a job and showing
 "refreshing in the background".
+
+**Phase 2 implementation:** Verification seeds the sync state and first snapshot. The scheduler
+also seeds missing states for previously verified rows, then dispatches due accounts within the
+remaining background minute budget. Forced refresh bypasses the short-lived player cache, so a
+cached response cannot count as a successful sync; ordinary reads still use stale-while-error.
+A 404 becomes a display-only stale flag after three consecutive not-found responses, with one
+owner notice. Ownership remains verified. A fifth failure enters the frozen tier; one failed
+weekly retry sets `flagged` and stops automatic scheduling. Manual refresh can recover it.
+`coc:compact-snapshots` retains all changes for 90 days, then one per day up to a year and one
+per week afterward, always keeping the latest fallback snapshot.
 
 ## 7. Failure handling
 

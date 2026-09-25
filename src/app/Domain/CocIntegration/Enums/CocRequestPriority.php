@@ -10,9 +10,10 @@ enum CocRequestPriority: string
 {
     case Interactive = 'interactive';
     case Background = 'background';
+    case Manual = 'manual';
 
     public function limiterKey(): string
     {
-        return 'coc-'.$this->value;
+        return $this === self::Manual ? 'coc-interactive' : 'coc-'.$this->value;
     }
 }

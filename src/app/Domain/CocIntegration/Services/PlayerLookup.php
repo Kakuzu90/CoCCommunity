@@ -6,6 +6,7 @@ use App\Domain\CocIntegration\Contracts\CocApiClient;
 use App\Domain\CocIntegration\Data\PlayerData;
 use App\Domain\CocIntegration\Enums\CocRequestPriority;
 use App\Domain\CocIntegration\Exceptions\CocApiException;
+use App\Domain\CocIntegration\Http\CachedCocApiClient;
 use App\Support\ValueObjects\PlayerTag;
 
 /**
@@ -22,6 +23,15 @@ final readonly class PlayerLookup
      */
     public function find(PlayerTag $tag, CocRequestPriority $priority = CocRequestPriority::Interactive): PlayerData
     {
+        return $this->client->player($tag, $priority);
+    }
+
+    public function refresh(PlayerTag $tag, CocRequestPriority $priority = CocRequestPriority::Background): PlayerData
+    {
+        if ($this->client instanceof CachedCocApiClient) {
+            return $this->client->refresh($tag, $priority);
+        }
+
         return $this->client->player($tag, $priority);
     }
 }

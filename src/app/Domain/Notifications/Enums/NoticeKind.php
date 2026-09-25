@@ -17,6 +17,7 @@ enum NoticeKind: string
     case TagReleased = 'tag_released';
     case DisputeOpened = 'dispute_opened';
     case DisputeDecided = 'dispute_decided';
+    case AccountNotFound = 'account_not_found';
 
     public function title(): string
     {
@@ -34,6 +35,7 @@ enum NoticeKind: string
             self::TagReleased => 'Account released',
             self::DisputeOpened => 'Ownership dispute opened on your account',
             self::DisputeDecided => 'An ownership dispute was decided',
+            self::AccountNotFound => 'We could not find your game account',
         };
     }
 
@@ -53,6 +55,7 @@ enum NoticeKind: string
             self::TagReleased => 'A Clash of Clans account was released from your profile.',
             self::DisputeOpened => 'Someone opened an ownership dispute for one of your verified accounts. Respond within 7 days: the fastest way to end it is to re-verify with a fresh in-game token.',
             self::DisputeDecided => 'A moderator reviewed an ownership dispute involving your account. Open your disputes to see the decision.',
+            self::AccountNotFound => 'The game API could not find your player tag on three checks. Your verification remains in place. Review your attached accounts and try refreshing later.',
         };
     }
 
@@ -60,7 +63,7 @@ enum NoticeKind: string
     {
         return match ($this) {
             self::Warning, self::Restricted, self::SanctionLifted => 'moderation',
-            self::AccountVerified, self::TagReleased => 'account',
+            self::AccountVerified, self::TagReleased, self::AccountNotFound => 'account',
             self::DisputeOpened, self::DisputeDecided => 'account',
             default => 'security',
         };
@@ -77,7 +80,7 @@ enum NoticeKind: string
     {
         return match ($this) {
             self::PasswordChanged, self::NewSignIn => 'settings.sessions.index',
-            self::AccountVerified, self::AccountSuperseded, self::TagReleased => 'accounts.index',
+            self::AccountVerified, self::AccountSuperseded, self::TagReleased, self::AccountNotFound => 'accounts.index',
             self::DisputeOpened, self::DisputeDecided => 'accounts.disputes.index',
             self::EmailVerified, self::SanctionLifted => 'home',
             default => null,

@@ -58,14 +58,14 @@ final class DisputeQuery
      */
     public function queue(?DisputeStatus $status = null, int $perPage = 20): LengthAwarePaginator
     {
-        $paginator = CocAccountDispute::query()
-            ->when(
-                $status !== null,
-                fn ($q) => $q->where('status', $status->value),
-                fn ($q) => $q->whereIn('status', DisputeStatus::liveValues()),
-            )
-            ->orderByDesc('created_at')
-            ->paginate($perPage);
+        $query = CocAccountDispute::query();
+        if ($status !== null) {
+            $query->where('status', $status->value);
+        } else {
+            $query->whereIn('status', DisputeStatus::liveValues());
+        }
+
+        $paginator = $query->orderByDesc('created_at')->paginate($perPage);
 
         $names = $this->names($paginator->getCollection());
 

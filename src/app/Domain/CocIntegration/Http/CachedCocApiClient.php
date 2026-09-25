@@ -54,6 +54,17 @@ final class CachedCocApiClient implements CocApiClient
         return $this->inner->verifyToken($tag, $token);
     }
 
+    public function refresh(PlayerTag $tag, CocRequestPriority $priority): PlayerData
+    {
+        $id = ltrim($tag->value, '#');
+        $player = $this->inner->player($tag, $priority);
+        $this->cache->forget("coc:404:{$id}");
+        $this->cache->put("coc:player:{$id}", $player, (int) config('coc.cache.player_ttl'));
+        $this->cache->put("coc:player:{$id}:last", $player, (int) config('coc.cache.stale_ttl'));
+
+        return $player;
+    }
+
     /** Drop the cached player and negative marker so the next lookup hits the API (manual refresh). */
     public function forget(PlayerTag $tag): void
     {

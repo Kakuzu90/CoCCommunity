@@ -95,6 +95,36 @@ return [
         'retention_days' => (int) env('COC_REQUEST_LOG_RETENTION_DAYS', 7),
     ],
 
+    'sync' => [
+        'queue' => env('COC_SYNC_QUEUE', 'sync'),
+        'tries' => (int) env('COC_SYNC_TRIES', 3),
+        'backoff' => [
+            (int) env('COC_SYNC_BACKOFF_FIRST', 60),
+            (int) env('COC_SYNC_BACKOFF_SECOND', 300),
+            (int) env('COC_SYNC_BACKOFF_THIRD', 900),
+        ],
+        'overlap_seconds' => (int) env('COC_SYNC_OVERLAP_SECONDS', 65),
+        'batch_size' => (int) env('COC_SYNC_BATCH_SIZE', 200),
+        'scheduler_seconds' => (int) env('COC_SYNC_SCHEDULER_SECONDS', 300),
+        'unique_seconds' => (int) env('COC_SYNC_UNIQUE_SECONDS', 60),
+        'retry_seconds' => (int) env('COC_SYNC_RETRY_SECONDS', 60),
+        'not_found_stale_after' => (int) env('COC_SYNC_NOT_FOUND_STALE_AFTER', 3),
+        'freeze_after' => (int) env('COC_SYNC_FREEZE_AFTER', 5),
+        'hot_owner_days' => (int) env('COC_SYNC_HOT_OWNER_DAYS', 7),
+        'warm_owner_days' => (int) env('COC_SYNC_WARM_OWNER_DAYS', 30),
+        'hot_view_hours' => (int) env('COC_SYNC_HOT_VIEW_HOURS', 24),
+        'manual_cooldown_seconds' => (int) env('COC_REFRESH_COOLDOWN_SECONDS', 600),
+        'manual_timeout_seconds' => (int) env('COC_REFRESH_TIMEOUT_SECONDS', 3),
+        'snapshot_full_days' => (int) env('COC_SNAPSHOT_FULL_DAYS', 90),
+        'snapshot_daily_days' => (int) env('COC_SNAPSHOT_DAILY_DAYS', 365),
+        'tiers' => [
+            'hot' => (int) env('COC_SYNC_HOT_SECONDS', 7200),
+            'warm' => (int) env('COC_SYNC_WARM_SECONDS', 43200),
+            'cold' => (int) env('COC_SYNC_COLD_SECONDS', 259200),
+            'frozen' => (int) env('COC_SYNC_FROZEN_SECONDS', 604800),
+        ],
+    ],
+
     /*
      * Automated key rotation via the developer portal (specs/09 §3). Disabled by default: it needs
      * portal credentials (blocked on the operator) and a stable egress IP. Off → the documented

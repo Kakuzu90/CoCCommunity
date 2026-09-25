@@ -16,6 +16,9 @@
     @if($flash !== '')
         <x-ui.alert tone="success" wire:key="accounts-flash">{{ $flash }}</x-ui.alert>
     @endif
+    @error('refresh')
+        <x-ui.alert tone="danger" wire:key="accounts-refresh-error">{{ $message }}</x-ui.alert>
+    @enderror
 
     <section class="settings-card accounts-attach" aria-labelledby="attach-heading">
         @if($preview === null)
@@ -123,6 +126,11 @@
                 <p class="account-meta ui-help">
                     Town Hall {{ $account->thLevel }} · {{ number_format($account->trophies) }} trophies{{ $account->leagueName ? ' · '.$account->leagueName : '' }}
                 </p>
+                @if($account->syncedAtIso)
+                    <p class="account-sync-age ui-help" @if($account->stale) role="status" @endif>
+                        {{ $account->stale ? 'Game data unavailable. Showing saved data from ' : 'Updated ' }}<time datetime="{{ $account->syncedAtIso }}">{{ $account->syncedAge }}</time>.
+                    </p>
+                @endif
 
                 <div class="account-status">
                     @if($account->isFeatured)<x-ui.badge variant="featured">Featured</x-ui.badge>@endif
@@ -142,6 +150,14 @@
                             </div>
                         </form>
                     @else
+                        @if(in_array($account->status->value, ['verified', 'unverified'], true))
+                            <x-ui.button type="button" variant="ghost" size="sm"
+                                wire:click="refreshAccount({{ $account->id }})"
+                                wire:target="refreshAccount({{ $account->id }})" wire:loading.attr="disabled">
+                                <span wire:loading.remove wire:target="refreshAccount({{ $account->id }})">Refresh</span>
+                                <span wire:loading wire:target="refreshAccount({{ $account->id }})">Refreshing…</span>
+                            </x-ui.button>
+                        @endif
                         <x-ui.button type="button" variant="ghost" size="sm"
                             wire:click="confirmDetach({{ $account->id }})">Detach</x-ui.button>
                     @endif

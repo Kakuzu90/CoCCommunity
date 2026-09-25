@@ -2,16 +2,20 @@
 
 namespace App\Livewire\Accounts;
 
+use App\Domain\CocIntegration\Exceptions\CocApiException;
+use App\Domain\PlayerAccounts\Enums\RefreshOutcome;
 use App\Domain\PlayerAccounts\Exceptions\AccountAttachException;
 use App\Domain\PlayerAccounts\Exceptions\DisputeException;
 use App\Domain\PlayerAccounts\Queries\PlayerAccountQuery;
 use App\Domain\PlayerAccounts\Services\AccountAttachService;
 use App\Domain\PlayerAccounts\Services\AccountDetachService;
 use App\Domain\PlayerAccounts\Services\DisputeService;
+use App\Domain\PlayerAccounts\Services\ManualAccountRefresh;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
+use RuntimeException;
 
 /**
  * The attach + token-verification surface (specs/13 §3, §6, specs/18 §6). Two-step by design: look the
@@ -164,6 +168,25 @@ final class ManageAccounts extends Component
 
         $this->flash = 'That account has been released.';
         $this->reset('password', 'confirmingDetachId');
+    }
+
+    public function refreshAccount(int $id, ManualAccountRefresh $service): void
+    {
+        $this->authorize('manage-own-coc-accounts');
+
+        try {
+            $outcome = $service->refresh($this->userId(), $id);
+            $this->flash = $outcome === RefreshOutcome::Queued
+                ? 'The game API was slow. Your account will refresh in the background.'
+                : 'Game data refreshed.';
+            $this->resetErrorBag('refresh');
+        } catch (CocApiException $exception) {
+            $this->addError('refresh', $exception->isNotFound()
+                ? 'The game API could not find this player tag. Your verification is unchanged.'
+                : 'The game API is unavailable. Your saved account data is still available.');
+        } catch (RuntimeException $exception) {
+            $this->addError('refresh', $exception->getMessage());
+        }
     }
 
     public function render(PlayerAccountQuery $accounts): View

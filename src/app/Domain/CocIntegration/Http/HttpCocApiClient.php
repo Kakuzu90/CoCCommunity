@@ -31,7 +31,10 @@ final class HttpCocApiClient implements CocApiClient
 
     public function player(PlayerTag $tag, CocRequestPriority $priority = CocRequestPriority::Interactive): PlayerData
     {
-        $json = $this->get('/players/'.$tag->encoded(), $tag->value);
+        $timeout = $priority === CocRequestPriority::Manual
+            ? (int) config('coc.sync.manual_timeout_seconds')
+            : (int) config('coc.timeouts.total');
+        $json = $this->get('/players/'.$tag->encoded(), $tag->value, $timeout);
 
         if (! isset($json['tag'])) {
             throw new CocApiException(CocErrorReason::Malformed, "Malformed player payload for {$tag->value}.", 200);
@@ -57,9 +60,9 @@ final class HttpCocApiClient implements CocApiClient
     /**
      * @return array<string, mixed>
      */
-    private function get(string $path, string $tagForMessage): array
+    private function get(string $path, string $tagForMessage, int $timeout): array
     {
-        return $this->send('GET', $path, null, $tagForMessage);
+        return $this->send('GET', $path, null, $tagForMessage, $timeout);
     }
 
     /**
@@ -68,7 +71,7 @@ final class HttpCocApiClient implements CocApiClient
      */
     private function post(string $path, array $body, string $tagForMessage): array
     {
-        return $this->send('POST', $path, $body, $tagForMessage);
+        return $this->send('POST', $path, $body, $tagForMessage, (int) config('coc.timeouts.total'));
     }
 
     /**
@@ -77,7 +80,7 @@ final class HttpCocApiClient implements CocApiClient
      * @param  array<string, mixed>|null  $body
      * @return array<string, mixed>
      */
-    private function send(string $method, string $path, ?array $body, string $tagForMessage): array
+    private function send(string $method, string $path, ?array $body, string $tagForMessage, int $timeout): array
     {
         $attempts = 0;
 
@@ -86,7 +89,7 @@ final class HttpCocApiClient implements CocApiClient
             $key = $this->keys->next();
 
             try {
-                $response = $this->dispatch($method, $path, $body, $key);
+                $response = $this->dispatch($method, $path, $body, $key, $timeout);
             } catch (ConnectionException $e) {
                 throw new CocApiException(CocErrorReason::Timeout, 'The game API did not respond in time.', null, null, $e);
             }
@@ -114,14 +117,14 @@ final class HttpCocApiClient implements CocApiClient
     /**
      * @param  array<string, mixed>|null  $body
      */
-    private function dispatch(string $method, string $path, ?array $body, CocKey $key): Response
+    private function dispatch(string $method, string $path, ?array $body, CocKey $key, int $timeout): Response
     {
         $request = $this->http
             ->baseUrl((string) config('coc.base_url'))
             ->withToken($key->token)
             ->acceptJson()
             ->connectTimeout((int) config('coc.timeouts.connect'))
-            ->timeout((int) config('coc.timeouts.total'));
+            ->timeout($timeout);
 
         return $method === 'POST'
             ? $request->post($path, $body ?? [])

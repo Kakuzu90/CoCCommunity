@@ -138,7 +138,7 @@ final class AccountAttachService
             ?? $rows->first(fn (CocAccount $r): bool => $r->status === CocAccountStatus::Released)
             ?? new CocAccount;
 
-        $account->fill($this->syncData($player));
+        $account->fill(AccountProgression::fromPlayer($player));
         if (! $account->exists) {
             $account->ulid = (string) Str::ulid();
         }
@@ -296,45 +296,5 @@ final class AccountAttachService
             throw AccountAttachException::of(AttachError::RateLimited);
         }
         RateLimiter::hit($key, 3600);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function syncData(PlayerData $player): array
-    {
-        return [
-            'ign' => $player->name,
-            'th_level' => max(1, $player->townHallLevel),
-            'builder_hall_level' => $player->builderHallLevel,
-            'builder_trophies' => $player->builderTrophies,
-            'xp_level' => $player->expLevel,
-            'trophies' => $player->trophies,
-            'best_trophies' => $player->bestTrophies,
-            'war_stars' => $player->warStars,
-            'attack_wins' => $player->attackWins,
-            'defense_wins' => $player->defenseWins,
-            'donations' => $player->donations,
-            'donations_received' => $player->donationsReceived,
-            'clan_tag' => $player->clan?->tag,
-            'clan_role' => $player->clan?->role,
-            'league_id' => $player->league?->id,
-            'league_name' => $player->league?->name,
-            'league_icon_url' => $player->league?->iconUrl,
-            // Store the progression lists straight from the API payload so nothing is lost in mapping —
-            // label icons and achievements are preserved (specs/09 §8). The per-hero `equipment` loadout
-            // is dropped: every equipment piece already lives in the hero_equipment column.
-            'heroes' => array_map(
-                static fn (mixed $hero): mixed => is_array($hero) ? array_diff_key($hero, ['equipment' => null]) : $hero,
-                $player->raw['heroes'] ?? [],
-            ),
-            'troops' => $player->raw['troops'] ?? [],
-            'spells' => $player->raw['spells'] ?? [],
-            'hero_equipment' => $player->raw['heroEquipment'] ?? [],
-            'labels' => $player->raw['labels'] ?? [],
-            'achievements' => $player->raw['achievements'] ?? [],
-            'raw_payload' => $player->raw,
-            'api_synced_at' => now(),
-        ];
     }
 }

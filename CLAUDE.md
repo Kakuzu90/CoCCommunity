@@ -71,7 +71,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] API client, decorators, key pool
 - [x] Attach + token verification flow
 - [x] Conflicts, disputes, ownership transfer
-- [ ] Tiered sync + snapshots
+- [x] Tiered sync + snapshots
 - [ ] PlayerCard, account detail, progression
 - [ ] Asset pack v1
 - [ ] Profile v2

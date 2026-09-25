@@ -33,3 +33,5 @@ Schedule::command('platform:check-health')->everyFiveMinutes()->onOneServer()->r
 Schedule::command('platform:anonymize-deleted')->dailyAt('03:00')->onOneServer();
 Schedule::command('notifications:prune')->dailyAt('02:15')->onOneServer();
 Schedule::command('coc:prune-api-requests')->dailyAt('02:30')->onOneServer();
+Schedule::command('coc:sync-accounts')->everyFiveMinutes()->withoutOverlapping()->onOneServer();
+Schedule::command('coc:compact-snapshots')->dailyAt('02:45')->withoutOverlapping()->onOneServer();

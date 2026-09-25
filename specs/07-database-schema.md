@@ -149,8 +149,9 @@ Denormalised counters so profile pages are a single row read.
 ## Clash of Clans accounts
 
 > **Implemented (Phase 2 "Attach + token verification flow" and "Conflicts, disputes, ownership
-> transfer").** `coc_accounts`, `coc_account_claims` and `coc_account_disputes` ship now;
-> `coc_account_snapshots` lands with tiered sync, and `clans`/`clan_memberships` with the clan work.
+> transfer", and "Tiered sync + snapshots").** `coc_accounts`, `coc_account_claims`,
+> `coc_account_disputes`, `coc_account_snapshots`, and `sync_states` ship now;
+> `clans`/`clan_memberships` land with the clan work.
 > Portability divergences for the SQLite CI leg: JSON columns use `->jsonb()` (Laravel maps it to `text`
 > on SQLite); the partial unique indexes (`WHERE status = 'verified'`, `WHERE is_featured`, and the
 > disputes' live-per-claimant guard) are created with raw `CREATE UNIQUE INDEX ... WHERE`, which both
@@ -654,8 +655,10 @@ Rolling log of outbound API calls for rate-limit accounting and incident forensi
 Per-resource sync bookkeeping so a restarted scheduler resumes correctly.
 
 `id`, `resource_type (coc_account|clan)`, `resource_id`, `last_attempt_at`, `last_success_at`,
-`consecutive_failures`, `next_due_at`, `tier (hot|warm|cold)`.
-**Unique:** `(resource_type, resource_id)`. **Index:** `(next_due_at) WHERE next_due_at IS NOT NULL`.
+`viewed_at`, `consecutive_failures`, `not_found_failures`, `next_due_at`,
+`tier (hot|warm|cold|frozen)`, `stale`, `flagged`.
+**Unique:** `(resource_type, resource_id)`. **Index:** `(next_due_at)`; the due query excludes nulls.
+`stale` affects display only; `flagged` marks a frozen account whose weekly retry also failed.
 
 ### Framework tables [M]
 `jobs`, `job_batches`, `failed_jobs`, `cache`, `cache_locks`, `sessions`, `migrations` —

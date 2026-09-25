@@ -19,7 +19,7 @@ final class CocIntegrationServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(CocKeyPool::class, fn ($app) => new CocKeyPool(
-            (array) config('coc.tokens'),
+            array_values(array_filter((array) config('coc.tokens'), 'is_string')),
             $app->make(Cache::class),
         ));
 

@@ -21,6 +21,7 @@ use App\Domain\PlayerAccounts\Exceptions\DisputeException;
 use App\Domain\PlayerAccounts\Models\CocAccount;
 use App\Domain\PlayerAccounts\Models\CocAccountClaim;
 use App\Domain\PlayerAccounts\Models\CocAccountDispute;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -222,6 +223,9 @@ final class DisputeResolutionService
             ->get();
 
         $held = $rows->firstWhere('id', $dispute->coc_account_id) ?? $rows->first();
+        if ($held === null) {
+            throw (new ModelNotFoundException)->setModel(CocAccount::class);
+        }
 
         $previousHolderId = null;
         foreach ($rows as $row) {

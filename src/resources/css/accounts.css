@@ -40,8 +40,9 @@
 }
 .account-identity { display: grid; gap: 2px; }
 .account-meta { margin: 0; font-variant-numeric: tabular-nums; }
+.account-sync-age { margin: 0; }
 .account-status { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
-.account-actions { display: flex; justify-content: flex-start; }
+.account-actions { display: flex; justify-content: flex-start; gap: var(--space-2); flex-wrap: wrap; }
 .account-detach { display: grid; gap: var(--space-3); width: 100%; }
 
 @media (min-width: 720px) {

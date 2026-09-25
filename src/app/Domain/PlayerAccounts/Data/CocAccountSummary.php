@@ -21,9 +21,12 @@ final readonly class CocAccountSummary
         public ?string $clanTag,
         public ?string $leagueName,
         public ?string $verifiedAtIso,
+        public ?string $syncedAtIso,
+        public ?string $syncedAge,
+        public bool $stale,
     ) {}
 
-    public static function fromModel(CocAccount $account): self
+    public static function fromModel(CocAccount $account, bool $stale = false): self
     {
         return new self(
             id: $account->id,
@@ -36,6 +39,9 @@ final readonly class CocAccountSummary
             clanTag: $account->clan_tag,
             leagueName: $account->league_name,
             verifiedAtIso: $account->verified_at?->toIso8601String(),
+            syncedAtIso: $account->api_synced_at?->toIso8601String(),
+            syncedAge: $account->api_synced_at?->diffForHumans(),
+            stale: $stale,
         );
     }
 }

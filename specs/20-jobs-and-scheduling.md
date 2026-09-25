@@ -98,6 +98,7 @@ re-encode being re-reserved and run twice (§5). The three workers are separate 
 ```
 every min    health:scheduler-heartbeat   (writes a heartbeat /health reads to detect a dead scheduler)
 * / 5 min    coc:sync-accounts            (withoutOverlapping, onOneServer)
+daily  02:45 coc:compact-snapshots        (withoutOverlapping, onOneServer)
 * / 5 min    platform:check-health
 * / 15 min   bases:recompute-trending
 * / 15 min   moderation:expire-sanctions

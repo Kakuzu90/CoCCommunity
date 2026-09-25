@@ -19,7 +19,7 @@ Alpine.data('uiSelect', () => ({
         this.options = [...this.$refs.native.options].filter(option => option.value && !option.disabled).map(option => ({ value: option.value, label: option.text }));
         if (this.disabled) this.close(false);
     },
-    get selectedLabel() { return this.options.find(option => option.value === this.value)?.label || 'Choose an option'; },
+    get selectedLabel() { return this.options.find(option => option.value === this.value)?.label || this.$refs.native.querySelector('option[value=""]')?.text || 'Choose an option'; },
     get filtered() { return this.options.filter(option => option.label.toLocaleLowerCase().includes(this.query.trim().toLocaleLowerCase())); },
     get activeId() { return this.open && this.filtered[this.active] ? this.$refs.list.id + '-' + this.active : null; },
     show() {

@@ -36,3 +36,5 @@ require __DIR__.'/web/uploads.php';
 require __DIR__.'/auth.php';
 
 require __DIR__.'/web/settings.php';
+
+require __DIR__.'/web/admin.php';

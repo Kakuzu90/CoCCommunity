@@ -51,5 +51,30 @@
 <symbol id="ui-icon-menu" viewBox="0 0 24 24">
 <path d="M4 7h16M4 12h16M4 17h16" />
 </symbol>
+<symbol id="ui-icon-dashboard" viewBox="0 0 24 24">
+<path d="M4 4h7v6H4zM13 4h7v10h-7zM13 17h7v3h-7zM4 13h7v7H4z" />
+</symbol>
+<symbol id="ui-icon-flag" viewBox="0 0 24 24">
+<path d="M5 21V4m0 1h12l-2.5 3.5L17 12H5" />
+</symbol>
+<symbol id="ui-icon-scale" viewBox="0 0 24 24">
+<path d="M12 4v16M8 20h8M5 8h14l-2-4H7Z" />
+<path d="M5 8 2.5 14a3 3 0 0 0 6 0L5 8Zm14 0-2.5 6a3 3 0 0 0 6 0L19 8Z" />
+</symbol>
+<symbol id="ui-icon-document" viewBox="0 0 24 24">
+<path d="M7 3h7l4 4v14H7Zm7 0v4h4" />
+<path d="M9.5 13h5M9.5 17h5" />
+</symbol>
+<symbol id="ui-icon-image" viewBox="0 0 24 24">
+<path d="M4 5h16v14H4Z" />
+<path d="M8.5 11a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM5 18l5-5 3 3 3-3 3 3" />
+</symbol>
+<symbol id="ui-icon-store" viewBox="0 0 24 24">
+<path d="M5 10v9h14v-9M4 9l2-5h12l2 5" />
+<path d="M4 9a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0M10 19v-5h4v5" />
+</symbol>
+<symbol id="ui-icon-list" viewBox="0 0 24 24">
+<path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01" />
+</symbol>
 </defs>
 </svg>

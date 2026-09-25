@@ -8,5 +8,6 @@
 @import './fonts.css';
 @import './tokens.css';
 @import './ui.css';
+@import './admin.css';
 @source '../**/*.blade.php';
 @source '../**/*.js';

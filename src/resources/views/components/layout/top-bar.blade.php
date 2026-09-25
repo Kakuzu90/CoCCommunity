@@ -29,6 +29,9 @@
             <x-ui.dropdown label="Account">
                 <a href="{{ route('settings.profile.edit') }}" class="ui-menu-item" role="menuitem" tabindex="-1">Edit profile</a>
                 <a href="{{ route('settings.profile.edit') }}" class="ui-menu-item" role="menuitem" tabindex="-1">Settings</a>
+                @can('access-admin')
+                    <a href="{{ route('admin.dashboard') }}" class="ui-menu-item" role="menuitem" tabindex="-1">Admin</a>
+                @endcan
                 <form method="POST" action="{{ route('logout') }}" role="none">
                     @csrf
                     <button type="submit" class="ui-menu-item" role="menuitem" tabindex="-1">Log out</button>

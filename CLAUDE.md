@@ -64,7 +64,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] Profiles + avatar upload
 - [x] Privacy settings + public profile
 - [x] Settings area (sessions, deletion)
-- [ ] Admin v1 + audit log
+- [x] Admin v1 + audit log
 - [ ] Notifications v1
 
 ### Phase 2 — Verified CoC accounts
@@ -198,6 +198,15 @@ App http://localhost:8080 · Mail http://localhost:8025 · Storage console http:
 - `specs/` updated if the implementation diverged from the plan.
 
 <!-- antislop:start -->
+## UI work: ui-ux-pro-max is mandatory
+Before creating or editing any UI surface — Blade views/components, CSS (`*.css`, `*.scss`),
+or any `.vue`/`.svelte`/`.jsx`/`.tsx` — you MUST load and apply the `ui-ux-pro-max` skill first
+(query its design-system/domain guidance for the surface at hand), alongside the antislop skills
+below. This is enforced by the `PreToolUse` hook in `.claude/settings.json`
+(`.claude/hooks/require-uiux.sh`), which prompts on every UI-file write; the hook is the guard,
+this rule is the intent. Do not approve those prompts unless you have actually run the skill for
+the current work.
+
 ## antislop
 For UI, copy, people, mobile layout, or code comments work, load the antislop skill for the task:
 - Core filter, always on: `antislop`

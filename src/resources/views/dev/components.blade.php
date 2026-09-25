@@ -29,7 +29,7 @@
 <h1>A common language.<br>Room to make it yours.</h1>
 <p class="gallery-description">Bold where we celebrate. Clear where we work. The building blocks of Clash Commons, from the first tap to the next milestone.</p>
 </div>
-        <nav class="gallery-nav" aria-label="Component sections">@foreach(['foundations' => 'Foundations', 'actions' => 'Actions', 'forms' => 'Forms', 'identity' => 'Identity', 'surfaces' => 'Surfaces', 'feedback' => 'Feedback', 'navigation' => 'Navigation', 'game-assets' => 'Game assets', 'auth' => 'Auth'] as $id => $text)<a href="#{{ $id }}">{{ $text }}</a>
+        <nav class="gallery-nav" aria-label="Component sections">@foreach(['foundations' => 'Foundations', 'actions' => 'Actions', 'forms' => 'Forms', 'identity' => 'Identity', 'surfaces' => 'Surfaces', 'feedback' => 'Feedback', 'navigation' => 'Navigation', 'game-assets' => 'Game assets', 'auth' => 'Auth', 'admin' => 'Admin'] as $id => $text)<a href="#{{ $id }}">{{ $text }}</a>
 
 @endforeach
 </nav>
@@ -62,7 +62,7 @@
 </div>
             <x-ui.card class="mt-6">
 <p class="gallery-eyebrow mb-3">Iconography · original 24px outline set, no game marks</p>
-<div class="grid grid-cols-4 sm:grid-cols-8 gap-4">@foreach(['home', 'search', 'layers', 'shield', 'user', 'bell', 'menu', 'heart', 'star', 'plus', 'check', 'close', 'chevron', 'arrow', 'info', 'spinner'] as $name)<div class="gallery-swatch" style="display:grid;place-items:center">
+<div class="grid grid-cols-4 sm:grid-cols-8 gap-4">@foreach(['home', 'search', 'layers', 'shield', 'user', 'bell', 'menu', 'heart', 'star', 'plus', 'check', 'close', 'chevron', 'arrow', 'info', 'spinner', 'dashboard', 'flag', 'scale', 'document', 'image', 'store', 'list'] as $name)<div class="gallery-swatch" style="display:grid;place-items:center">
 <x-ui.icon :name="$name" size="24" />
 </div>
 @endforeach
@@ -366,6 +366,49 @@
 <div class="gallery-row">@foreach(['active' => 'success', 'restricted' => 'warning', 'suspended' => 'warning', 'banned' => 'danger', 'pending_deletion' => 'neutral'] as $status => $tone)<x-ui.pill :tone="$tone">{{ \App\Domain\Auth\Enums\UserStatus::from($status)->label() }}</x-ui.pill>
 @endforeach</div>
 </div>
+</div>
+</x-ui.card>
+        </section>
+        <section id="admin" class="gallery-section">
+            <div class="gallery-section-head">
+<span class="gallery-number">10</span>
+<h2>Back-office, intentionally plain</h2>
+</div>
+<x-ui.card>
+<p class="ui-help">Admin surfaces (specs/18 §4) drop the game styling: body font, small radius, denser spacing, no lift or glow. These are where staff work, so they stay clean and boring. The classes below (<code>.adm-*</code>) are the same ones the <code>/admin</code> area renders.</p>
+
+<span class="ui-label">Account status</span>
+<div class="gallery-row" style="margin-bottom: var(--space-4)">@foreach(['active','restricted','suspended','banned','pending_deletion'] as $status)<span class="adm-status" data-status="{{ $status }}">{{ \App\Domain\Auth\Enums\UserStatus::from($status)->label() }}</span>
+@endforeach</div>
+
+<span class="ui-label">Stat cards</span>
+<div class="adm-cards" style="margin-bottom: var(--space-4)">
+<div class="adm-card"><div class="adm-card-label">Total users</div><div class="adm-card-value">1,248</div></div>
+<div class="adm-card"><div class="adm-card-label">Staff accounts</div><div class="adm-card-value">7</div></div>
+<div class="adm-card"><div class="adm-card-label">Under sanction</div><div class="adm-card-value">12</div></div>
+</div>
+
+<span class="ui-label">DataTable</span>
+<div class="adm-panel" style="margin-bottom: var(--space-4)">
+<div class="adm-table-wrap"><table class="adm-table">
+<thead><tr><th>User</th><th>Role</th><th>Status</th><th>Joined</th></tr></thead>
+<tbody>
+<tr><td><a href="#admin">sparrowhawk</a></td><td><span class="adm-role">User</span></td><td><span class="adm-status" data-status="active">Active</span></td><td>2024-11-02</td></tr>
+<tr><td><a href="#admin">gollum</a></td><td><span class="adm-role">User</span></td><td><span class="adm-status" data-status="suspended">Suspended</span></td><td>2025-01-18</td></tr>
+<tr><td><a href="#admin">gandalf</a></td><td><span class="adm-role">Admin</span></td><td><span class="adm-status" data-status="active">Active</span></td><td>2024-08-10</td></tr>
+</tbody>
+</table></div>
+</div>
+
+<span class="ui-label">Audit trail with before/after diff</span>
+<div class="adm-panel">
+<div class="adm-table-wrap"><table class="adm-table">
+<thead><tr><th>When</th><th>Action</th><th>Actor</th><th>Target</th><th>Change</th></tr></thead>
+<tbody>
+<tr><td>2 hours ago</td><td>User suspended</td><td>gandalf</td><td><a href="#admin">gollum</a></td><td><pre class="adm-diff">- status: active
++ status: suspended</pre></td></tr>
+</tbody>
+</table></div>
 </div>
 </x-ui.card>
         </section>

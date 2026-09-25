@@ -53,4 +53,15 @@ return [
         'grace_days' => 30,
         'chunk_size' => 100,
     ],
+
+    // Back-office (specs/12, specs/04 §2). Page sizes and sanction duration bounds are config, not
+    // magic numbers in the request rules. Durations mirror the sanction table in specs/12 §6.
+    'admin' => [
+        'users_per_page' => 25,
+        'audit_per_page' => 50,
+    ],
+    'sanctions' => [
+        'restriction' => ['min_days' => 1, 'max_days' => 30],
+        'suspension' => ['min_days' => 1, 'max_days' => 90],
+    ],
 ];

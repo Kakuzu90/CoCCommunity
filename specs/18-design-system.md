@@ -238,7 +238,7 @@ Implemented as one component reading a tier map, so a new TH level is a config l
 | **Button** | primary (gold), secondary (surface+border), ghost, danger, success | default, hover, active(compressed), focus-visible, disabled, loading(spinner, width-locked) |
 | | sizes: sm 32px, md 40px, lg 48px; `block`, `icon-only` (square, aria-label required) | |
 | **Input / Textarea** | default, with-prefix, with-suffix, with-counter | default, focus, error, disabled, readonly |
-| **Select** | searchable dropdown (Alpine), native fallback | same |
+| **Select** | searchable dropdown (Alpine), native fallback; optional `placeholder` (resting/empty label, e.g. "All roles") | same |
 | **Checkbox / Radio / Toggle** | — | default, checked, indeterminate, focus, disabled |
 | **Pill / Tag** | neutral, category (per-category hue), th, status, removable | default, hover, selected |
 | **Badge** | verified (gold check), featured (purple star), role (mod/admin), rarity | — |
@@ -305,6 +305,15 @@ DataTable (sortable, filterable, bulk-select, sticky header), FilterBar, DetailP
 ActionPanel (with mandatory reason field), AuditTrailList, DiffViewer (before/after JSON),
 EvidenceGallery, AssignmentControl, PriorityBadge, SlaIndicator.
 These use body font, `--radius-sm`, no lift, no glow, denser spacing (`--space-2` rhythm).
+
+**Implemented (Admin v1):** the plainness is the *layout* (`.adm-*` classes: sticky sidebar, dense
+tables, small radius, no lift/glow), not a parallel control library. Form controls reuse the shared
+`x-ui.*` primitives (`x-ui.select`, `x-ui.input`, `x-ui.textarea`) so inputs read the same site-wide
+and there is one keyboard/focus/validation implementation to maintain. The FilterBar, DataTable,
+DetailPanel, ActionPanel and AuditTrailList/DiffViewer are built; PriorityBadge, SlaIndicator,
+EvidenceGallery and AssignmentControl arrive with the Phase 3 moderation queue. The admin nav uses
+platform icons only (`dashboard`, `flag`, `scale`, `document`, `image`, `store`, `list` were added to
+the sprite for it).
 
 ## 5. Layout
 

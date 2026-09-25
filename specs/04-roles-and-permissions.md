@@ -73,6 +73,10 @@ Additional flags gating capabilities: `email_verified_at` (required for any writ
 2. Every row above `Report content` requires the actor to record a reason; the reason is mandatory
    at the service layer, not merely in the form.
 
+An actor is never listed in their own management surface: the admin user list (Admin v1) excludes the
+viewing account. Acting on oneself is already impossible (`UserPolicy::outranks()` returns false for
+self), and a staff member manages their own account through Settings, not the moderation tools.
+
 ## 3. Authorization strategy
 
 ### Policies as the only source of truth

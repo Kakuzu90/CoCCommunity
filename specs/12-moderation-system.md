@@ -207,6 +207,9 @@ ownership transfers, role changes and data exports. Two-year retention, never ed
 
 - **Admin dashboard** surfaces: open cases by priority, oldest unactioned case, SLA breaches,
   cases per moderator, auto-action precision, quarantined media count, open disputes.
+  *(Admin v1 ships the user-management and audit metrics only — total users, staff, accounts under
+  sanction, and recent audit activity. The case/SLA/quarantine KPIs above depend on the report queue
+  and land with the Phase 3 moderation task that builds it.)*
 - **Staffing signal:** if median time-to-first-response exceeds the SLA for two consecutive weeks,
   the platform either recruits moderators or tightens automated restrictions. This is a documented
   operational trigger, not an ad-hoc decision.

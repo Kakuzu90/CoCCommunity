@@ -3,17 +3,22 @@
 namespace App\Domain\GameAssets\Services;
 
 use App\Domain\GameAssets\Exceptions\AssetPackException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /**
- * What the pack knows about a unit beyond its artwork: its kind (the API lists pets and siege
- * machines inside `troops`) and which equipment belongs to which hero. Read from the committed
- * manifest and `config('assets.heroes_equipments')`; a missing manifest means "unknown", never an error.
+ * Unit kinds, names and configured progression/equipment order.
+ * Missing manifests keep display fallbacks available.
  */
 final class GameAssetCatalogue
 {
+    private const PROGRESSION_KINDS = ['heroes' => 'hero', 'units' => 'troop', 'spells' => 'spell', 'pets' => 'pet', 'siege-machines' => 'siege'];
+
     /** @var array<string, string>|null */
     private ?array $kinds = null;
+
+    /** @var array<string, string> */
+    private array $names = [];
 
     public function __construct(private readonly ManifestReader $reader) {}
 
@@ -21,6 +26,34 @@ final class GameAssetCatalogue
     public function kind(string $unitSlug): ?string
     {
         return $this->kinds()[$unitSlug] ?? null;
+    }
+
+    public function name(string $unitSlug): string
+    {
+        $this->kinds();
+
+        return $this->names[$unitSlug] ?? ucwords(str_replace('-', ' ', $unitSlug));
+    }
+
+    /** @return array<string, list<string>> Asset kind to slugs, preserving configured section and item order. */
+    public function progressionOrder(): array
+    {
+        $order = [];
+        foreach ((array) config('assets') as $section => $values) {
+            $kind = self::PROGRESSION_KINDS[$section] ?? null;
+            if ($kind === null) {
+                continue;
+            }
+
+            $slugs = array_map(static function (mixed $value) use ($kind): string {
+                $slug = Str::slug(str_replace('_', '-', (string) $value));
+
+                return $kind === 'spell' && $slug !== '' && ! str_ends_with($slug, '-spell') ? $slug.'-spell' : $slug;
+            }, Arr::flatten((array) $values));
+            $order[$kind] = array_values(array_unique(array_filter($slugs, static fn (string $slug): bool => $slug !== '')));
+        }
+
+        return $order;
     }
 
     /**
@@ -59,6 +92,7 @@ final class GameAssetCatalogue
         foreach ($manifest['assets'] as $entry) {
             if ($entry['category'] === 'unit' && isset($entry['kind'])) {
                 $this->kinds[(string) $entry['slug']] = (string) $entry['kind'];
+                $this->names[(string) $entry['slug']] = (string) $entry['name'];
             }
         }
 

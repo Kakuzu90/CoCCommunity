@@ -109,5 +109,111 @@ return [
             'rocket-backpack',
             'revenge-deck'
         ]
+    ],
+
+    'heroes' => [
+        'barbarian_king',
+        'archer-queen',
+        'minion-prince',
+        'grand-warden',
+        'royal-champion',
+        'dragon-duke'
+    ],
+
+    'units' => [
+        'elixir' => [
+            'barbarian',
+            'archer',
+            'giant',
+            'goblin',
+            'wall-breaker',
+            'balloon',
+            'wizard',
+            'healer',
+            'dragon',
+            'pekka',
+            'baby-dragon',
+            'miner',
+            'electro-dragon',
+            'yeti',
+            'dragon-rider',
+            'electro-titan',
+            'root-rider',
+            'thrower',
+            'meteor-golem'
+        ],
+        'dark-elixir' => [
+            'minion',
+            'hog-rider',
+            'valkyrie',
+            'golem',
+            'witch',
+            'lava-hound',
+            'bowler',
+            'ice-golem',
+            'headhunter',
+            'apprentice-warden',
+            'druid',
+            'furnace',
+            'ruin-witch'
+        ],
+    ],
+
+    'spells' => [
+        'elixir' => [
+            'lightning',
+            'healing',
+            'rage',
+            'jump',
+            'freeze',
+            'clone',
+            'invisibility',
+            'recall',
+            'revive',
+            'totem'
+        ],
+        'dark-elixir' => [
+            'poison',
+            'earthquake',
+            'haste',
+            'skeleton',
+            'bat',
+            'overgrowth',
+            'ice-block',
+            'angry'
+        ],
+    ],
+
+    'pets' => [
+        'lassi',
+        'electro-owl',
+        'mighty-yak',
+        'unicorn',
+        'frosty',
+        'diggy',
+        'poison-lizard',
+        'phoenix',
+        'spirit-fox',
+        'angry-jelly',
+        'sneezy',
+        'greedy-raven'
+    ],
+
+    'siege-machines' => [
+        'wall-wrecker',
+        'battle-blimp',
+        'stone-slammer',
+        'siege-barracks',
+        'log-launcher',
+        'flame-flinger',
+        'battle-drill',
+        'troop-launcher',
+        'sky-wagon'
+    ],
+
+    'guardians' => [
+        'longshot',
+        'smasher',
+        'logger'
     ]
 ];

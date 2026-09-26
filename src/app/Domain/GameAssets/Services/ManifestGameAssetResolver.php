@@ -105,10 +105,10 @@ final class ManifestGameAssetResolver implements GameAssetResolver
         return $this->index;
     }
 
-    /** "P.E.K.K.A League 20" → "pekka", "Legend League" → "legend". */
+    /** "P.E.K.K.A League 20" → "pekka", "Legend II" → "legend". */
     private function leagueFamily(string $name): string
     {
-        $slug = (string) preg_replace('/-\d+$/', '', Str::slug($name));
+        $slug = (string) preg_replace('/-(?:\d+|[ivxlcdm]+)$/', '', Str::slug($name));
 
         return (string) preg_replace('/-league$/', '', $slug);
     }

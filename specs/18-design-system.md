@@ -396,6 +396,11 @@ review. The top-tier PlayerCard keeps red on the TH numeral and uses gold for th
 PlayerCard hero → verification status banner → stat blocks with deltas → hero/troop/spell/equipment
 progression grids (level chips, maxed indicator) → custom images gallery → bases credited to this
 account → sync status footer ("updated 12 minutes ago" + manual refresh button).
+Home Village grids follow the section and item order in `config/assets.php`, flattening resource
+subgroups without extra labels. Configured units absent from the account use the locked equipment
+tile treatment: gray art, no level badge or fire, and no equipment action. Unknown API units remain
+visible after configured entries; Builder Base retains its reported units. Guardians stay hidden
+until their progression is available from the API.
 *Empty (no images):* owner sees an upload dropzone; others see nothing.
 *Loading:* progression grid skeleton.
 *Error (API stale):* amber banner "Game data is temporarily unavailable — showing data from

@@ -51,6 +51,11 @@ it('resolves a league tier to its family emblem by the API name', function () {
     expect($resolver->league(105000020, 'P.E.K.K.A League 20')->url)->toStartWith('https://cdn.test/game/leagues/pekka.png')
         ->and($resolver->league(105000020, 'P.E.K.K.A League 20')->name)->toBe('P.E.K.K.A League 20')
         ->and($resolver->league(105000034, 'Legend League')->url)->toStartWith('https://cdn.test/game/leagues/legend.png')
+        ->and($resolver->league(105000035, 'Legend II')->url)->toStartWith('https://cdn.test/game/leagues/legend.png')
+        ->and($resolver->league(105000035, 'Legend II')->name)->toBe('Legend II')
+        ->and($resolver->league(105000034, 'Legend I')->isPlaceholder())->toBeFalse()
+        ->and($resolver->league(105000036, 'Legend III')->isPlaceholder())->toBeFalse()
+        ->and($resolver->league(105000035, 'Legend League II')->isPlaceholder())->toBeFalse()
         ->and($resolver->league(105000000, 'Unranked')->isPlaceholder())->toBeTrue()
         ->and($resolver->league(29000022, 'Crystal League I')->isPlaceholder())->toBeTrue();
 });
@@ -90,5 +95,6 @@ it('resolves the committed pack for every catalogue the progression grid asks fo
         expect($resolver->townHall($level)->isPlaceholder())->toBeFalse("Town Hall {$level} should be in the pack");
     }
     expect($resolver->league(1, 'Valkyrie League 14')->isPlaceholder())->toBeFalse()
+        ->and($resolver->league(105000035, 'Legend II')->url)->toStartWith('https://cdn.test/game/leagues/legend.png')
         ->and($resolver->unit('a-troop-from-next-update')->isPlaceholder())->toBeTrue();
 });

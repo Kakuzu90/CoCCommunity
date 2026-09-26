@@ -4,7 +4,7 @@ return [
     'title_max' => 80,
     'description_max' => 2000,
     'th_min' => 2,
-    'th_max' => 30,
+    'th_max' => 18,
     'tags_max' => 10,
     'tag_length_max' => 24,
     'screenshots_max' => 2,

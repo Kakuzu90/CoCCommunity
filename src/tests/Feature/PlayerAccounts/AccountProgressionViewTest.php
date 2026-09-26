@@ -11,17 +11,23 @@ use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
 
-/** A throwaway pack that knows Diggy is a pet and Wall Wrecker a siege machine. */
+/** A throwaway pack with pet, siege machine and guardian kinds. */
 function progressionView(): AccountProgressionView
 {
     $dir = sys_get_temp_dir().'/progression-'.uniqid();
     @mkdir($dir, 0777, true);
     $entry = fn (string $slug, string $kind) => ['key' => "x/{$slug}.png", 'slug' => $slug, 'name' => $slug, 'category' => 'unit', 'kind' => $kind, 'sha256' => 'x', 'bytes' => 1];
-    file_put_contents($dir.'/manifest.json', json_encode(['assets' => [$entry('diggy', 'pet'), $entry('wall-wrecker', 'siege')]]));
+    file_put_contents($dir.'/manifest.json', json_encode(['assets' => [$entry('diggy', 'pet'), $entry('wall-wrecker', 'siege'), $entry('longshot', 'guardian')]]));
 
     config([
         'assets.pack_path' => $dir,
         'assets.heroes_equipments' => ['barbarian_king' => ['barbarian-puppet', 'spiky ball']],
+        'assets.heroes' => ['barbarian_king'],
+        'assets.units' => ['elixir' => ['barbarian']],
+        'assets.spells' => ['elixir' => ['lightning']],
+        'assets.pets' => ['diggy'],
+        'assets.siege-machines' => ['wall-wrecker'],
+        'assets.guardians' => [],
         'coc.excluded_units' => ['super-barbarian'],
     ]);
     app()->forgetInstance(GameAssetCatalogue::class);
@@ -52,12 +58,73 @@ it('splits progression by village and groups pets and siege machines out of troo
     $data = progressionFixture();
     $view = progressionView()->build($data['heroes'], $data['troops'], $data['spells'], $data['hero_equipment']);
 
-    expect(array_keys($view['home']))->toBe(['Heroes', 'Pets', 'Troops', 'Siege machines', 'Spells'])
+    expect(array_keys($view['home']))->toBe(['Heroes', 'Troops', 'Spells', 'Pets', 'Siege machines'])
         ->and(array_column($view['home']['Troops'], 'slug'))->toBe(['barbarian'])
         ->and(array_column($view['home']['Pets'], 'slug'))->toBe(['diggy'])
         ->and(array_column($view['home']['Siege machines'], 'slug'))->toBe(['wall-wrecker'])
         ->and(array_column($view['builder']['Heroes'], 'slug'))->toBe(['battle-machine'])
         ->and(array_column($view['builder']['Troops'], 'slug'))->toBe(['raged-barbarian']);
+});
+
+it('preserves configured order and fills missing assets with locked tiles without currency groups', function () {
+    $service = progressionView();
+    config([
+        'assets.heroes' => ['archer-queen', 'barbarian_king'],
+        'assets.units' => ['elixir' => ['wizard', 'barbarian'], 'dark-elixir' => ['minion']],
+        'assets.spells' => ['elixir' => ['rage', 'lightning'], 'dark-elixir' => ['poison']],
+        'assets.pets' => ['unicorn', 'diggy'],
+        'assets.siege-machines' => ['battle-blimp', 'wall-wrecker'],
+        'assets.guardians' => ['longshot'],
+    ]);
+    $data = progressionFixture();
+    $view = $service->build($data['heroes'], $data['troops'], $data['spells'], $data['hero_equipment']);
+
+    expect(array_keys($view['home']))->toBe(['Heroes', 'Troops', 'Spells', 'Pets', 'Siege machines'])
+        ->and(array_column($view['home']['Heroes'], 'slug'))->toBe(['archer-queen', 'barbarian-king'])
+        ->and(array_column($view['home']['Troops'], 'slug'))->toBe(['wizard', 'barbarian', 'minion'])
+        ->and(array_column($view['home']['Spells'], 'slug'))->toBe(['rage-spell', 'lightning-spell', 'poison-spell'])
+        ->and(array_column($view['home']['Pets'], 'slug'))->toBe(['unicorn', 'diggy'])
+        ->and(array_column($view['home']['Siege machines'], 'slug'))->toBe(['battle-blimp', 'wall-wrecker'])
+        ->and($view['home']['Heroes'][0])->toMatchArray(['unlocked' => false, 'equipment' => [], 'maxed' => false])
+        ->and($view['home']['Troops'][0])->toMatchArray(['level' => 0, 'unlocked' => false, 'maxed' => false])
+        ->and($view['home']['Troops'][1])->toMatchArray(['level' => 12, 'unlocked' => true, 'maxed' => true])
+        ->and($view['home']['Spells'][1])->toMatchArray(['level' => 11, 'unlocked' => true])
+        ->and($view['home'])->not->toHaveKey('Guardians')
+        ->and(array_column($view['builder']['Troops'], 'slug'))->toBe(['raged-barbarian']);
+});
+
+it('keeps unknown API units after configured entries and excludes configured hidden units', function () {
+    $service = progressionView();
+    config(['assets.units' => ['elixir' => ['super-barbarian', 'archer', 'barbarian']]]);
+    $view = $service->build([], [
+        ['name' => 'Future Troop', 'level' => 2, 'maxLevel' => 3],
+        ['name' => 'Super Barbarian', 'level' => 1, 'maxLevel' => 1],
+        ['name' => 'Barbarian', 'level' => 12, 'maxLevel' => 12],
+    ], [], []);
+
+    expect(array_column($view['home']['Troops'], 'slug'))->toBe(['archer', 'barbarian', 'future-troop'])
+        ->and($view['home']['Troops'][2])->toMatchArray(['unlocked' => true, 'level' => 2]);
+});
+
+it('hides guardians from both villages even when configured or present in stored troops', function () {
+    $service = progressionView();
+    config(['assets.guardians' => ['longshot', 'smasher', 'logger']]);
+    $view = $service->build([], [
+        ['name' => 'Longshot', 'level' => 1, 'maxLevel' => 10, 'village' => 'home'],
+        ['name' => 'Longshot', 'level' => 1, 'maxLevel' => 10, 'village' => 'builderBase'],
+    ], [], []);
+
+    expect($view['home'])->not->toHaveKey('Guardians')
+        ->and(array_column($view['home']['Troops'], 'slug'))->toBe(['barbarian'])
+        ->and($view['builder'])->toBe([]);
+});
+
+it('shows configured locked assets even when no progression is available', function () {
+    $view = progressionView()->build([], [], [], []);
+
+    expect($view['builder'])->toBe([])
+        ->and(array_column($view['home']['Troops'], 'slug'))->toBe(['barbarian'])
+        ->and($view['home']['Troops'][0])->toMatchArray(['unlocked' => false, 'level' => 0, 'maxed' => false]);
 });
 
 it('hides excluded units', function () {
@@ -90,7 +157,7 @@ it('renders village tabs, level badges and the hero equipment dialog', function 
         ->assertSee('Level 105, maxed')->assertSee('Level 5')
         ->assertSee('aria-haspopup="dialog"', false)
         ->assertSee('Barbarian King equipment')->assertSee('Not unlocked')
-        ->assertDontSee('Super Barbarian');
+        ->assertDontSee('Super Barbarian')->assertDontSee('Elixir')->assertDontSee('Dark elixir');
 });
 
 it('renders the hero card with clan, role, league and donations', function () {

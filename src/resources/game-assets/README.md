@@ -9,7 +9,8 @@ Byte-exact Clash of Clans assets served from the `game/` bucket prefix (specs/10
   `league`), `kind`, `village`, `source`, `sha256`, `bytes`. `GameAssetResolver` reads it at
   runtime, and `assets:verify-pack` audits the bucket against it.
 - Unit slugs are `Str::slug()` of the API name (`P.E.K.K.A` → `pekka`, `Healing Spell` →
-  `healing-spell`). League emblems are one per family (`Wizard League 12` → `wizard`).
+  `healing-spell`). League emblems are one per family (`Wizard League 12` → `wizard`,
+  `Legend II` → `legend`).
 
 ## Adding or replacing assets
 

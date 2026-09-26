@@ -1,5 +1,8 @@
 import { Livewire, Alpine } from '../../vendor/livewire/livewire/dist/livewire.esm';
 import displayFont from '@fontsource/lilita-one/files/lilita-one-latin-400-normal.woff2?url';
+import { unitFire } from './unit-fire';
+
+Alpine.data('unitFire', unitFire);
 
 // Shared by the gallery and future layouts; Livewire provides the single Alpine instance.
 Alpine.data('uiSelect', () => ({

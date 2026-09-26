@@ -18,7 +18,14 @@
     <span class="unit-tile__art" aria-hidden="true">
         <x-game.asset type="unit" :value="$unit['slug']" :name="$unit['name']" :size="$size" />
         @if($unlocked)
-            <span class="unit-tile__level" aria-hidden="true"><span>{{ $unit['level'] }}</span></span>
+            <span class="unit-tile__level" aria-hidden="true">
+                @if($unit['maxed'])
+                    <span class="unit-tile__fire-ring" aria-hidden="true">
+                        <canvas class="unit-tile__fire" x-data="unitFire" width="48" height="48"></canvas>
+                    </span>
+                @endif
+                <span class="unit-tile__number">{{ $unit['level'] }}</span>
+            </span>
         @endif
     </span>
     <span class="unit-tile__sr">{{ $unit['name'] }}, {{ $state }}@if($opens), show equipment @endif</span>

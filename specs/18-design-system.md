@@ -349,6 +349,8 @@ Each page below specifies its structure and its three required states
 > lookup → an "Is this you?" confirmation card → in-game token entry; account status is shown as a labelled
 > pill (never colour alone), featured accounts carry the `x-ui.badge` featured variant, and detach asks for
 > the current password inline. Empty and error states use `x-ui.empty-state` and `x-ui.input` field errors.
+> Attached rows show Town Hall and league artwork beside the player identity and status, with sync time
+> and actions below. Trophies are omitted from these rows; accounts without a league show "Unranked".
 > A gallery entry lives under `/dev/components#player-accounts`.
 
 ### Home feed (`/`)

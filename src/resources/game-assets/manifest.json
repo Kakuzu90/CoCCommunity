@@ -1471,8 +1471,8 @@
             "kind": "troop",
             "village": "home",
             "source": "staff-curated",
-            "sha256": "07e44165f5fd4a5244e53dad6ec1e7676395d29f305681c59e3b92ebf75216e7",
-            "bytes": 1286651
+            "sha256": "07f99f638472eae01bbd3266529041baef94aa0efc194b62b6afe139458780f4",
+            "bytes": 402701
         },
         {
             "key": "units/giant.png",

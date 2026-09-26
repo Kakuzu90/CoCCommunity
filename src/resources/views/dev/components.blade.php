@@ -438,38 +438,59 @@
                 <x-player.card :account="$sampleCard(\App\Domain\PlayerAccounts\Enums\CocAccountStatus::Disputed)" variant="mini" href="#player-accounts" />
                 <x-player.card :account="$sampleCard(\App\Domain\PlayerAccounts\Enums\CocAccountStatus::Verified, true)" variant="standard" href="#player-accounts" />
             </div>
-            <p class="ui-help">Attached accounts read as a row: identity, progression, then status. Status is a labelled pill, never colour alone, so it survives colour-blind and greyscale viewing.</p>
+            <p class="ui-help">Attached accounts show Town Hall and league artwork beside the player name and ownership status. Actions and sync time sit below.</p>
             <div class="accounts-list mt-6">
-                <article class="account-row">
-                    <div class="account-identity">
-                        <p class="account-name">Barch Enjoyer</p>
-                        <p class="account-tag ui-help">#2PP0LJQ</p>
+                <article class="account-row account-row--attached">
+                    <div class="account-summary">
+                        <div class="account-townhall">
+                            <x-game.asset type="townhall" :value="15" :size="72" aria-hidden="true" />
+                            <span>Town Hall 15</span>
+                        </div>
+                        <div class="account-identity">
+                            <h3 class="account-name">Barch Enjoyer</h3>
+                            <p class="account-tag ui-help">#2PP0LJQ</p>
+                            <div class="account-status">
+                                <x-ui.badge variant="featured">Featured</x-ui.badge>
+                                <x-ui.pill tone="primary">Verified</x-ui.pill>
+                            </div>
+                        </div>
                     </div>
-                    <div class="account-stats">
-                        <p class="account-meta ui-help">Town Hall 15 · 4,280 trophies · Legend League</p>
+                    <div class="account-league">
+                        <x-game.asset type="league" :value="29000022" name="Legend League" :size="48" aria-hidden="true" />
+                        <div><span class="account-league__label">Current league</span><strong>Legend League</strong></div>
+                    </div>
+                    <div class="account-footer">
                         <p class="account-sync-age ui-help">Updated 4 minutes ago.</p>
-                    </div>
-                    <div class="account-status">
-                        <x-ui.badge variant="featured">Featured</x-ui.badge>
-                        <x-ui.pill tone="primary">Verified</x-ui.pill>
-                    </div>
-                    <div class="account-actions">
-                        <a class="ui-button" data-variant="secondary" data-size="sm" href="#player-accounts">View player</a>
-                        <x-ui.button variant="secondary" size="sm">Refresh</x-ui.button>
-                        <x-ui.button variant="danger" size="sm" class="account-detach-trigger">Detach</x-ui.button>
+                        <div class="account-actions">
+                            <a class="ui-button" data-variant="secondary" data-size="sm" href="#player-accounts">View player</a>
+                            <x-ui.button variant="secondary" size="sm" disabled>Refresh</x-ui.button>
+                            <x-ui.button variant="danger" size="sm" class="account-detach-trigger" disabled>Detach</x-ui.button>
+                        </div>
                     </div>
                 </article>
-                <article class="account-row">
-                    <div class="account-identity">
-                        <p class="account-name">Second Base</p>
-                        <p class="account-tag ui-help">#9VU2LY0</p>
+                <article class="account-row account-row--attached">
+                    <div class="account-summary">
+                        <div class="account-townhall">
+                            <x-game.asset type="townhall" :value="12" :size="72" aria-hidden="true" />
+                            <span>Town Hall 12</span>
+                        </div>
+                        <div class="account-identity">
+                            <h3 class="account-name">Second Base</h3>
+                            <p class="account-tag ui-help">#9VU2LY0</p>
+                            <div class="account-status"><x-ui.pill tone="neutral">Unverified</x-ui.pill></div>
+                        </div>
                     </div>
-                    <div class="account-stats"><p class="account-meta ui-help">Town Hall 12 · 2,100 trophies</p></div>
-                    <div class="account-status"><x-ui.pill tone="neutral">Unverified</x-ui.pill></div>
-                    <div class="account-actions">
-                        <a class="ui-button" data-variant="secondary" data-size="sm" href="#player-accounts">View player</a>
-                        <x-ui.button variant="secondary" size="sm">Refresh</x-ui.button>
-                        <x-ui.button variant="danger" size="sm" class="account-detach-trigger">Detach</x-ui.button>
+                    <div class="account-league">
+                        <x-game.asset type="league" :value="0" name="Unranked" :size="48" aria-hidden="true" />
+                        <div><span class="account-league__label">Current league</span><strong>Unranked</strong></div>
+                    </div>
+                    <div class="account-footer">
+                        <p class="account-sync-age ui-help">Not synced yet.</p>
+                        <div class="account-actions">
+                            <a class="ui-button" data-variant="secondary" data-size="sm" href="#player-accounts">View player</a>
+                            <x-ui.button variant="secondary" size="sm" disabled>Refresh</x-ui.button>
+                            <x-ui.button variant="danger" size="sm" class="account-detach-trigger" disabled>Detach</x-ui.button>
+                        </div>
                     </div>
                 </article>
             </div>

@@ -119,47 +119,59 @@
         <h2 id="list-heading">Attached accounts</h2>
 
         @forelse($accounts as $account)
-            <article class="account-row" wire:key="account-{{ $account->id }}">
-                <div class="account-identity">
-                    <p class="account-name">{{ $account->ign }}</p>
-                    <p class="account-tag ui-help">{{ $account->tag }}</p>
+            <article class="account-row account-row--attached" wire:key="account-{{ $account->id }}">
+                <div class="account-summary">
+                    <div class="account-townhall">
+                        <x-game.asset type="townhall" :value="$account->thLevel" :size="72" aria-hidden="true" />
+                        <span>Town Hall {{ $account->thLevel }}</span>
+                    </div>
+                    <div class="account-identity">
+                        <h3 class="account-name">{{ $account->ign }}</h3>
+                        <p class="account-tag ui-help">{{ $account->tag }}</p>
+                        <div class="account-status">
+                            @if($account->isFeatured)<x-ui.badge variant="featured">Featured</x-ui.badge>@endif
+                            <x-ui.pill :tone="$statusTone($account->status)">{{ $account->status->label() }}</x-ui.pill>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="account-stats">
-                    <p class="account-meta ui-help">
-                        Town Hall {{ $account->thLevel }} · {{ number_format($account->trophies) }} trophies{{ $account->leagueName ? ' · '.$account->leagueName : '' }}
-                    </p>
+                <div class="account-league">
+                    <x-game.asset type="league" :value="$account->leagueId ?? 0" :name="$account->leagueName ?? 'Unranked'" :size="48" aria-hidden="true" />
+                    <div>
+                        <span class="account-league__label">Current league</span>
+                        <strong>{{ $account->leagueName ?? 'Unranked' }}</strong>
+                    </div>
+                </div>
+
+                <div class="account-footer">
                     @if($account->syncedAtIso)
                         <p class="account-sync-age ui-help" @if($account->stale) role="status" @endif>
                             {{ $account->stale ? 'Game data unavailable. Showing saved data from ' : 'Updated ' }}<time datetime="{{ $account->syncedAtIso }}">{{ $account->syncedAge }}</time>.
                         </p>
+                    @else
+                        <p class="account-sync-age ui-help">Not synced yet.</p>
                     @endif
-                </div>
 
-                <div class="account-status">
-                    @if($account->isFeatured)<x-ui.badge variant="featured">Featured</x-ui.badge>@endif
-                    <x-ui.pill :tone="$statusTone($account->status)">{{ $account->status->label() }}</x-ui.pill>
-                </div>
-
-                <div class="account-actions">
-                    <a class="ui-button" data-variant="secondary" data-size="sm" href="{{ route('accounts.show', $account->ulid) }}">View player</a>
-                    @if($account->status->isVerified() && ! $account->isFeatured)
-                        <x-ui.button type="button" variant="secondary" size="sm"
-                            wire:click="feature({{ $account->id }})"
-                            wire:target="feature({{ $account->id }})" wire:loading.attr="disabled">Set as featured</x-ui.button>
-                    @endif
-                    @if(in_array($account->status->value, ['verified', 'unverified'], true))
-                        <x-ui.button type="button" variant="secondary" size="sm"
-                            wire:click="refreshAccount({{ $account->id }})"
-                            wire:target="refreshAccount({{ $account->id }})" wire:loading.attr="disabled">
-                            <span wire:loading.remove wire:target="refreshAccount({{ $account->id }})">Refresh</span>
-                            <span wire:loading wire:target="refreshAccount({{ $account->id }})">Refreshing…</span>
-                        </x-ui.button>
-                    @endif
-                    @if($confirmingDetachId !== $account->id)
-                        <x-ui.button type="button" variant="danger" size="sm" class="account-detach-trigger"
-                            wire:click="confirmDetach({{ $account->id }})">Detach</x-ui.button>
-                    @endif
+                    <div class="account-actions">
+                        <a class="ui-button" data-variant="secondary" data-size="sm" href="{{ route('accounts.show', $account->ulid) }}">View account</a>
+                        @if($account->status->isVerified() && ! $account->isFeatured)
+                            <x-ui.button type="button" variant="secondary" size="sm"
+                                wire:click="feature({{ $account->id }})"
+                                wire:target="feature({{ $account->id }})" wire:loading.attr="disabled">Set as featured</x-ui.button>
+                        @endif
+                        @if(in_array($account->status->value, ['verified', 'unverified'], true))
+                            <x-ui.button type="button" variant="secondary" size="sm"
+                                wire:click="refreshAccount({{ $account->id }})"
+                                wire:target="refreshAccount({{ $account->id }})" wire:loading.attr="disabled">
+                                <span wire:loading.remove wire:target="refreshAccount({{ $account->id }})">Refresh</span>
+                                <span wire:loading wire:target="refreshAccount({{ $account->id }})">Refreshing…</span>
+                            </x-ui.button>
+                        @endif
+                        @if($confirmingDetachId !== $account->id)
+                            <x-ui.button type="button" variant="danger" size="sm" class="account-detach-trigger"
+                                wire:click="confirmDetach({{ $account->id }})">Detach</x-ui.button>
+                        @endif
+                    </div>
                 </div>
 
                 @if($confirmingDetachId === $account->id)

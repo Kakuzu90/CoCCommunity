@@ -25,6 +25,7 @@ final readonly class CocAccountSummary
         public ?string $syncedAtIso,
         public ?string $syncedAge,
         public bool $stale,
+        public ?int $leagueId = null,
     ) {}
 
     public static function fromModel(CocAccount $account, bool $stale = false): self
@@ -44,6 +45,7 @@ final readonly class CocAccountSummary
             syncedAtIso: $account->api_synced_at?->toIso8601String(),
             syncedAge: $account->api_synced_at?->diffForHumans(),
             stale: $stale,
+            leagueId: $account->league_id,
         );
     }
 }

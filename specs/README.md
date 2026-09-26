@@ -33,6 +33,7 @@ development tasks for an agentic coding workflow.
 | 23 | [23-edge-cases.md](23-edge-cases.md) | Major edge cases by domain with expected behaviour |
 | 24 | [24-risks-and-assumptions.md](24-risks-and-assumptions.md) | Risk register, assumptions, mitigations, open questions |
 | 25 | [25-development-phases.md](25-development-phases.md) | Phased roadmap, exit criteria, task-conversion guidance |
+| 26 | [26-inertia-react-migration.md](26-inertia-react-migration.md) | **Proposed.** Livewire + Alpine → Inertia + React migration plan, spec edits on approval |
 
 ## Load map
 

@@ -7,55 +7,52 @@ use App\Domain\GameAssets\Services\ManifestReader;
 function resolverWith(array $assets, bool $enabled = true): ManifestGameAssetResolver
 {
     $dir = sys_get_temp_dir().'/ga-'.uniqid();
-    @mkdir($dir.'/7', 0777, true);
-    file_put_contents($dir.'/7/manifest.json', json_encode(['version' => 7, 'assets' => $assets]));
+    @mkdir($dir, 0777, true);
+    file_put_contents($dir.'/manifest.json', json_encode(['assets' => $assets]));
 
     config([
         'assets.enabled' => $enabled,
-        'assets.manifest_path' => $dir,
-        'assets.pack_version' => 7,
+        'assets.pack_path' => $dir,
         'assets.prefix' => 'game',
         'assets.cdn_url' => 'https://cdn.test',
+        'assets.cache_bust_length' => 12,
     ]);
 
     return new ManifestGameAssetResolver(new ManifestReader);
 }
 
-it('resolves a catalogued unit to its versioned, unmodified URL', function () {
-    $resolver = resolverWith([
-        ['key' => 'units/barbarian.png', 'slug' => 'barbarian', 'name' => 'Barbarian', 'category' => 'unit', 'sha256' => 'x', 'bytes' => 1],
-    ]);
+function manifestEntry(string $key, string $slug, string $name, string $category = 'unit', string $sha = 'abcdef0123456789abcd'): array
+{
+    return ['key' => $key, 'slug' => $slug, 'name' => $name, 'category' => $category, 'sha256' => $sha, 'bytes' => 1];
+}
 
-    $asset = $resolver->unit('barbarian');
+it('resolves a catalogued unit to its unmodified, checksum-busted URL', function () {
+    $asset = resolverWith([manifestEntry('units/barbarian.png', 'barbarian', 'Barbarian')])->unit('barbarian');
 
     expect($asset->isPlaceholder())->toBeFalse()
-        ->and($asset->url)->toBe('https://cdn.test/game/7/units/barbarian.png')
+        ->and($asset->url)->toBe('https://cdn.test/game/units/barbarian.png?v=abcdef012345')
         ->and($asset->name)->toBe('Barbarian');
 });
 
 it('falls back to a labelled placeholder for an unknown unit', function () {
-    $asset = resolverWith([
-        ['key' => 'units/barbarian.png', 'slug' => 'barbarian', 'name' => 'Barbarian', 'category' => 'unit', 'sha256' => 'x', 'bytes' => 1],
-    ])->unit('mystery-troop');
+    $asset = resolverWith([manifestEntry('units/barbarian.png', 'barbarian', 'Barbarian')])->unit('mystery-troop');
 
     expect($asset->isPlaceholder())->toBeTrue()
         ->and($asset->url)->toBeNull()
         ->and($asset->name)->toBe('Mystery Troop');
 });
 
-it('uses labelled placeholders for the active empty pack', function () {
-    config([
-        'assets.enabled' => true,
-        'assets.manifest_path' => resource_path('game-assets'),
-        'assets.pack_version' => 1,
+it('resolves a league tier to its family emblem by the API name', function () {
+    $resolver = resolverWith([
+        manifestEntry('leagues/pekka.png', 'pekka', 'P.E.K.K.A League', 'league'),
+        manifestEntry('leagues/legend.png', 'legend', 'Legend League', 'league'),
     ]);
 
-    $resolver = new ManifestGameAssetResolver(new ManifestReader);
-
-    expect($resolver->unit('barbarian')->isPlaceholder())->toBeTrue()
-        ->and($resolver->unit('barbarian')->name)->toBe('Barbarian')
-        ->and($resolver->townHall(15)->isPlaceholder())->toBeTrue()
-        ->and($resolver->league(29000022, 'Legend League')->isPlaceholder())->toBeTrue();
+    expect($resolver->league(105000020, 'P.E.K.K.A League 20')->url)->toStartWith('https://cdn.test/game/leagues/pekka.png')
+        ->and($resolver->league(105000020, 'P.E.K.K.A League 20')->name)->toBe('P.E.K.K.A League 20')
+        ->and($resolver->league(105000034, 'Legend League')->url)->toStartWith('https://cdn.test/game/leagues/legend.png')
+        ->and($resolver->league(105000000, 'Unranked')->isPlaceholder())->toBeTrue()
+        ->and($resolver->league(29000022, 'Crystal League I')->isPlaceholder())->toBeTrue();
 });
 
 it('always carries a name for Town Halls and leagues even without a pack', function () {
@@ -74,11 +71,24 @@ it('passes through clan badges from the API URL without mirroring them', functio
 });
 
 it('returns placeholders everywhere when the kill switch is off', function () {
-    $resolver = resolverWith([
-        ['key' => 'units/barbarian.png', 'slug' => 'barbarian', 'name' => 'Barbarian', 'category' => 'unit', 'sha256' => 'x', 'bytes' => 1],
-    ], enabled: false);
+    $resolver = resolverWith([manifestEntry('units/barbarian.png', 'barbarian', 'Barbarian')], enabled: false);
 
     expect($resolver->unit('barbarian')->isPlaceholder())->toBeTrue()
         ->and($resolver->townHall(15)->isPlaceholder())->toBeTrue()
         ->and($resolver->clanBadge('https://api-assets.example/badge.png', 'Reddit Zulu')->isPlaceholder())->toBeTrue();
+});
+
+it('resolves the committed pack for every catalogue the progression grid asks for', function () {
+    config(['assets.enabled' => true, 'assets.pack_path' => resource_path('game-assets'), 'assets.cdn_url' => 'https://cdn.test']);
+    $resolver = new ManifestGameAssetResolver(new ManifestReader);
+
+    // Slugs are Str::slug() of the API names the progression grid receives.
+    foreach (['barbarian', 'pekka', 'barbarian-king', 'healing-spell', 'lassi', 'wall-wrecker', 'metal-pants'] as $slug) {
+        expect($resolver->unit($slug)->isPlaceholder())->toBeFalse("unit '{$slug}' should be in the pack");
+    }
+    foreach (range(1, 18) as $level) {
+        expect($resolver->townHall($level)->isPlaceholder())->toBeFalse("Town Hall {$level} should be in the pack");
+    }
+    expect($resolver->league(1, 'Valkyrie League 14')->isPlaceholder())->toBeFalse()
+        ->and($resolver->unit('a-troop-from-next-update')->isPlaceholder())->toBeTrue();
 });

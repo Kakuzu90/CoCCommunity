@@ -4,9 +4,9 @@
  * Game asset policy configuration — specs/18 §2, specs/10 §11.
  *
  * Clash of Clans assets are used only to identify game content, unmodified, and are served
- * byte-for-byte from a versioned `game/` prefix that never touches the media pipeline. Every
- * value the resolver, the `<x-game.asset>` component and the pack commands need is here so the
- * whole category is one config surface: a kill switch, a pack version and an origin.
+ * byte-for-byte from the `game/` prefix that never touches the media pipeline. Every value the
+ * resolver, the `<x-game.asset>` component and the pack commands need is here so the whole
+ * category is one config surface: a kill switch, a pack location and an origin.
  */
 return [
     // Kill switch. False → the resolver returns our own placeholder everywhere and no game asset
@@ -22,29 +22,92 @@ return [
     // job ignores it by rule, not by accident (specs/10 §11.3).
     'prefix' => 'game',
 
-    // Active pack version. Activation and rollback are a one-line change here; the previous version
-    // stays in the bucket, immutable (specs/10 §11.2).
-    'pack_version' => (int) env('GAME_ASSET_PACK_VERSION', 1),
-
     // Public, cookieless CDN origin — the same origin as public media. Image resizing/optimisation
     // must be OFF for the `game/` prefix at the CDN (specs/10 §11.3); that is edge config, verified
     // in staging, not something the app can assert locally.
     'cdn_url' => env('AWS_URL'),
 
-    // The committed manifest the resolver reads at runtime (no per-request bucket listing). The
-    // pack for version {n} lives at {manifest_path}/{n}/manifest.json (specs/10 §11.2).
-    'manifest_path' => resource_path('game-assets'),
+    // The committed pack: the curated files plus the manifest the resolver reads at runtime (no
+    // per-request bucket listing). Keys in the manifest are paths relative to this directory.
+    'pack_path' => resource_path('game-assets'),
 
-    // Long-lived immutable caching is safe because a version prefix is never edited in place.
+    // URLs carry `?v={first n chars of the file's SHA-256}`, so a replaced file gets a new URL and
+    // long-lived immutable caching stays safe without versioned prefixes (specs/10 §11.3).
+    'cache_bust_length' => 12,
     'cache_control' => 'public, max-age=31536000, immutable',
 
     // Real MIME allowlist for pack uploads — game art is delivered as raster images, byte-exact.
     'allowed_mimes' => ['image/png', 'image/webp', 'image/jpeg'],
 
-    // Manifest category → prefix sub-directory under game/{version}/.
-    'categories' => [
-        'unit' => 'units',
-        'townhall' => 'townhalls',
-        'league' => 'leagues',
+    // Pack sub-directory → manifest category + kind. Every troop, hero, spell, pet, siege machine,
+    // equipment and guardian icon shares the `unit` lookup namespace, matching the API's names.
+    'directories' => [
+        'units' => ['category' => 'unit', 'kind' => 'troop'],
+        'heroes' => ['category' => 'unit', 'kind' => 'hero'],
+        'spells' => ['category' => 'unit', 'kind' => 'spell'],
+        'pets' => ['category' => 'unit', 'kind' => 'pet'],
+        'machines' => ['category' => 'unit', 'kind' => 'siege'],
+        'equipments' => ['category' => 'unit', 'kind' => 'equipment'],
+        'guardians' => ['category' => 'unit', 'kind' => 'guardian'],
+        'townhalls' => ['category' => 'townhall', 'kind' => 'townhall'],
+        'leagues' => ['category' => 'league', 'kind' => 'league'],
     ],
+
+    // Heroes equipment
+    'heroes_equipments' => [
+        'barbarian_king' => [
+            'barbarian-puppet',
+            'rage-vial',
+            'earthquake-boots',
+            'vampstache',
+            'giant-gauntlet',
+            'spiky-ball',
+            'snake-bracelet',
+            'stick-horse'
+        ],
+        'archer-queen' => [
+            'archer-puppet',
+            'invisibility-vial',
+            'giant-arrow',
+            'healer-puppet',
+            'frozen-arrow',
+            'magic-mirror',
+            'action-figure',
+            'monolith-arrow'
+        ],
+        'minion-prince' => [
+            'henchmen-puppet',
+            'dark-orb',
+            'metal-pants',
+            'noble-iron',
+            'meteor-staff',
+            'dark-crown'
+        ],
+        'grand-warden' => [
+             'eternal tome',
+            'life-gem',
+            'rage-gem',
+            'healing-tome',
+            'heroic torch',
+            'fireball',
+            'lavaloon-puppet'
+        ],
+        'royal-champion' => [
+            'seeking-shield',
+            'royal-gem',
+            'hog-rider-puppet',
+            'haste-vial',
+            'rocket-spear',
+            'electro-boots',
+            'frost-flake'
+        ],
+        'dragon-duke' => [
+            'fire-heart',
+            'flame-blower',
+            'stun-blaster',
+            'electro-fangs',
+            'rocket-backpack',
+            'revenge-deck'
+        ]
+    ]
 ];

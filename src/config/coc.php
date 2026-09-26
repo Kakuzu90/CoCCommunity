@@ -140,4 +140,25 @@ return [
         'portal_email' => env('COC_PORTAL_EMAIL'),
         'portal_password' => env('COC_PORTAL_PASSWORD'),
     ],
+
+    // Excluded units: these should not be display in the unit list.
+    'excluded_units' => [
+        'super-barbarian',
+        'super-archer',
+        'sneaky-goblin',
+        'super-wall-breaker',
+        'super-giant',
+        'rocket-balloon',
+        'super-wizard',
+        'super-dragon',
+        'inferno-dragon',
+        'super-minion',
+        'super-valkyrie',
+        'super-witch',
+        'ice-hound',
+        'super-bowler',
+        'super-miner',
+        'super-yeti',
+        'super-hog-rider'
+    ]
 ];

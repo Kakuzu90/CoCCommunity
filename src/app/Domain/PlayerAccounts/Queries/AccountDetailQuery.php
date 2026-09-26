@@ -8,11 +8,13 @@ use App\Domain\PlayerAccounts\Enums\CocAccountStatus;
 use App\Domain\PlayerAccounts\Models\CocAccount;
 use App\Domain\PlayerAccounts\Models\CocAccountSnapshot;
 use App\Domain\PlayerAccounts\Models\SyncState;
+use App\Domain\PlayerAccounts\Services\AccountProgressionView;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 final class AccountDetailQuery
 {
+    public function __construct(private readonly AccountProgressionView $progression) {}
+
     public function find(string $ulid, ?int $viewerId): ?AccountDetailData
     {
         $account = CocAccount::query()->where('ulid', $ulid)->whereNotNull('user_id')
@@ -51,8 +53,9 @@ final class AccountDetailQuery
 
         $cards = $accounts->map(function (CocAccount $account) use ($sync, $showClan, $owner): AccountDetailData {
             $state = $sync->get($account->id);
+            $clan = $showClan ? $this->clan($account) : [];
             $stats = [];
-            foreach (['trophies', 'war_stars', 'xp_level'] as $key) {
+            foreach (['trophies', 'best_trophies', 'war_stars', 'xp_level', 'donations', 'donations_received'] as $key) {
                 $stats[$key] = ['value' => (int) $account->{$key}, 'delta' => null];
             }
 
@@ -68,6 +71,7 @@ final class AccountDetailQuery
                 owner: $owner, imagesCount: $account->images_count,
                 stats: $stats, progression: [],
                 clanShared: $showClan || $account->clan_tag === null,
+                clanName: $clan['clanName'] ?? null, clanBadgeUrl: $clan['clanBadgeUrl'] ?? null, clanLevel: $clan['clanLevel'] ?? null,
             );
         });
 
@@ -126,29 +130,19 @@ final class AccountDetailQuery
             $value = (int) $account->{$key};
             $stats[$key] = ['value' => $value, 'delta' => $previous === null ? null : $value - (int) $previous->{$key}];
         }
+        // Snapshots do not record donations received, so it has no delta.
+        $stats['donations_received'] = ['value' => $account->donations_received, 'delta' => null];
 
-        $progression = [];
-        foreach (['heroes' => 'Heroes', 'troops' => 'Troops', 'spells' => 'Spells', 'hero_equipment' => 'Equipment'] as $column => $label) {
-            $progression[$label] = [];
-            foreach ($account->{$column} ?? [] as $raw) {
-                if (! is_array($raw)) {
-                    continue;
-                }
-                $name = (string) ($raw['name'] ?? 'Unknown');
-                $progression[$label][] = [
-                    'name' => $name,
-                    'slug' => Str::slug($name),
-                    'level' => (int) ($raw['level'] ?? 0),
-                    'maxLevel' => (int) ($raw['maxLevel'] ?? 0),
-                ];
-            }
-        }
+        $progression = $this->progression->build(
+            $account->heroes ?? [], $account->troops ?? [], $account->spells ?? [], $account->hero_equipment ?? [],
+        );
 
         $sync = SyncState::query()->where('resource_type', 'coc_account')
             ->where('resource_id', $account->id)->first();
         $stale = $sync !== null && ($sync->stale || $sync->consecutive_failures > 0);
         $showClan = $viewerId === (int) $account->user_id
             || (bool) (DB::table('privacy_settings')->where('user_id', $account->user_id)->value('show_clan') ?? true);
+        $clan = $showClan ? $this->clan($account) : [];
 
         return new AccountDetailData(
             id: $account->id, ulid: $account->ulid, tag: $account->tag, ign: $account->ign,
@@ -162,6 +156,28 @@ final class AccountDetailQuery
             imagesCount: $account->images_count,
             stats: $stats, progression: $progression,
             clanShared: $showClan || $account->clan_tag === null,
+            clanName: $clan['clanName'] ?? null, clanBadgeUrl: $clan['clanBadgeUrl'] ?? null, clanLevel: $clan['clanLevel'] ?? null,
         );
+    }
+
+    /**
+     * Clan name, badge and level from the last API payload; the account keeps only the clan tag in columns.
+     *
+     * @return array{clanName?: string, clanBadgeUrl?: string, clanLevel?: int}
+     */
+    private function clan(CocAccount $account): array
+    {
+        $clan = $account->raw_payload['clan'] ?? null;
+        if ($account->clan_tag === null || ! is_array($clan)) {
+            return [];
+        }
+        $badges = is_array($clan['badgeUrls'] ?? null) ? $clan['badgeUrls'] : [];
+        $badge = $badges['medium'] ?? $badges['small'] ?? null;
+
+        return array_filter([
+            'clanName' => isset($clan['name']) ? (string) $clan['name'] : null,
+            'clanBadgeUrl' => is_string($badge) ? $badge : null,
+            'clanLevel' => isset($clan['clanLevel']) ? (int) $clan['clanLevel'] : null,
+        ], fn (mixed $value): bool => $value !== null);
     }
 }

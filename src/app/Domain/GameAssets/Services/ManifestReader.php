@@ -6,16 +6,16 @@ use App\Domain\GameAssets\Exceptions\AssetPackException;
 
 /**
  * Reads and validates a pack `manifest.json` (specs/10 §11.2). The manifest records, per asset:
- * key, slug, display name, category, village, source, SHA-256 and byte size — so "unmodified" is
- * demonstrable, not asserted. The committed copy is what the resolver reads at runtime; the bucket
- * copy is what `assets:verify-pack` audits against.
+ * key, slug, display name, category, kind, village, source, SHA-256 and byte size — so "unmodified"
+ * is demonstrable, not asserted. The committed copy is what the resolver reads at runtime and what
+ * `assets:verify-pack` audits the bucket against.
  *
- * @phpstan-type ManifestEntry array{key: string, slug: string, name: string, category: string, village?: string, source?: string, sha256: string, bytes: int}
+ * @phpstan-type ManifestEntry array{key: string, slug: string, name: string, category: string, kind?: string, village?: string, source?: string, sha256: string, bytes: int}
  */
 final class ManifestReader
 {
     /**
-     * @return array{version: int, assets: array<int, array<string, mixed>>}
+     * @return array{assets: array<int, array<string, mixed>>}
      */
     public function read(string $file): array
     {
@@ -41,10 +41,7 @@ final class ManifestReader
             $assets[] = $entry;
         }
 
-        return [
-            'version' => (int) ($decoded['version'] ?? 0),
-            'assets' => $assets,
-        ];
+        return ['assets' => $assets];
     }
 
     /**

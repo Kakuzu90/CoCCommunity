@@ -8,19 +8,18 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Uploads a curated asset pack to the versioned `game/` prefix byte-for-byte (specs/10 §11.2).
+ * Uploads the curated asset pack to the `game/` prefix byte-for-byte (specs/10 §11.2).
  *
  * Nothing is re-encoded, resized or optimised — the files are the originals, and any rewrite would
  * forfeit the "unmodified" claim the fan-content policy requires. Every local file is checked
  * against the manifest's SHA-256 and byte size *before* any upload, and every uploaded object is
- * re-read and checksummed *after*, so a corrupted or mismatched pack aborts. Activation is a
- * separate config change (`assets.pack_version`), so a partial upload is never live.
+ * re-read and checksummed *after*, so a corrupted or mismatched pack aborts.
  */
 final class AssetPackPublisher
 {
     public function __construct(private readonly ManifestReader $reader) {}
 
-    public function publish(string $sourceDir, int $version): PublishReport
+    public function publish(string $sourceDir): PublishReport
     {
         $sourceDir = rtrim($sourceDir, '/');
         $manifest = $this->reader->read($sourceDir.'/manifest.json');
@@ -57,12 +56,12 @@ final class AssetPackPublisher
             $planned[] = ['key' => $key, 'local' => $local, 'sha' => $sha, 'mime' => $mime];
         }
 
-        // Phase 2 — upload byte-for-byte to game/{version}/{key}, immutable, then verify each object.
+        // Phase 2 — upload byte-for-byte to game/{key}, immutable, then verify each object.
         $disk = $this->disk();
         $prefix = trim((string) config('assets.prefix'), '/');
         $written = [];
         foreach ($planned as $item) {
-            $object = "{$prefix}/{$version}/{$item['key']}";
+            $object = "{$prefix}/{$item['key']}";
             $disk->put($object, (string) file_get_contents($item['local']), [
                 'ContentType' => $item['mime'],
                 'CacheControl' => (string) config('assets.cache_control'),
@@ -77,7 +76,7 @@ final class AssetPackPublisher
             $written[] = $object;
         }
 
-        return new PublishReport($version, $written);
+        return new PublishReport($written);
     }
 
     private function disk(): Filesystem

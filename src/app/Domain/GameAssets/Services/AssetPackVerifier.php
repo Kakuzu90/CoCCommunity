@@ -7,24 +7,22 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Audits a published pack against its committed manifest (specs/10 §9 `assets:verify-pack`, weekly):
+ * Audits the published pack against its committed manifest (specs/10 §9 `assets:verify-pack`, weekly):
  * every manifest entry must resolve to an object whose SHA-256 matches the recorded checksum, and
- * no extra object may exist under the version prefix. This is what makes "unmodified" demonstrable
+ * no extra object may exist under the `game/` prefix. This is what makes "unmodified" demonstrable
  * rather than asserted, and it catches a bucket edited out from under the repo.
  */
 final class AssetPackVerifier
 {
     public function __construct(private readonly ManifestReader $reader) {}
 
-    public function verify(int $version): VerifyReport
+    public function verify(): VerifyReport
     {
-        $file = rtrim((string) config('assets.manifest_path'), '/')."/{$version}/manifest.json";
-        $manifest = $this->reader->read($file);
+        $manifest = $this->reader->read(rtrim((string) config('assets.pack_path'), '/').'/manifest.json');
         $assets = $manifest['assets'];
 
         $disk = $this->disk();
-        $prefix = trim((string) config('assets.prefix'), '/');
-        $base = "{$prefix}/{$version}";
+        $base = trim((string) config('assets.prefix'), '/');
 
         $missing = [];
         $modified = [];
@@ -52,7 +50,7 @@ final class AssetPackVerifier
             }
         }
 
-        return new VerifyReport($version, count($assets), $missing, $modified, $extra);
+        return new VerifyReport(count($assets), $missing, $modified, $extra);
     }
 
     private function disk(): Filesystem

@@ -190,7 +190,7 @@ config/
 ├── recruitment.php# activity levels, war preferences, expiry and bump windows
 ├── platform.php   # feature flags defaults, trust-ramp thresholds, reserved usernames
 ├── navigation.php # primary nav items (label, route, icon) rendered as top bar, sidebar and bottom tabs
-├── assets.php     # pack_version, manifest path, CDN base, enabled flag, placeholder + fallback rules
+├── assets.php     # pack path, directory→category map, CDN base, cache-bust length, enabled flag
 ```
 
 No magic numbers in application code. Every limit, weight and window named above is a config key,
@@ -230,7 +230,8 @@ php artisan stats:reconcile               # repairs all denormalised counters
 php artisan moderation:expire-sanctions
 php artisan notifications:prune
 php artisan search:reindex {type?}
-php artisan assets:publish-pack {path} --version=  # upload a curated game-asset pack to R2, byte-exact
+php artisan assets:build-manifest [--check]  # regenerate the game-asset manifest from the pack files
+php artisan assets:publish-pack {path?}  # upload the curated game-asset pack to R2, byte-exact
 php artisan assets:verify-pack           # bucket objects still match the manifest checksums
 php artisan platform:anonymize-deleted
 php artisan dev:seed-demo                 # non-production only

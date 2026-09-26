@@ -72,7 +72,7 @@ IDOR) green.
 | Conflicts & disputes | Conflict detection, dispute creation with evidence, holder response flow, admin resolution, ownership transfer with audit |
 | Sync | `sync_states`, tiered scheduler, `SyncCocAccountJob`, snapshot-on-change, manual refresh, stale-data UI |
 | Account UI | PlayerCard (all variants), account detail page, progression grids wired to `GameAssetResolver` (unit, TH, clan badge, league emblem — unmodified, with fallbacks), account images (≤5), TH badge ramp |
-| Asset pack v1 | Curated unit / Town Hall / league asset pack assembled and published to `game/1/` with its manifest; unknown-unit placeholder verified against a game update |
+| Asset pack v1 | Curated unit / Town Hall / league asset pack assembled and published to `game/` with its manifest; unknown-unit placeholder verified against a game update |
 | Profile v2 | Connected accounts, verified badge, featured card, stat blocks |
 | Admin | CoC account management, claims, disputes queue, forced transfer |
 

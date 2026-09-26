@@ -73,8 +73,7 @@ Update this as tasks complete. It is the fastest way to reorient after time away
 - [x] Conflicts, disputes, ownership transfer
 - [x] Tiered sync + snapshots
 - [x] PlayerCard, account detail, progression
-- [ ] Asset pack v1 (curated files pending)
-  - [x] Placeholder release: labelled fallbacks with an empty manifest
+- [x] Asset pack v1
 - [x] Profile v2
 
 ### Phase 3 — Bases + moderation (MVP ships here)
@@ -100,11 +99,10 @@ If a task appears to need a real account, that is a design smell — check the s
 | Mail provider | `mailpit` container | Before Phase 1 ships to staging |
 | Cloudflare Turnstile | Cloudflare's public always-pass test keys | Before public launch |
 | Sentry | Log channel | Any time |
-| Game asset pack | Placeholder + label from `GameAssetResolver` | Before Phase 2 asset pack v1 |
+| Game asset pack | Committed pack in `src/resources/game-assets/`, published to MinIO `game/` | — |
 
 ### Blocked on you (not the agent), in the order they bite
 
-- [ ] Curated game asset pack — Phase 2 "Asset pack v1"
 - [ ] CoC API key from developer.clashofclans.com, bound to the staging egress IP — before Phase 2 staging
 - [ ] R2 bucket + CDN domain — before Phase 3 public launch
 - [ ] Mail provider (Postmark/SES) with SPF, DKIM, DMARC — before public launch

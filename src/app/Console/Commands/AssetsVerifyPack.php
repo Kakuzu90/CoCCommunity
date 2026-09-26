@@ -9,16 +9,14 @@ use Illuminate\Console\Command;
 /** Weekly integrity audit (specs/10 §9): the bucket must still match the committed manifest. */
 class AssetsVerifyPack extends Command
 {
-    protected $signature = 'assets:verify-pack {--pack= : Pack version to audit (defaults to the active version)}';
+    protected $signature = 'assets:verify-pack';
 
     protected $description = 'Verify every game asset in the bucket matches its manifest checksum; alert on missing, extra or modified objects';
 
     public function handle(AssetPackVerifier $verifier): int
     {
-        $version = (int) ($this->option('pack') ?? config('assets.pack_version'));
-
         try {
-            $report = $verifier->verify($version);
+            $report = $verifier->verify();
         } catch (AssetPackException $e) {
             $this->error("Verify failed: {$e->getMessage()}");
 
@@ -26,13 +24,7 @@ class AssetsVerifyPack extends Command
         }
 
         if ($report->ok()) {
-            if ($report->checked === 0) {
-                $this->info("assets:verify-pack — game/{$version}/ is an empty placeholder pack (0 game assets published).");
-
-                return self::SUCCESS;
-            }
-
-            $this->info("assets:verify-pack — game/{$version}/ matches its manifest ({$report->checked} assets).");
+            $this->info("assets:verify-pack — game/ matches its manifest ({$report->checked} assets).");
 
             return self::SUCCESS;
         }

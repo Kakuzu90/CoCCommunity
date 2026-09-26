@@ -319,12 +319,19 @@
 <h2>Game assets, unmodified and labelled</h2>
 </div>
 <x-ui.card>
-<p class="ui-help">Every Clash of Clans asset is referenced through <code>&lt;x-game.asset&gt;</code> / <code>GameAssetResolver</code> — never a hardcoded path (specs/18 §2.3). Each carries an accessible name and, when the asset is unknown or the category kill switch is off, falls back to our own original placeholder. The curated pack itself lands in Phase 2, so the catalogue examples below render as placeholders today.</p>
+<p class="ui-help">Every Clash of Clans asset is referenced through <code>&lt;x-game.asset&gt;</code> / <code>GameAssetResolver</code> — never a hardcoded path (specs/18 §2.3). Each carries an accessible name and, when the asset is unknown or the category kill switch is off, falls back to our own original placeholder. The Town Hall, hero and league examples below render from the committed pack. Town Hall 99 is not in the pack, so it shows the placeholder.</p>
 <div class="gallery-row" style="align-items: flex-end; gap: var(--space-4)">
 <figure><x-game.asset type="townhall" :value="15" :size="72" /><figcaption class="ui-label">Town Hall 15</figcaption></figure>
 <figure><x-game.asset type="unit" value="barbarian-king" name="Barbarian King" :size="72" /><figcaption class="ui-label">Barbarian King</figcaption></figure>
 <figure><x-game.asset type="league" :value="29000022" name="Legend League" :size="72" /><figcaption class="ui-label">Legend League</figcaption></figure>
+<figure><x-game.asset type="townhall" :value="99" :size="72" /><figcaption class="ui-label">Placeholder (not in pack)</figcaption></figure>
 <figure><x-game.asset type="clan" :value="$sampleBadge" name="Sample Clan" :size="72" /><figcaption class="ui-label">Clan badge (pass-through)</figcaption></figure>
+</div>
+<div class="gallery-row" style="align-items: flex-start; gap: var(--space-5); margin-top: var(--space-4)">
+<div style="width: 76px"><x-player.unit :unit="['name' => 'Barbarian', 'slug' => 'barbarian', 'level' => 11, 'maxLevel' => 12, 'maxed' => false, 'unlocked' => true, 'equipment' => []]" /></div>
+<div style="width: 76px"><x-player.unit :unit="['name' => 'Barbarian King', 'slug' => 'barbarian-king', 'level' => 105, 'maxLevel' => 105, 'maxed' => true, 'unlocked' => true, 'equipment' => []]" opens="gallery-equipment" /></div>
+<div style="width: 76px"><x-player.unit :unit="['name' => 'Spiky Ball', 'slug' => 'spiky-ball', 'level' => 0, 'maxLevel' => 0, 'maxed' => false, 'unlocked' => false, 'equipment' => []]" /></div>
+<x-ui.modal name="gallery-equipment" title="Barbarian King equipment"><p class="ui-help">Progression tiles: level badge, maxed flame, locked, and a hero tile that opens its equipment.</p></x-ui.modal>
 </div>
 <div class="gallery-row" style="align-items: flex-end; gap: var(--space-3); margin-top: var(--space-4)">@foreach([32, 48, 64, 96] as $s)<x-game.asset type="townhall" :value="14" :size="$s" />
 @endforeach

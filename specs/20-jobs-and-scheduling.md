@@ -49,7 +49,7 @@ re-encode being re-reserved and run twice (§5). The three workers are separate 
 | `DeleteMediaObjectsJob` | Media purge, entity deletion | Deletes originals + variants from R2; idempotent |
 | `SweepOrphanMediaJob` | Hourly schedule | — |
 | `ReconcileStorageJob` | Weekly schedule | Two-pass: log, then delete on second detection. **Scans `public/`, `quarantine/`, `private/` only — the `game/` prefix is allowlisted out, because game assets have no `media` row by design** ([10 §9](10-media-storage.md)) |
-| `VerifyGameAssetPackJob` | Weekly schedule | Checks every manifest entry still exists in `game/{version}/` with a matching SHA-256; alerts on missing, extra or altered objects |
+| `VerifyGameAssetPackJob` | Weekly schedule | Checks every manifest entry still exists in `game/` with a matching SHA-256; alerts on missing, extra or altered objects |
 
 ### Bases (`default`)
 

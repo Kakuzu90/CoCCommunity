@@ -34,10 +34,9 @@ public/bases/{base_ulid}/{media_ulid}/video_720p.mp4
 public/bases/{base_ulid}/{media_ulid}/poster.webp
 private/evidence/{report_ulid}/{media_ulid}/original.{ext}   ← signed URLs only, staff access
 
-game/{pack_version}/units/{slug}.png          ← curated game assets, uploaded by staff, byte-exact
-game/{pack_version}/townhalls/{level}.png
-game/{pack_version}/leagues/{league_id}.png
-game/{pack_version}/manifest.json
+game/{units|heroes|spells|pets|machines|equipments|guardians}/{slug}.png  ← curated, staff-uploaded, byte-exact
+game/townhalls/{level}.png
+game/leagues/{family}.png                     ← one emblem per league family (e.g. wizard)
 ```
 
 The `public/` paths above are illustrative of eventual entity nesting. In practice the worker writes
@@ -314,17 +313,19 @@ does not permit ([18 §2](18-design-system.md)).
 
 | Asset | Source | Why |
 |---|---|---|
-| Troop / hero / spell / equipment icons | **Self-hosted** in `game/{version}/units/` | Finite, versioned set; not in the API |
-| Town Hall imagery | **Self-hosted** in `game/{version}/townhalls/` | Finite set, one per level |
-| League emblems | **Self-hosted** in `game/{version}/leagues/`, keyed by league id | Finite set; mirroring removes a third-party dependency on every page render |
+| Troop / hero / spell / pet / siege / equipment / guardian icons | **Self-hosted** in `game/{kind dir}/` | Finite set; not in the API |
+| Town Hall imagery | **Self-hosted** in `game/townhalls/` | Finite set, one per level |
+| League emblems | **Self-hosted** in `game/leagues/`, one per league family, matched from the API league name (`Wizard League 12` → `wizard`) | Finite set; mirroring removes a third-party dependency on every page render |
 | **Clan badges** | **Referenced** from the API's `badgeUrls` | One per clan, unbounded and mutable — thousands of clans, badges change when a clan edits them. Mirroring would be a sync problem with no upside |
 
 So `GameAssetResolver` has two paths: manifest lookup for the static catalogue, pass-through of the
 stored API URL for clan badges. Callers do not know or care which.
 
-Until curated originals are available, version 1 is an empty placeholder manifest. Unit, Town Hall
-and league lookups render the original labelled fallback in `<x-game.asset>`; there are no game
-assets to checksum. The first curated pack uses a new versioned prefix.
+The pack is committed at `resources/game-assets/` (`config('assets.pack_path')`). There is one
+live pack, not numbered versions: the troop/hero/spell/pet/siege/equipment/guardian catalogue (all
+resolved through `unit()` by `Str::slug()` of the API name), Town Halls 1–18 and the league
+families. Anything not in the manifest — a unit from the next game update — renders the labelled
+fallback in `<x-game.asset>`.
 
 ### 11.2 Upload procedure (a runbook, not a feature)
 
@@ -332,25 +333,29 @@ assets to checksum. The first curated pack uses a new versioned prefix.
    resizing, no format conversion, no optimisation pass, no sprite-sheeting. `pngcrush`,
    `imageoptim` and similar are explicitly out: lossless or not, they rewrite the file and
    forfeit the "unmodified" claim.
-2. A `manifest.json` is generated listing, per asset: key, slug, display name, category, village
-   (home/builder), source, SHA-256 and byte size.
-3. `php artisan assets:publish-pack {path} --pack={n}` uploads the whole tree to
-   `game/{n}/` with `Content-Type` set from the real file signature and
-   `Cache-Control: public, max-age=31536000, immutable`, verifies each uploaded object's checksum
-   against the manifest, and fails atomically — a partial pack is never activated. (The flag is
-   `--pack`, not `--version`: Symfony Console reserves `--version` at the application level.) Every
-   local file is checksummed against the manifest *before* any upload and every uploaded object is
-   re-read and checksummed *after*, so a mismatch aborts before anything is live.
+2. `php artisan assets:build-manifest` generates `manifest.json` listing, per asset: key, slug,
+   display name, category, kind, village (home/builder), source, SHA-256 and byte size. Checksums
+   are always recomputed; hand-curated slugs and names (API spellings such as `P.E.K.K.A`,
+   `Healing Spell`) are preserved across rebuilds. File names must be lowercase kebab-case —
+   rename a file, never re-encode it. `--check` fails if the committed manifest is stale (a test
+   runs it).
+3. `php artisan assets:publish-pack {path?}` uploads the whole tree to `game/` with
+   `Content-Type` set from the real file signature and
+   `Cache-Control: public, max-age=31536000, immutable`. Every local file is checksummed against
+   the manifest *before* any upload and every uploaded object is re-read and checksummed *after*,
+   so a mismatch aborts.
 4. The manifest is committed to the repository **and** stored alongside the pack. The repo copy is
    what the resolver reads at runtime (no per-request bucket listing); the bucket copy is what
    `assets:verify-pack` audits against.
-5. Activation is a config change (`config('assets.pack_version')`). The previous version stays in
-   the bucket, so a rollback is a one-line revert with no re-upload.
+5. There is no activation step: the committed manifest is live on deploy. Publish before deploying
+   a manifest change, so no URL points at an object that is not there yet.
 
 ### 11.3 Rules
 
-- **Immutable versioned prefixes.** A pack version is never edited in place. A new or corrected
-  asset means a new version. This is what makes `immutable` caching safe and rollback trivial.
+- **Checksum-busted URLs.** Resolved URLs carry `?v={first 12 hex of the SHA-256}`
+  (`config('assets.cache_bust_length')`), so replacing a file changes its URL. This is what makes
+  `immutable` caching safe without versioned prefixes. The CDN cache key must include the query
+  string (Cloudflare's default).
 - **No re-encode, ever.** Not on upload, not at the CDN. Cloudflare Image Resizing / Polish must be
   **off** for the `game/` prefix — they are transformations, and "we only compressed it" is not a
   defence. Assets are sized with CSS and `srcset` over separately-supplied source files, never by
@@ -376,7 +381,7 @@ assets to checksum. The first curated pack uses a new versioned prefix.
   from one original — avoid unless Supercell supplies them at those sizes.
 - Served from the same cookieless CDN origin as public media, with the same
   `X-Content-Type-Options: nosniff` and sandbox CSP headers.
-- Long-cached and versioned, so the asset pack contributes effectively nothing to bandwidth cost
+- Long-cached and checksum-busted, so the asset pack contributes effectively nothing to bandwidth cost
   after the first request per edge.
 - Every `<x-game.asset>` renders with explicit `width`/`height`, `loading="lazy"` below the fold,
   and an accessible name — a progression grid of 60 units must not cost layout shift or 60

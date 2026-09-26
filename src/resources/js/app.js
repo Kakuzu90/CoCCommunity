@@ -56,35 +56,36 @@ Alpine.data('uiSelect', () => ({
     destroy() { this.observer?.disconnect(); this.$refs.native.form?.removeEventListener('reset', this.resetHandler); },
 }));
 
+// Methods run from child elements (the close button), where $el is that child, so they use $root.
 Alpine.data('uiModal', () => ({
     previous: null, timer: null,
     show() {
-        if (this.$el.open) return;
+        if (this.$root.open) return;
         this.previous = document.activeElement;
-        this.$el.showModal();
-        this.$nextTick(() => (this.$el.querySelector('[autofocus]') || this.$el.querySelector('input, button'))?.focus());
+        this.$root.showModal();
+        this.$nextTick(() => (this.$root.querySelector('[autofocus]') || this.$root.querySelector('input, button'))?.focus());
     },
     close() {
-        if (!this.$el.open || this.timer) return;
-        this.$el.classList.add('is-closing');
-        const duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : parseFloat(getComputedStyle(this.$el).getPropertyValue('--dur-base'));
+        if (!this.$root.open || this.timer) return;
+        this.$root.classList.add('is-closing');
+        const duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : parseFloat(getComputedStyle(this.$root).getPropertyValue('--dur-base'));
         this.timer = setTimeout(() => {
-            this.$el.close();
-            this.$el.classList.remove('is-closing');
+            this.$root.close();
+            this.$root.classList.remove('is-closing');
             this.previous?.focus();
             this.timer = null;
         }, duration);
     },
     trap(event) {
-        const items = [...this.$el.querySelectorAll('button, input, select, textarea, a[href], [tabindex]')]
+        const items = [...this.$root.querySelectorAll('button, input, select, textarea, a[href], [tabindex]')]
             .filter(el => !el.disabled && el.tabIndex >= 0 && el.getClientRects().length);
-        if (!items.length) { event.preventDefault(); this.$el.focus(); return; }
+        if (!items.length) { event.preventDefault(); this.$root.focus(); return; }
         event.preventDefault();
         const index = items.indexOf(document.activeElement);
         items[(index + (event.shiftKey ? -1 : 1) + items.length) % items.length].focus();
     },
     backdrop(event) {
-        const box = this.$el.getBoundingClientRect();
+        const box = this.$root.getBoundingClientRect();
         if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) this.close();
     },
     destroy() { clearTimeout(this.timer); },

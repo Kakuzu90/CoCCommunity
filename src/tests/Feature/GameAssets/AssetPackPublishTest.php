@@ -8,8 +8,6 @@ use Tests\Support\MediaTesting;
 function packSource(array $files): string
 {
     $dir = sys_get_temp_dir().'/pack-'.uniqid();
-    @mkdir($dir.'/units', 0777, true);
-    @mkdir($dir.'/townhalls', 0777, true);
 
     $assets = [];
     foreach ($files as $key => $bytes) {
@@ -27,7 +25,7 @@ function packSource(array $files): string
             'bytes' => strlen($bytes),
         ];
     }
-    file_put_contents($dir.'/manifest.json', json_encode(['version' => 1, 'assets' => $assets]));
+    file_put_contents($dir.'/manifest.json', json_encode(['assets' => $assets]));
 
     return $dir;
 }
@@ -41,13 +39,22 @@ it('uploads the pack byte-for-byte and verifies each checksum', function () {
     $png = MediaTesting::pngBytes();
     $dir = packSource(['units/barbarian.png' => $png, 'townhalls/15.png' => MediaTesting::pngBytes(300, 300)]);
 
-    $report = app(AssetPackPublisher::class)->publish($dir, 1);
+    $report = app(AssetPackPublisher::class)->publish($dir);
 
     expect($report->count())->toBe(2);
-    Storage::disk('r2')->assertExists('game/1/units/barbarian.png');
-    Storage::disk('r2')->assertExists('game/1/townhalls/15.png');
+    Storage::disk('r2')->assertExists('game/units/barbarian.png');
+    Storage::disk('r2')->assertExists('game/townhalls/15.png');
     // Byte-exact: what we uploaded is what we stored — no re-encode.
-    expect(Storage::disk('r2')->get('game/1/units/barbarian.png'))->toBe($png);
+    expect(Storage::disk('r2')->get('game/units/barbarian.png'))->toBe($png);
+});
+
+it('publishes through the command from the configured pack path', function () {
+    config(['assets.pack_path' => packSource(['units/barbarian.png' => MediaTesting::pngBytes()])]);
+
+    $this->artisan('assets:publish-pack')
+        ->expectsOutput('Published 1 assets to game/.')
+        ->assertSuccessful();
+    Storage::disk('r2')->assertExists('game/units/barbarian.png');
 });
 
 it('aborts when a file does not match its manifest checksum (tamper defence)', function () {
@@ -55,7 +62,7 @@ it('aborts when a file does not match its manifest checksum (tamper defence)', f
     // Tamper with the file after the manifest was written.
     file_put_contents($dir.'/units/barbarian.png', MediaTesting::pngBytes(401, 301));
 
-    expect(fn () => app(AssetPackPublisher::class)->publish($dir, 1))
+    expect(fn () => app(AssetPackPublisher::class)->publish($dir))
         ->toThrow(AssetPackException::class);
 
     // Nothing was uploaded — the pre-flight check runs before any write.
@@ -65,8 +72,8 @@ it('aborts when a file does not match its manifest checksum (tamper defence)', f
 it('refuses an empty pack', function () {
     $dir = sys_get_temp_dir().'/pack-'.uniqid();
     @mkdir($dir, 0777, true);
-    file_put_contents($dir.'/manifest.json', json_encode(['version' => 1, 'assets' => []]));
+    file_put_contents($dir.'/manifest.json', json_encode(['assets' => []]));
 
-    expect(fn () => app(AssetPackPublisher::class)->publish($dir, 1))
+    expect(fn () => app(AssetPackPublisher::class)->publish($dir))
         ->toThrow(AssetPackException::class);
 });

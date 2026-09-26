@@ -51,7 +51,7 @@ it('renders a public card and account progression with snapshot changes', functi
     $this->get(route('profile.show', $owner->username))->assertOk()->assertSee('Night Chief');
     $this->get(route('accounts.show', $account->ulid))->assertOk()
         ->assertSee('Archer Queen')->assertSee('New Unknown Troop')
-        ->assertSee('Maxed')->assertSee('+100 since last update')
+        ->assertSee('Level 95, maxed')->assertSee('unit-tile--maxed', false)->assertSee('+100 since last update')
         ->assertDontSee('Refresh game data');
 });
 

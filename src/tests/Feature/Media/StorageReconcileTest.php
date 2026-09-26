@@ -18,13 +18,13 @@ it('reports orphaned public objects but never lists the game/ prefix', function 
     Storage::disk('r2')->put('public/avatar/01/full.webp', 'known');
     Storage::disk('r2')->put('public/avatar/99/orphan.webp', 'orphan');
     // A game asset has no media row by design — an unguarded reconcile would delete the whole pack.
-    Storage::disk('r2')->put('game/1/units/barbarian.png', 'game art');
+    Storage::disk('r2')->put('game/units/barbarian.png', 'game art');
 
     $report = app(StorageReconciler::class)->reconcile();
 
     expect($report->orphanObjects)->toContain('public/avatar/99/orphan.webp')
         ->and($report->orphanObjects)->not->toContain('public/avatar/01/full.webp')
-        ->and($report->orphanObjects)->not->toContain('game/1/units/barbarian.png')
+        ->and($report->orphanObjects)->not->toContain('game/units/barbarian.png')
         ->and($report->scannedPrefixes)->not->toContain('game');
 
     expect($media->path)->toBe('public/avatar/01/full.webp');

@@ -5,21 +5,21 @@ use Illuminate\Support\Facades\Storage;
 use Tests\Support\MediaTesting;
 
 /** Publish a committed manifest + matching bucket objects, then mutate the bucket to test the audit. */
-function seedVersion(int $version, array $files): void
+function seedPack(array $files): void
 {
     $dir = sys_get_temp_dir().'/verify-'.uniqid();
-    @mkdir($dir."/{$version}", 0777, true);
+    @mkdir($dir, 0777, true);
 
     $assets = [];
     foreach ($files as $key => $bytes) {
-        Storage::disk('r2')->put("game/{$version}/{$key}", $bytes);
+        Storage::disk('r2')->put("game/{$key}", $bytes);
         $assets[] = [
             'key' => $key, 'slug' => pathinfo($key, PATHINFO_FILENAME), 'name' => 'X',
             'category' => 'unit', 'sha256' => hash('sha256', $bytes), 'bytes' => strlen($bytes),
         ];
     }
-    file_put_contents($dir."/{$version}/manifest.json", json_encode(['version' => $version, 'assets' => $assets]));
-    config(['assets.manifest_path' => $dir, 'assets.pack_version' => $version]);
+    file_put_contents($dir.'/manifest.json', json_encode(['assets' => $assets]));
+    config(['assets.pack_path' => $dir]);
 }
 
 beforeEach(function () {
@@ -27,47 +27,36 @@ beforeEach(function () {
     config(['assets.disk' => 'r2', 'assets.prefix' => 'game']);
 });
 
-it('identifies the active placeholder pack without claiming game assets were published', function () {
-    config(['assets.manifest_path' => resource_path('game-assets'), 'assets.pack_version' => 1]);
+it('passes when every object matches the manifest', function () {
+    seedPack(['units/a.png' => MediaTesting::pngBytes()]);
 
+    $report = app(AssetPackVerifier::class)->verify();
+
+    expect($report->ok())->toBeTrue()->and($report->checked)->toBe(1);
     $this->artisan('assets:verify-pack')
-        ->expectsOutput('assets:verify-pack — game/1/ is an empty placeholder pack (0 game assets published).')
+        ->expectsOutput('assets:verify-pack — game/ matches its manifest (1 assets).')
         ->assertSuccessful();
 });
 
-it('still flags stray objects in the placeholder pack prefix', function () {
-    config(['assets.manifest_path' => resource_path('game-assets'), 'assets.pack_version' => 1]);
-    Storage::disk('r2')->put('game/1/units/stray.png', 'stray');
-
-    $this->artisan('assets:verify-pack')
-        ->expectsOutput('extra: game/1/units/stray.png')
-        ->assertFailed();
-});
-
-it('passes when every object matches the manifest', function () {
-    seedVersion(1, ['units/a.png' => MediaTesting::pngBytes()]);
-
-    $report = app(AssetPackVerifier::class)->verify(1);
-
-    expect($report->ok())->toBeTrue()->and($report->checked)->toBe(1);
-});
-
 it('flags a modified object', function () {
-    seedVersion(1, ['units/a.png' => MediaTesting::pngBytes()]);
-    Storage::disk('r2')->put('game/1/units/a.png', MediaTesting::pngBytes(401, 301));
+    seedPack(['units/a.png' => MediaTesting::pngBytes()]);
+    Storage::disk('r2')->put('game/units/a.png', MediaTesting::pngBytes(401, 301));
 
-    $report = app(AssetPackVerifier::class)->verify(1);
+    $report = app(AssetPackVerifier::class)->verify();
 
-    expect($report->ok())->toBeFalse()->and($report->modified)->toBe(['game/1/units/a.png']);
+    expect($report->ok())->toBeFalse()->and($report->modified)->toBe(['game/units/a.png']);
 });
 
 it('flags a missing object and an extra object', function () {
-    seedVersion(1, ['units/a.png' => MediaTesting::pngBytes()]);
-    Storage::disk('r2')->delete('game/1/units/a.png');
-    Storage::disk('r2')->put('game/1/units/stowaway.png', 'not in the manifest');
+    seedPack(['units/a.png' => MediaTesting::pngBytes()]);
+    Storage::disk('r2')->delete('game/units/a.png');
+    Storage::disk('r2')->put('game/units/stowaway.png', 'not in the manifest');
 
-    $report = app(AssetPackVerifier::class)->verify(1);
+    $report = app(AssetPackVerifier::class)->verify();
 
-    expect($report->missing)->toBe(['game/1/units/a.png'])
-        ->and($report->extra)->toBe(['game/1/units/stowaway.png']);
+    expect($report->missing)->toBe(['game/units/a.png'])
+        ->and($report->extra)->toBe(['game/units/stowaway.png']);
+    $this->artisan('assets:verify-pack')
+        ->expectsOutput('extra: game/units/stowaway.png')
+        ->assertFailed();
 });

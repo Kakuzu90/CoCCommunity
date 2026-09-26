@@ -8,10 +8,4 @@ enum GameAssetCategory: string
     case Unit = 'unit';
     case TownHall = 'townhall';
     case League = 'league';
-
-    /** Sub-directory under game/{version}/ for this category (specs/10 §11). */
-    public function directory(): string
-    {
-        return (string) config("assets.categories.{$this->value}", $this->value);
-    }
 }

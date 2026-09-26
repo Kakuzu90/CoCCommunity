@@ -15,23 +15,6 @@
         <x-ui.alert tone="info">This account is {{ strtolower($account->status->label()) }}. Verification is required before it appears publicly.</x-ui.alert>
     @endif
 
-    <section class="account-detail__section" aria-labelledby="account-stats-heading">
-        <h2 id="account-stats-heading">Player stats</h2>
-        <dl class="account-detail__stats">
-            @foreach(['trophies' => 'Trophies', 'best_trophies' => 'Best trophies', 'war_stars' => 'War stars', 'xp_level' => 'XP level', 'attack_wins' => 'Attack wins', 'defense_wins' => 'Defense wins', 'donations' => 'Donations'] as $key => $label)
-                <div class="account-detail__stat">
-                    <dt>{{ $label }}</dt>
-                    <dd>{{ number_format($account->stats[$key]['value']) }}</dd>
-                    @if($account->stats[$key]['delta'] !== null)
-                        <span class="account-detail__delta" aria-label="Change since previous snapshot: {{ $account->stats[$key]['delta'] > 0 ? '+' : '' }}{{ $account->stats[$key]['delta'] }}">
-                            {{ $account->stats[$key]['delta'] > 0 ? '+' : '' }}{{ number_format($account->stats[$key]['delta']) }} since last update
-                        </span>
-                    @endif
-                </div>
-            @endforeach
-        </dl>
-    </section>
-
     <section class="account-detail__section" aria-labelledby="account-progression-heading">
         <h2 id="account-progression-heading">Progression</h2>
         <div wire:loading wire:target="refresh" class="account-detail__loading" role="status" aria-live="polite">
@@ -41,24 +24,22 @@
                 <x-ui.skeleton variant="card" label="Refreshing progression" />
             </div>
         </div>
-        <div class="account-detail__groups" wire:loading.remove wire:target="refresh">
-            @foreach($account->progression as $group => $units)
-                <section aria-labelledby="progression-{{ \Illuminate\Support\Str::slug($group) }}">
-                    <h3 id="progression-{{ \Illuminate\Support\Str::slug($group) }}">{{ $group }}</h3>
-                    @if($units)
+        <div wire:loading.remove wire:target="refresh">
+            <x-ui.tabs id="village" label="Village" :tabs="\App\Domain\PlayerAccounts\Services\AccountProgressionView::VILLAGES">
+                <x-slot:home>@include('livewire.accounts.partials.village-progression', ['village' => 'home', 'groups' => $account->progression['home'] ?? []])</x-slot:home>
+                <x-slot:builder>@include('livewire.accounts.partials.village-progression', ['village' => 'builder', 'groups' => $account->progression['builder'] ?? []])</x-slot:builder>
+            </x-ui.tabs>
+
+            @foreach(array_merge(...array_values(array_map(fn ($groups) => $groups['Heroes'] ?? [], $account->progression))) as $hero)
+                @if($hero['equipment'])
+                    <x-ui.modal :name="'equipment-'.$hero['slug']" :title="$hero['name'].' equipment'">
                         <ul class="account-detail__units">
-                            @foreach($units as $unit)
-                                <li>
-                                    <x-game.asset type="unit" :value="$unit['slug']" :name="$unit['name']" :size="32" />
-                                    <span class="account-detail__unit-name">{{ $unit['name'] }}</span>
-                                    <span class="account-detail__level">Level {{ $unit['level'] }} @if($unit['maxLevel'] > 0 && $unit['level'] >= $unit['maxLevel']) · Maxed @endif</span>
-                                </li>
+                            @foreach($hero['equipment'] as $item)
+                                <li><x-player.unit :unit="$item" /></li>
                             @endforeach
                         </ul>
-                    @else
-                        <p class="ui-help">No {{ strtolower($group) }} data shared by the game yet.</p>
-                    @endif
-                </section>
+                    </x-ui.modal>
+                @endif
             @endforeach
         </div>
     </section>

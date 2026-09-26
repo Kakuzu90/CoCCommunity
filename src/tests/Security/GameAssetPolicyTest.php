@@ -17,8 +17,7 @@ use Tests\Support\MediaTesting;
 it('serves no game asset when fan-content permission is revoked (kill switch)', function () {
     config([
         'assets.enabled' => false,
-        'assets.manifest_path' => sys_get_temp_dir(),
-        'assets.pack_version' => 999, // manifest deliberately absent — the switch must short-circuit first
+        'assets.pack_path' => sys_get_temp_dir().'/no-pack-'.uniqid(), // manifest deliberately absent — the switch must short-circuit first
     ]);
     $resolver = new ManifestGameAssetResolver(new ManifestReader);
 
@@ -51,7 +50,7 @@ it('refuses to publish a modified (non-byte-exact) asset', function () {
     @mkdir($dir.'/units', 0777, true);
     $bytes = MediaTesting::pngBytes();
     file_put_contents($dir.'/units/barbarian.png', $bytes);
-    file_put_contents($dir.'/manifest.json', json_encode(['version' => 1, 'assets' => [[
+    file_put_contents($dir.'/manifest.json', json_encode(['assets' => [[
         'key' => 'units/barbarian.png', 'slug' => 'barbarian', 'name' => 'Barbarian',
         'category' => 'unit', 'sha256' => hash('sha256', $bytes), 'bytes' => strlen($bytes),
     ]]]));
@@ -59,7 +58,7 @@ it('refuses to publish a modified (non-byte-exact) asset', function () {
     // Simulate an optimiser rewriting the file after the manifest was cut.
     file_put_contents($dir.'/units/barbarian.png', MediaTesting::pngBytes(401, 301));
 
-    expect(fn () => app(AssetPackPublisher::class)->publish($dir, 1))
+    expect(fn () => app(AssetPackPublisher::class)->publish($dir))
         ->toThrow(AssetPackException::class);
     expect(Storage::disk('r2')->allFiles('game'))->toBe([]);
 });

@@ -70,7 +70,7 @@ the convention is the influence and the execution is ours ([18 §3](18-design-sy
   swapping to originals, or changing the delivery origin is then one class.
 - **Two sources, invisible to callers.**
   - *Curated catalogue* (troop, hero, spell and equipment icons, Town Hall imagery, league emblems):
-    a finite, versioned set that staff download and upload to R2 under `game/{version}/`,
+    a finite set that staff download and upload to R2 under `game/`,
     **byte-for-byte**, served from our CDN. Procedure and rules in
     [10 §11](10-media-storage.md).
   - *Clan badges*: referenced from the API's own `badgeUrls` and stored as URLs
@@ -81,8 +81,8 @@ the convention is the influence and the execution is ours ([18 §3](18-design-sy
   is the wrong tool by definition.
 - **Never transformed in delivery either.** CDN image resizing/optimisation is off for the `game/`
   prefix. Assets are sized with CSS, not by transforming the file.
-- **Versioned and immutable.** `game/{version}/` is never edited in place; a corrected asset means
-  a new pack version, activated by one config value and revertible the same way.
+- **Immutable URLs.** Each URL carries a checksum of its file, so a corrected asset gets a new URL
+  and a cached copy is never stale ([10 §11.3](10-media-storage.md)).
 - **Provenance.** A committed `manifest.json` records slug, display name, category, source, byte
   size and SHA-256 per asset, and a weekly job verifies the bucket still matches it — so
   "unmodified" is demonstrable, not asserted.

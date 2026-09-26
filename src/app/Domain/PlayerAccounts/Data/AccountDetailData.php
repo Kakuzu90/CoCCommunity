@@ -7,7 +7,7 @@ use App\Domain\PlayerAccounts\Enums\CocAccountStatus;
 final readonly class AccountDetailData
 {
     /**
-     * @param  array<string, array<int, array{name: string, level: int, maxLevel: int, slug: string}>>  $progression
+     * @param  array<string, array<string, list<array<string, mixed>>>>  $progression  village → group → units (AccountProgressionView)
      * @param  array<string, array{value: int, delta: ?int}>  $stats
      */
     public function __construct(
@@ -30,5 +30,20 @@ final readonly class AccountDetailData
         public array $stats,
         public array $progression,
         public bool $clanShared = true,
+        public ?string $clanName = null,
+        public ?string $clanBadgeUrl = null,
+        public ?int $clanLevel = null,
     ) {}
+
+    /** API role → in-game label. The API calls Elders `admin`. */
+    public function clanRoleLabel(): ?string
+    {
+        return match ($this->clanRole) {
+            null, '' => null,
+            'admin', 'elder' => 'Elder',
+            'coLeader' => 'Co-leader',
+            'leader' => 'Leader',
+            default => 'Member',
+        };
+    }
 }
